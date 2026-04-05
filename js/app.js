@@ -7,6 +7,7 @@ const chess = new Chess();
 const engine = new Engine();
 let board = null;
 let orientation = COLOR.white;
+let playerColor = COLOR.white;   // which side the human plays
 let pendingBestMove = null;
 
 // --- DOM refs ---
@@ -38,7 +39,7 @@ function initBoard() {
     }
   });
 
-  board.enableMoveInput(handleMoveInput, COLOR.white);
+  board.enableMoveInput(handleMoveInput, playerColor);
 }
 
 function handleMoveInput(event) {
@@ -81,10 +82,33 @@ async function triggerEval() {
     pendingBestMove = bestMove;
     updateEvalBar(score);
     engineStatus.textContent = formatScore(score);
+
+    // Play engine counter-move if it's the engine's turn
+    const engineTurnChar = playerColor === COLOR.white ? 'b' : 'w';
+    if (chess.turn() === engineTurnChar && bestMove && !chess.isGameOver()) {
+      await playEngineMove(bestMove);
+    }
   } catch {
     engineStatus.textContent = 'Engine error';
   } finally {
     btnStop.disabled = true;
+  }
+}
+
+async function playEngineMove(move) {
+  // Brief pause so the human can see their own move before engine responds
+  await new Promise(r => setTimeout(r, 400));
+
+  const from = move.slice(0, 2);
+  const to = move.slice(2, 4);
+  const promotion = move.length > 4 ? move[4] : 'q';
+
+  const result = chess.move({ from, to, promotion });
+  if (result) {
+    board.setPosition(chess.fen(), true);
+    renderMoveList();
+    // Evaluate the position after engine's move (won't loop — now human's turn)
+    triggerEval();
   }
 }
 
@@ -138,7 +162,15 @@ function renderMoveList() {
 // --- Controls ---
 document.getElementById('btn-flip').addEventListener('click', () => {
   orientation = orientation === COLOR.white ? COLOR.black : COLOR.white;
+  playerColor = playerColor === COLOR.white ? COLOR.black : COLOR.white;
   board.setOrientation(orientation, true);
+  board.disableMoveInput();
+  board.enableMoveInput(handleMoveInput, playerColor);
+  // If it's now the engine's turn after switching sides, let it move
+  const engineTurnChar = playerColor === COLOR.white ? 'b' : 'w';
+  if (chess.turn() === engineTurnChar) {
+    triggerEval();
+  }
 });
 
 document.getElementById('btn-reset').addEventListener('click', () => {
@@ -147,6 +179,8 @@ document.getElementById('btn-reset').addEventListener('click', () => {
   pendingBestMove = null;
   bestMoveDisplay.textContent = '';
   board.setPosition(chess.fen(), true);
+  board.disableMoveInput();
+  board.enableMoveInput(handleMoveInput, playerColor);
   renderMoveList();
   triggerEval();
 });
