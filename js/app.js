@@ -14,10 +14,17 @@ const evalFill        = document.getElementById('eval-fill');
 const evalLabel       = document.getElementById('eval-label');
 const engineStatus    = document.getElementById('engine-status');
 const bestMoveDisplay = document.getElementById('best-move-display');
+const debugLog        = document.getElementById('debug-log');
 const moveList        = document.getElementById('move-list');
 const fenInput        = document.getElementById('fen-input');
 const btnHint         = document.getElementById('btn-hint');
 const btnStop         = document.getElementById('btn-stop');
+
+// Show errors on-screen (no dev tools needed)
+function dbg(msg) {
+  console.log(msg);
+  debugLog.textContent = msg;
+}
 
 // --- Board ---
 function initBoard() {
@@ -189,17 +196,26 @@ document.getElementById('btn-copy-fen').addEventListener('click', () => {
 
 // --- Boot ---
 async function main() {
-  initBoard();
+  dbg('Initializing board...');
+  try {
+    initBoard();
+    dbg('Board OK');
+  } catch (err) {
+    dbg(`Board error: ${err.message}`);
+    return;
+  }
   renderMoveList();
 
   engineStatus.textContent = 'Loading engine...';
+  dbg('Fetching Stockfish...');
   try {
     await engine.init();
     engineStatus.textContent = 'Ready';
+    dbg('Engine ready');
     triggerEval();
   } catch (err) {
     engineStatus.textContent = 'Engine unavailable';
-    console.error('Engine init failed:', err);
+    dbg(`Engine error: ${err.message}`);
   }
 }
 

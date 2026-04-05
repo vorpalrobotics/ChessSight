@@ -112,6 +112,14 @@ main {
   margin-bottom: 0.4rem;
 }
 
+#debug-log {
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  word-break: break-all;
+}
+
 #best-move-display {
   font-size: 1.1rem;
   font-weight: bold;

@@ -2,7 +2,9 @@
 // Fetched via CDN and run in a blob Worker to avoid cross-origin restrictions.
 const STOCKFISH_URLS = [
   'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js',
-  'https://cdn.jsdelivr.net/npm/stockfish@10.0.2/stockfish.js',
+  'https://cdn.jsdelivr.net/npm/stockfish@10/stockfish.js',
+  'https://cdn.jsdelivr.net/npm/stockfish@9/stockfish.js',
+  'https://cdn.jsdelivr.net/npm/stockfish/stockfish.js',
 ];
 
 export class Engine {
