@@ -33,6 +33,11 @@
         <span class="mode-name">Loose Pieces</span>
         <span class="mode-desc">Count undefended pieces for each side</span>
       </button>
+      <button class="mode-card" id="mode-under">
+        <span class="mode-icon">⚠</span>
+        <span class="mode-name">Underguarded</span>
+        <span class="mode-desc">Count pieces with more attackers than defenders</span>
+      </button>
     </div>
   </div>
 
@@ -138,7 +143,41 @@
     <button id="btn-loose-next">NEXT ›</button>
   </div>
 
-  <!-- ── Screen 5: Drill summary ── -->
+  <!-- ── Screen 5: Underguarded drill ── -->
+  <div id="screen-under" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Underguarded</h2>
+        <span id="under-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="under-timer">0:00</span>
+        <span id="under-misses">Misses: 0</span>
+        <button id="btn-under-done">DONE</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="under-board"></div>
+    </div>
+
+    <div class="drill-answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">W</span>
+        <div class="digit-buttons" id="under-digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B</span>
+        <div class="digit-buttons" id="under-digits-black"></div>
+      </div>
+    </div>
+
+    <div id="under-status"></div>
+    <div id="under-result" class="hidden"></div>
+    <button id="btn-under-next">NEXT ›</button>
+  </div>
+
+  <!-- ── Screen 6: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>

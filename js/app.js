@@ -5,9 +5,10 @@ import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
 import { initLoose, startLoose } from './loose.js';
+import { initUnder, startUnder } from './under.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -29,6 +30,11 @@ document.getElementById('mode-captures').addEventListener('click', async () => {
 document.getElementById('mode-loose').addEventListener('click', async () => {
   showScreen('screen-loose');
   await startLoose();
+});
+
+document.getElementById('mode-under').addEventListener('click', async () => {
+  showScreen('screen-under');
+  await startUnder();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -393,3 +399,4 @@ export async function startEngineMode() {
 initChecks(showScreen);
 initCaptures(showScreen);
 initLoose(showScreen);
+initUnder(showScreen);
