@@ -112,8 +112,8 @@ header h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.25rem 1rem 2rem;
-  gap: 1rem;
+  padding: 1rem 1rem 1.5rem;
+  gap: 0.75rem;
 }
 
 #checks-top {
@@ -122,43 +122,62 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+#checks-top-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 #checks-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--accent);
-  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-#checks-controls {
+#checks-puzzle-num {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+#checks-top-right {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 #checks-timer {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-family: monospace;
-  min-width: 3.2em;
+  min-width: 3em;
   color: var(--text);
 }
 
 #checks-misses {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 #btn-checks-done {
-  background: var(--accent);
-  color: #fff;
+  background: var(--surface2);
+  color: var(--text-muted);
   font-weight: 700;
-  padding: 0.4rem 1.1rem;
-  letter-spacing: 0.05em;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--surface2);
 }
 #btn-checks-done:hover:not(:disabled) {
-  background: #c8304a;
+  background: #7a1a2e;
+  color: #fff;
+  border-color: var(--accent);
 }
 
 #checks-board-wrap {
@@ -175,7 +194,7 @@ header h1 {
 #answer-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.45rem;
   width: 100%;
   max-width: calc(var(--board-size) + 4px);
 }
@@ -183,38 +202,40 @@ header h1 {
 .answer-row {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.5rem;
 }
 
 .answer-label {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
-  min-width: 46px;
+  min-width: 16px;
 }
 
 .digit-buttons {
   display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
+  gap: 3px;
+  flex-wrap: nowrap;
 }
 
 .digit-btn {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--surface2);
   color: var(--text);
   border: 2px solid transparent;
   transition: background 0.1s, border-color 0.12s;
 }
-.digit-btn:hover:not(.correct):not(.incorrect) {
-  background: var(--accent);
-  border-color: var(--accent);
+/* Hover/active: lighter blue — NOT red — so correct answers don't flash red */
+.digit-btn:hover:not(.correct):not(.incorrect),
+.digit-btn:active:not(.correct):not(.incorrect) {
+  background: #1a5ca8;
+  border-color: #3a80d0;
 }
 .digit-btn.correct {
   background: #1b6e42;
@@ -230,18 +251,104 @@ header h1 {
 }
 
 #checks-status {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
-  min-height: 1.1em;
+  min-height: 1em;
 }
 
 #checks-result {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #27ae60;
   text-align: center;
-  padding: 0.4rem 0;
+}
+
+#btn-checks-next {
+  margin-top: 0.25rem;
+  padding: 0.5rem 2.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--surface2);
+  color: var(--text);
+  border: 2px solid var(--surface2);
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+#btn-checks-next:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── Summary screen ── */
+#screen-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+}
+
+#summary-box {
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: 14px;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 300px;
+}
+
+#summary-box h2 {
+  font-size: 1.3rem;
+  color: var(--accent);
+  text-align: center;
+}
+
+#summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  font-size: 0.95rem;
+}
+
+.summary-label {
+  color: var(--text-muted);
+}
+
+.summary-value {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+#summary-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+#btn-summary-again {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.5rem 1.25rem;
+}
+#btn-summary-again:hover:not(:disabled) {
+  background: #c8304a;
+}
+#btn-summary-menu {
+  background: var(--surface2);
+  padding: 0.5rem 1.25rem;
 }
 
 main {

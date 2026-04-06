@@ -3,7 +3,6 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
-// Fallback positions if Lichess API is unavailable
 const FALLBACK_FENS = [
   'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
   'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 5 6',
@@ -24,16 +23,23 @@ let answerB = 0;
 let correctW = false;
 let correctB = false;
 let puzzleActive = false;
-const drillResults = [];  // { seconds, misses } per completed puzzle
+let puzzleCount = 0;
+const drillResults = [];   // { seconds, misses } per completed puzzle
+let navigate = null;       // injected by app.js for screen transitions
 
 // --- Public API ---
 
-export function initChecks() {
+export function initChecks(navigateFn) {
+  navigate = navigateFn;
   createDigitButtons();
-  document.getElementById('btn-checks-done').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-checks-done').addEventListener('click', showSummary);
+  document.getElementById('btn-checks-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-summary-again').addEventListener('click', restartDrill);
+  document.getElementById('btn-summary-menu').addEventListener('click', () => navigate('screen-select'));
 }
 
 export async function startChecks() {
+  resetDrill();
   await loadNextPuzzle();
 }
 
@@ -42,6 +48,8 @@ export async function startChecks() {
 async function loadNextPuzzle() {
   stopTimer();
   resetUI();
+  puzzleCount++;
+  document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
   setStatus('Loading puzzle…');
 
   let fen;
@@ -52,7 +60,6 @@ async function loadNextPuzzle() {
     fen = FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
   }
 
-  // Initialise board on first call (screen must be visible by now)
   if (!board) {
     board = new Chessboard(document.getElementById('checks-board'), {
       position: fen,
@@ -81,11 +88,9 @@ async function fetchLichessPuzzle() {
 }
 
 function parsePuzzleFen(data) {
-  // Replay the game PGN to the puzzle's starting ply to get the position FEN.
   const gameChess = new Chess();
   gameChess.loadPgn(data.game.pgn);
   const moves = gameChess.history();
-
   const puzzleChess = new Chess();
   const ply = Math.min(data.puzzle.initialPly, moves.length);
   for (let i = 0; i < ply; i++) puzzleChess.move(moves[i]);
@@ -95,23 +100,15 @@ function parsePuzzleFen(data) {
 // --- Check counting ---
 
 function countChecksForColor(fen, colorChar) {
-  // Temporarily set the side-to-move to colorChar so we can enumerate
-  // that colour's legal moves and count how many deliver check.
   const parts = fen.split(' ');
   parts[1] = colorChar;
-  parts[3] = '-';          // clear en-passant (may be invalid with swapped turn)
+  parts[3] = '-';
   const modFen = parts.join(' ');
-
   const tmp = new Chess();
   try { tmp.load(modFen); } catch { return 0; }
-
   let count = 0;
   for (const m of tmp.moves({ verbose: true })) {
-    try {
-      tmp.move(m);
-      if (tmp.inCheck()) count++;
-      tmp.undo();
-    } catch { /* skip */ }
+    try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
   }
   return count;
 }
@@ -146,9 +143,32 @@ function puzzleComplete() {
   stopTimer();
   drillResults.push({ seconds, misses });
   const el = document.getElementById('checks-result');
-  el.textContent =
-    `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
+  el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
+}
+
+// --- Summary ---
+
+function showSummary() {
+  stopTimer();
+  const count = drillResults.length;
+  document.getElementById('stat-count').textContent = count;
+  if (count > 0) {
+    const avgTime = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
+    const avgMisses = drillResults.reduce((s, r) => s + r.misses, 0) / count;
+    document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
+    document.getElementById('stat-avg-misses').textContent = avgMisses.toFixed(1);
+  } else {
+    document.getElementById('stat-avg-time').textContent = '—';
+    document.getElementById('stat-avg-misses').textContent = '—';
+  }
+  navigate('screen-summary');
+}
+
+async function restartDrill() {
+  navigate('screen-checks');
+  resetDrill();
+  await loadNextPuzzle();
 }
 
 // --- UI helpers ---
@@ -166,6 +186,11 @@ function createDigitButtons() {
       container.appendChild(btn);
     }
   });
+}
+
+function resetDrill() {
+  puzzleCount = 0;
+  drillResults.length = 0;
 }
 
 function resetUI() {

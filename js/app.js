@@ -5,7 +5,7 @@ import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -374,4 +374,4 @@ export async function startEngineMode() {
 }
 
 // --- Boot ---
-initChecks();
+initChecks(showScreen);

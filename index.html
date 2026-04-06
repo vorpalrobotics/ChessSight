@@ -29,8 +29,11 @@
   <!-- ── Screen 2: Checks drill ── -->
   <div id="screen-checks" class="screen hidden">
     <div id="checks-top">
-      <h2 id="checks-title">Count Checks</h2>
-      <div id="checks-controls">
+      <div id="checks-top-left">
+        <h2 id="checks-title">Count Checks</h2>
+        <span id="checks-puzzle-num">#1</span>
+      </div>
+      <div id="checks-top-right">
         <span id="checks-timer">0:00</span>
         <span id="checks-misses">Misses: 0</span>
         <button id="btn-checks-done">DONE</button>
@@ -43,17 +46,43 @@
 
     <div id="answer-panel">
       <div class="answer-row">
-        <span class="answer-label">WHITE</span>
+        <span class="answer-label">W</span>
         <div class="digit-buttons" id="digits-white"></div>
       </div>
       <div class="answer-row">
-        <span class="answer-label">BLACK</span>
+        <span class="answer-label">B</span>
         <div class="digit-buttons" id="digits-black"></div>
       </div>
     </div>
 
     <div id="checks-status"></div>
     <div id="checks-result" class="hidden"></div>
+    <button id="btn-checks-next">NEXT ›</button>
+  </div>
+
+  <!-- ── Screen 3: Drill summary ── -->
+  <div id="screen-summary" class="screen hidden">
+    <div id="summary-box">
+      <h2>Drill Summary</h2>
+      <div id="summary-stats">
+        <div class="summary-row">
+          <span class="summary-label">Positions completed</span>
+          <span class="summary-value" id="stat-count">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Average time</span>
+          <span class="summary-value" id="stat-avg-time">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Average misses</span>
+          <span class="summary-value" id="stat-avg-misses">—</span>
+        </div>
+      </div>
+      <div id="summary-actions">
+        <button id="btn-summary-again">Play Again</button>
+        <button id="btn-summary-menu">← Menu</button>
+      </div>
+    </div>
   </div>
 
   <!-- ── Screen 3: Engine analysis (existing) ── -->
