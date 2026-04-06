@@ -241,13 +241,15 @@ header h1 {
   background: #1b6e42;
   border-color: #27ae60;
   color: #fff;
-  cursor: default;
+  pointer-events: none;  /* prevents hover re-triggering the red base rule */
+  transition: none;       /* snap to green instantly — no animated path through red */
 }
 .digit-btn.incorrect {
   background: #6e1b1b;
   border-color: #c0392b;
   color: #fff;
-  cursor: default;
+  pointer-events: none;
+  transition: none;
 }
 
 #checks-status {

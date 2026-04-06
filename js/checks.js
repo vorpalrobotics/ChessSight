@@ -129,7 +129,7 @@ function countChecksForColor(fen, colorChar) {
   for (const m of tmp.moves({ verbose: true })) {
     try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
   }
-  return count;
+  return Math.min(count, 9); // 9 means "9 or more" — matches the "9+" button
 }
 
 // --- Digit button interaction ---
@@ -200,7 +200,7 @@ function createDigitButtons() {
       btn.className = 'digit-btn';
       btn.dataset.color = color;
       btn.dataset.value = i;
-      btn.textContent = i;
+      btn.textContent = i === 9 ? '9+' : i;
       btn.addEventListener('click', () => handleDigitClick(color, i));
       container.appendChild(btn);
     }
