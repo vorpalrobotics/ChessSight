@@ -26,6 +26,7 @@ let playerColor = COLOR.white;   // which side the human plays
 let pendingBestMove = null;
 let currentLevel = LEVELS[3];   // default: Hard
 let moveIsDrag = false;
+let selectedSquare = null;      // tracks the square clicked in click-to-move mode
 
 // --- DOM refs ---
 const evalFill        = document.getElementById('eval-fill');
@@ -87,13 +88,25 @@ function clearMoveMarkers() {
 function handleMoveInput(event) {
   if (event.type === INPUT_EVENT_TYPE.moveInputStarted) {
     const piece = chess.get(event.square);
-    if (!piece || piece.color !== chess.turn()) return false;
+    if (!piece || piece.color !== chess.turn()) {
+      clearMoveMarkers();
+      selectedSquare = null;
+      return false;
+    }
+    // Clicking the already-selected square cancels the move
+    if (event.square === selectedSquare) {
+      clearMoveMarkers();
+      selectedSquare = null;
+      return false;
+    }
     clearMoveMarkers();
+    selectedSquare = event.square;
     board.addMarker(MARKER_SELECTED, event.square);
     return true;
   }
 
   if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
+    selectedSquare = null;
     const move = chess.move({
       from: event.squareFrom,
       to: event.squareTo,
@@ -116,12 +129,15 @@ function handleMoveInput(event) {
       triggerEval();
       return true;
     }
+    // Invalid move — animate piece back to its source square
     clearMoveMarkers();
+    board.setPosition(chess.fen(), true);
     return false;
   }
 
   if (event.type === INPUT_EVENT_TYPE.moveInputCanceled) {
     clearMoveMarkers();
+    selectedSquare = null;
   }
 
   return true;
