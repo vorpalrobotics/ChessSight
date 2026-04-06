@@ -1,0 +1,202 @@
+import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
+import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
+
+const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
+
+// Fallback positions if Lichess API is unavailable
+const FALLBACK_FENS = [
+  'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
+  'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 5 6',
+  'rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 b - - 0 8',
+  'r2qkb1r/ppp2ppp/2np1n2/4p1B1/2B1P3/2NP1N2/PPP2PPP/R2QK2R b KQkq - 1 8',
+  'r1bqr1k1/ppp2pbp/2np1np1/3Pp3/2P5/2N1BNP1/PP2PPBP/R2Q1RK1 w - - 2 10',
+  'r2q1rk1/ppp1bppp/2n1bn2/3pp3/2PP4/2N1PN2/PPQ1BPPP/R1B2RK1 w - - 4 10',
+  'r1b2rk1/ppq1bppp/2n1pn2/3pN3/2PP4/2N1B3/PPQ1BPPP/R4RK1 w - - 0 12',
+];
+
+// --- Module state ---
+let board = null;
+let timerInterval = null;
+let seconds = 0;
+let misses = 0;
+let answerW = 0;
+let answerB = 0;
+let correctW = false;
+let correctB = false;
+let puzzleActive = false;
+const drillResults = [];  // { seconds, misses } per completed puzzle
+
+// --- Public API ---
+
+export function initChecks() {
+  createDigitButtons();
+  document.getElementById('btn-checks-done').addEventListener('click', loadNextPuzzle);
+}
+
+export async function startChecks() {
+  await loadNextPuzzle();
+}
+
+// --- Puzzle loading ---
+
+async function loadNextPuzzle() {
+  stopTimer();
+  resetUI();
+  setStatus('Loading puzzle…');
+
+  let fen;
+  try {
+    fen = await fetchLichessPuzzle();
+  } catch (err) {
+    console.warn('Lichess unavailable, using fallback:', err.message);
+    fen = FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
+  }
+
+  // Initialise board on first call (screen must be visible by now)
+  if (!board) {
+    board = new Chessboard(document.getElementById('checks-board'), {
+      position: fen,
+      orientation: COLOR.white,
+      style: { pieces: { file: PIECES_URL } },
+    });
+  } else {
+    board.setPosition(fen, false);
+  }
+
+  answerW = countChecksForColor(fen, 'w');
+  answerB = countChecksForColor(fen, 'b');
+
+  setStatus('');
+  puzzleActive = true;
+  startTimer();
+}
+
+async function fetchLichessPuzzle() {
+  const resp = await fetch('https://lichess.org/api/puzzle/next', {
+    headers: { Accept: 'application/json' },
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  return parsePuzzleFen(data);
+}
+
+function parsePuzzleFen(data) {
+  // Replay the game PGN to the puzzle's starting ply to get the position FEN.
+  const gameChess = new Chess();
+  gameChess.loadPgn(data.game.pgn);
+  const moves = gameChess.history();
+
+  const puzzleChess = new Chess();
+  const ply = Math.min(data.puzzle.initialPly, moves.length);
+  for (let i = 0; i < ply; i++) puzzleChess.move(moves[i]);
+  return puzzleChess.fen();
+}
+
+// --- Check counting ---
+
+function countChecksForColor(fen, colorChar) {
+  // Temporarily set the side-to-move to colorChar so we can enumerate
+  // that colour's legal moves and count how many deliver check.
+  const parts = fen.split(' ');
+  parts[1] = colorChar;
+  parts[3] = '-';          // clear en-passant (may be invalid with swapped turn)
+  const modFen = parts.join(' ');
+
+  const tmp = new Chess();
+  try { tmp.load(modFen); } catch { return 0; }
+
+  let count = 0;
+  for (const m of tmp.moves({ verbose: true })) {
+    try {
+      tmp.move(m);
+      if (tmp.inCheck()) count++;
+      tmp.undo();
+    } catch { /* skip */ }
+  }
+  return count;
+}
+
+// --- Digit button interaction ---
+
+function handleDigitClick(color, value) {
+  if (!puzzleActive) return;
+  const isWhite = color === 'w';
+  if (isWhite && correctW) return;
+  if (!isWhite && correctB) return;
+
+  const btn = document.querySelector(
+    `.digit-btn[data-color="${color}"][data-value="${value}"]`
+  );
+  if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
+
+  const correct = isWhite ? answerW : answerB;
+  if (value === correct) {
+    btn.classList.add('correct');
+    if (isWhite) correctW = true; else correctB = true;
+    if (correctW && correctB) puzzleComplete();
+  } else {
+    btn.classList.add('incorrect');
+    misses++;
+    document.getElementById('checks-misses').textContent = `Misses: ${misses}`;
+  }
+}
+
+function puzzleComplete() {
+  puzzleActive = false;
+  stopTimer();
+  drillResults.push({ seconds, misses });
+  const el = document.getElementById('checks-result');
+  el.textContent =
+    `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
+  el.classList.remove('hidden');
+}
+
+// --- UI helpers ---
+
+function createDigitButtons() {
+  [['digits-white', 'w'], ['digits-black', 'b']].forEach(([containerId, color]) => {
+    const container = document.getElementById(containerId);
+    for (let i = 0; i <= 9; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'digit-btn';
+      btn.dataset.color = color;
+      btn.dataset.value = i;
+      btn.textContent = i;
+      btn.addEventListener('click', () => handleDigitClick(color, i));
+      container.appendChild(btn);
+    }
+  });
+}
+
+function resetUI() {
+  correctW = correctB = false;
+  misses = seconds = 0;
+  document.getElementById('checks-timer').textContent = '0:00';
+  document.getElementById('checks-misses').textContent = 'Misses: 0';
+  const result = document.getElementById('checks-result');
+  result.classList.add('hidden');
+  result.textContent = '';
+  document.querySelectorAll('.digit-btn').forEach(b =>
+    b.classList.remove('correct', 'incorrect')
+  );
+}
+
+function setStatus(msg) {
+  document.getElementById('checks-status').textContent = msg;
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    seconds++;
+    document.getElementById('checks-timer').textContent = formatTime(seconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function formatTime(s) {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}

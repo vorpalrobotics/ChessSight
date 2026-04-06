@@ -2,6 +2,26 @@ import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/np
 import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/markers/Markers.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
+import { initChecks, startChecks } from './checks.js';
+
+// --- Screen management ---
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-engine'];
+
+function showScreen(id) {
+  SCREEN_IDS.forEach(s =>
+    document.getElementById(s).classList.toggle('hidden', s !== id)
+  );
+  document.getElementById('btn-menu').classList.toggle('hidden', id === 'screen-select');
+}
+
+document.getElementById('mode-checks').addEventListener('click', async () => {
+  showScreen('screen-checks');
+  await startChecks();
+});
+
+document.getElementById('btn-menu').addEventListener('click', () => {
+  showScreen('screen-select');
+});
 
 // Custom marker types for move highlighting
 const MARKER_SELECTED = { class: 'marker-selected', slice: 'markerFrame' };
@@ -321,8 +341,14 @@ document.getElementById('btn-copy-fen').addEventListener('click', () => {
   });
 });
 
-// --- Boot ---
-async function main() {
+// --- Engine mode boot (called when engine screen is selected) ---
+let engineInitialized = false;
+
+export async function startEngineMode() {
+  showScreen('screen-engine');
+  if (engineInitialized) return;
+  engineInitialized = true;
+
   dbg('Initializing board...');
   try {
     initBoard();
@@ -347,4 +373,5 @@ async function main() {
   }
 }
 
-main();
+// --- Boot ---
+initChecks();

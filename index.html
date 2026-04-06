@@ -11,9 +11,53 @@
 <body>
   <header>
     <h1>ChessSight</h1>
+    <button id="btn-menu" class="hidden">&#8592; Menu</button>
   </header>
 
-  <main>
+  <!-- ── Screen 1: Mode selection ── -->
+  <div id="screen-select" class="screen">
+    <p class="screen-subtitle">Choose a mode</p>
+    <div id="mode-grid">
+      <button class="mode-card" id="mode-checks">
+        <span class="mode-icon">♟</span>
+        <span class="mode-name">Checks</span>
+        <span class="mode-desc">Count checking moves for each side</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Screen 2: Checks drill ── -->
+  <div id="screen-checks" class="screen hidden">
+    <div id="checks-top">
+      <h2 id="checks-title">Count Checks</h2>
+      <div id="checks-controls">
+        <span id="checks-timer">0:00</span>
+        <span id="checks-misses">Misses: 0</span>
+        <button id="btn-checks-done">DONE</button>
+      </div>
+    </div>
+
+    <div id="checks-board-wrap">
+      <div id="checks-board"></div>
+    </div>
+
+    <div id="answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">WHITE</span>
+        <div class="digit-buttons" id="digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">BLACK</span>
+        <div class="digit-buttons" id="digits-black"></div>
+      </div>
+    </div>
+
+    <div id="checks-status"></div>
+    <div id="checks-result" class="hidden"></div>
+  </div>
+
+  <!-- ── Screen 3: Engine analysis (existing) ── -->
+  <main id="screen-engine" class="hidden">
     <div id="board-container">
       <div id="eval-bar">
         <div id="eval-fill"></div>

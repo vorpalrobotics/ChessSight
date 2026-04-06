@@ -19,16 +19,229 @@ body {
   min-height: 100vh;
 }
 
+/* ── Utility ── */
+.hidden { display: none !important; }
+
+/* ── Header ── */
 header {
   padding: 1rem 2rem;
   background: var(--surface);
   border-bottom: 2px solid var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 header h1 {
   font-size: 1.5rem;
   letter-spacing: 0.05em;
   color: var(--accent);
+}
+
+#btn-menu {
+  background: transparent;
+  border: 1px solid var(--surface2);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+}
+#btn-menu:hover:not(:disabled) {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* ── Mode selection screen ── */
+#screen-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  gap: 2rem;
+}
+
+.screen-subtitle {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+#mode-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 170px;
+  padding: 2rem 1rem 1.5rem;
+  background: var(--surface);
+  border: 2px solid var(--surface2);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, background 0.15s;
+}
+.mode-card:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  transform: translateY(-3px);
+}
+.mode-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+.mode-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text);
+}
+.mode-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Checks drill screen ── */
+#screen-checks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem 1rem 2rem;
+  gap: 1rem;
+}
+
+#checks-top {
+  width: 100%;
+  max-width: calc(var(--board-size) + 4px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+#checks-title {
+  font-size: 1.25rem;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+#checks-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+#checks-timer {
+  font-size: 1.1rem;
+  font-family: monospace;
+  min-width: 3.2em;
+  color: var(--text);
+}
+
+#checks-misses {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+#btn-checks-done {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.4rem 1.1rem;
+  letter-spacing: 0.05em;
+}
+#btn-checks-done:hover:not(:disabled) {
+  background: #c8304a;
+}
+
+#checks-board-wrap {
+  width: var(--board-size);
+  height: var(--board-size);
+  flex-shrink: 0;
+}
+#checks-board {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Answer panel ── */
+#answer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+  max-width: calc(var(--board-size) + 4px);
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.answer-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  min-width: 46px;
+}
+
+.digit-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.digit-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 7px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 2px solid transparent;
+  transition: background 0.1s, border-color 0.12s;
+}
+.digit-btn:hover:not(.correct):not(.incorrect) {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.digit-btn.correct {
+  background: #1b6e42;
+  border-color: #27ae60;
+  color: #fff;
+  cursor: default;
+}
+.digit-btn.incorrect {
+  background: #6e1b1b;
+  border-color: #c0392b;
+  color: #fff;
+  cursor: default;
+}
+
+#checks-status {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  min-height: 1.1em;
+}
+
+#checks-result {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #27ae60;
+  text-align: center;
+  padding: 0.4rem 0;
 }
 
 main {
