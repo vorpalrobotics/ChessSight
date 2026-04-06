@@ -1,6 +1,11 @@
 import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
+import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/markers/Markers.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
+
+// Custom marker types for move highlighting
+const MARKER_SELECTED = { class: 'marker-selected', slice: 'markerFrame' };
+const MARKER_TARGET   = { class: 'marker-target',   slice: 'markerSquare' };
 
 // --- Engine difficulty levels ---
 const LEVELS = [
@@ -20,6 +25,7 @@ let orientation = COLOR.white;
 let playerColor = COLOR.white;   // which side the human plays
 let pendingBestMove = null;
 let currentLevel = LEVELS[3];   // default: Hard
+let moveIsDrag = false;
 
 // --- DOM refs ---
 const evalFill        = document.getElementById('eval-fill');
@@ -41,24 +47,50 @@ function dbg(msg) {
 
 // --- Board ---
 function initBoard() {
-  board = new Chessboard(document.getElementById('board'), {
+  const boardEl = document.getElementById('board');
+
+  // Detect drag vs click: track pointer movement after moveInputStarted
+  let ptrStartX = 0, ptrStartY = 0;
+  boardEl.addEventListener('pointerdown', e => {
+    ptrStartX = e.clientX;
+    ptrStartY = e.clientY;
+    moveIsDrag = false;
+  }, true);
+  boardEl.addEventListener('pointermove', e => {
+    if (!moveIsDrag && Math.hypot(e.clientX - ptrStartX, e.clientY - ptrStartY) > 8) {
+      moveIsDrag = true;
+    }
+  });
+
+  board = new Chessboard(boardEl, {
     position: chess.fen(),
     orientation,
     style: {
       pieces: {
         file: 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg'
       }
-    }
+    },
+    extensions: [{
+      class: Markers,
+      props: { sprite: 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.svg' }
+    }]
   });
 
   board.enableMoveInput(handleMoveInput, playerColor);
 }
 
+function clearMoveMarkers() {
+  board.removeMarkers(MARKER_SELECTED);
+  board.removeMarkers(MARKER_TARGET);
+}
+
 function handleMoveInput(event) {
   if (event.type === INPUT_EVENT_TYPE.moveInputStarted) {
     const piece = chess.get(event.square);
-    // Only allow moving the side to move
-    return piece && piece.color === chess.turn();
+    if (!piece || piece.color !== chess.turn()) return false;
+    clearMoveMarkers();
+    board.addMarker(MARKER_SELECTED, event.square);
+    return true;
   }
 
   if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
@@ -70,12 +102,26 @@ function handleMoveInput(event) {
     if (move) {
       pendingBestMove = null;
       bestMoveDisplay.textContent = '';
-      board.setPosition(chess.fen(), false);
+      if (moveIsDrag) {
+        // Drag: piece is already at dest visually — no animation, clear markers now
+        clearMoveMarkers();
+        board.setPosition(chess.fen(), false);
+      } else {
+        // Click: highlight dest, animate piece src→dst, then clear markers
+        board.addMarker(MARKER_TARGET, event.squareTo);
+        board.setPosition(chess.fen(), true);
+        setTimeout(clearMoveMarkers, 350);
+      }
       renderMoveList();
       triggerEval();
       return true;
     }
+    clearMoveMarkers();
     return false;
+  }
+
+  if (event.type === INPUT_EVENT_TYPE.moveInputCanceled) {
+    clearMoveMarkers();
   }
 
   return true;
