@@ -517,7 +517,7 @@ button {
   transition: background 0.15s;
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled):not(.digit-btn) {
   background: var(--accent);
 }
 
