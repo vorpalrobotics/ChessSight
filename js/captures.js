@@ -29,14 +29,14 @@ let navigate = null;       // injected by app.js for screen transitions
 
 // --- Public API ---
 
-export function initChecks(navigateFn) {
+export function initCaptures(navigateFn) {
   navigate = navigateFn;
   createDigitButtons();
-  document.getElementById('btn-checks-done').addEventListener('click', showSummary);
-  document.getElementById('btn-checks-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-captures-done').addEventListener('click', showSummary);
+  document.getElementById('btn-captures-next').addEventListener('click', loadNextPuzzle);
 }
 
-export async function startChecks() {
+export async function startCaptures() {
   resetDrill();
   await loadNextPuzzle();
 }
@@ -47,13 +47,13 @@ async function loadNextPuzzle() {
   stopTimer();
   resetUI();
   puzzleCount++;
-  document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
+  document.getElementById('captures-puzzle-num').textContent = `#${puzzleCount}`;
   setStatus('Loading puzzle…');
 
   const fen = await fetchValidFen();
 
   if (!board) {
-    board = new Chessboard(document.getElementById('checks-board'), {
+    board = new Chessboard(document.getElementById('captures-board'), {
       position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
@@ -62,8 +62,8 @@ async function loadNextPuzzle() {
     board.setPosition(fen, false);
   }
 
-  answerW = countChecksForColor(fen, 'w');
-  answerB = countChecksForColor(fen, 'b');
+  answerW = countCapturesForColor(fen, 'w');
+  answerB = countCapturesForColor(fen, 'b');
 
   setStatus('');
   puzzleActive = true;
@@ -71,16 +71,14 @@ async function loadNextPuzzle() {
 }
 
 // Retry up to 5 times to find a position where neither side starts in check.
-// A position with the side-to-move already in check causes the check-counter
-// to over-count: when we flip the FEN to enumerate the OTHER side's moves,
-// the opponent king is already attacked, so almost every move appears to
-// "give check".
+// A position with the side-to-move in check restricts that side's legal moves
+// (must escape check), producing an artificially low capture count.
 async function fetchValidFen() {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       const fen = await fetchLichessPuzzle();
-      if (!sideToMoveInCheck(fen)) return fen;
-      console.log('Skipping position where side-to-move is in check');
+      if (!eitherSideInCheck(fen)) return fen;
+      console.log('Skipping position where a side is in check');
     } catch (err) {
       console.warn('Lichess unavailable, using fallback:', err.message);
       break;
@@ -89,10 +87,19 @@ async function fetchValidFen() {
   return FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
 }
 
-function sideToMoveInCheck(fen) {
-  const tmp = new Chess();
-  try { tmp.load(fen); } catch { return true; }
-  return tmp.inCheck();
+function eitherSideInCheck(fen) {
+  const parts = fen.split(' ');
+  // Check side-to-move
+  const tmp1 = new Chess();
+  try { tmp1.load(fen); } catch { return true; }
+  if (tmp1.inCheck()) return true;
+  // Check the other side by flipping turn
+  const flipped = [...parts];
+  flipped[1] = parts[1] === 'w' ? 'b' : 'w';
+  flipped[3] = '-';
+  const tmp2 = new Chess();
+  try { tmp2.load(flipped.join(' ')); } catch { return true; }
+  return tmp2.inCheck();
 }
 
 async function fetchLichessPuzzle() {
@@ -114,19 +121,16 @@ function parsePuzzleFen(data) {
   return puzzleChess.fen();
 }
 
-// --- Check counting ---
+// --- Capture counting ---
 
-function countChecksForColor(fen, colorChar) {
+function countCapturesForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
-  parts[3] = '-';
+  parts[3] = '-'; // clear en passant (only valid for original side-to-move)
   const modFen = parts.join(' ');
   const tmp = new Chess();
   try { tmp.load(modFen); } catch { return 0; }
-  let count = 0;
-  for (const m of tmp.moves({ verbose: true })) {
-    try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
-  }
+  const count = tmp.moves({ verbose: true }).filter(m => m.captured).length;
   return Math.min(count, 9); // 9 means "9 or more" — matches the "9+" button
 }
 
@@ -139,7 +143,7 @@ function handleDigitClick(color, value) {
   if (!isWhite && correctB) return;
 
   const btn = document.querySelector(
-    `.digit-btn[data-color="${color}"][data-value="${value}"]`
+    `#screen-captures .digit-btn[data-color="${color}"][data-value="${value}"]`
   );
   if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
 
@@ -151,7 +155,7 @@ function handleDigitClick(color, value) {
   } else {
     btn.classList.add('incorrect');
     misses++;
-    document.getElementById('checks-misses').textContent = `Misses: ${misses}`;
+    document.getElementById('captures-misses').textContent = `Misses: ${misses}`;
   }
 }
 
@@ -159,7 +163,7 @@ function puzzleComplete() {
   puzzleActive = false;
   stopTimer();
   drillResults.push({ seconds, misses });
-  const el = document.getElementById('checks-result');
+  const el = document.getElementById('captures-result');
   el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
 }
@@ -186,7 +190,7 @@ function showSummary() {
 }
 
 async function restartDrill() {
-  navigate('screen-checks');
+  navigate('screen-captures');
   resetDrill();
   await loadNextPuzzle();
 }
@@ -194,7 +198,7 @@ async function restartDrill() {
 // --- UI helpers ---
 
 function createDigitButtons() {
-  [['digits-white', 'w'], ['digits-black', 'b']].forEach(([containerId, color]) => {
+  [['cap-digits-white', 'w'], ['cap-digits-black', 'b']].forEach(([containerId, color]) => {
     const container = document.getElementById(containerId);
     for (let i = 0; i <= 9; i++) {
       const btn = document.createElement('button');
@@ -216,24 +220,24 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = 0;
-  document.getElementById('checks-timer').textContent = '0:00';
-  document.getElementById('checks-misses').textContent = 'Misses: 0';
-  const result = document.getElementById('checks-result');
+  document.getElementById('captures-timer').textContent = '0:00';
+  document.getElementById('captures-misses').textContent = 'Misses: 0';
+  const result = document.getElementById('captures-result');
   result.classList.add('hidden');
   result.textContent = '';
-  document.querySelectorAll('.digit-btn').forEach(b =>
+  document.querySelectorAll('#screen-captures .digit-btn').forEach(b =>
     b.classList.remove('correct', 'incorrect')
   );
 }
 
 function setStatus(msg) {
-  document.getElementById('checks-status').textContent = msg;
+  document.getElementById('captures-status').textContent = msg;
 }
 
 function startTimer() {
   timerInterval = setInterval(() => {
     seconds++;
-    document.getElementById('checks-timer').textContent = formatTime(seconds);
+    document.getElementById('captures-timer').textContent = formatTime(seconds);
   }, 1000);
 }
 

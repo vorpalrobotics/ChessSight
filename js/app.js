@@ -3,9 +3,10 @@ import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extens
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
+import { initCaptures, startCaptures } from './captures.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -19,7 +20,16 @@ document.getElementById('mode-checks').addEventListener('click', async () => {
   await startChecks();
 });
 
+document.getElementById('mode-captures').addEventListener('click', async () => {
+  showScreen('screen-captures');
+  await startCaptures();
+});
+
 document.getElementById('btn-menu').addEventListener('click', () => {
+  showScreen('screen-select');
+});
+
+document.getElementById('btn-summary-menu').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
@@ -375,3 +385,4 @@ export async function startEngineMode() {
 
 // --- Boot ---
 initChecks(showScreen);
+initCaptures(showScreen);

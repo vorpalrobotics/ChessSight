@@ -23,28 +23,33 @@
         <span class="mode-name">Checks</span>
         <span class="mode-desc">Count checking moves for each side</span>
       </button>
+      <button class="mode-card" id="mode-captures">
+        <span class="mode-icon">⚔</span>
+        <span class="mode-name">Captures</span>
+        <span class="mode-desc">Count capturing moves for each side</span>
+      </button>
     </div>
   </div>
 
   <!-- ── Screen 2: Checks drill ── -->
   <div id="screen-checks" class="screen hidden">
-    <div id="checks-top">
-      <div id="checks-top-left">
-        <h2 id="checks-title">Count Checks</h2>
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Count Checks</h2>
         <span id="checks-puzzle-num">#1</span>
       </div>
-      <div id="checks-top-right">
+      <div class="drill-top-right">
         <span id="checks-timer">0:00</span>
         <span id="checks-misses">Misses: 0</span>
         <button id="btn-checks-done">DONE</button>
       </div>
     </div>
 
-    <div id="checks-board-wrap">
+    <div class="drill-board-wrap">
       <div id="checks-board"></div>
     </div>
 
-    <div id="answer-panel">
+    <div class="drill-answer-panel">
       <div class="answer-row">
         <span class="answer-label">W</span>
         <div class="digit-buttons" id="digits-white"></div>
@@ -60,7 +65,41 @@
     <button id="btn-checks-next">NEXT ›</button>
   </div>
 
-  <!-- ── Screen 3: Drill summary ── -->
+  <!-- ── Screen 3: Captures drill ── -->
+  <div id="screen-captures" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Count Captures</h2>
+        <span id="captures-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="captures-timer">0:00</span>
+        <span id="captures-misses">Misses: 0</span>
+        <button id="btn-captures-done">DONE</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="captures-board"></div>
+    </div>
+
+    <div class="drill-answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">W</span>
+        <div class="digit-buttons" id="cap-digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B</span>
+        <div class="digit-buttons" id="cap-digits-black"></div>
+      </div>
+    </div>
+
+    <div id="captures-status"></div>
+    <div id="captures-result" class="hidden"></div>
+    <button id="btn-captures-next">NEXT ›</button>
+  </div>
+
+  <!-- ── Screen 4: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>
