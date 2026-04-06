@@ -70,7 +70,7 @@ function handleMoveInput(event) {
     if (move) {
       pendingBestMove = null;
       bestMoveDisplay.textContent = '';
-      board.setPosition(chess.fen(), true);
+      board.setPosition(chess.fen(), false);
       renderMoveList();
       triggerEval();
       return true;
