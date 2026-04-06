@@ -141,6 +141,18 @@ main {
   opacity: 1;
 }
 
+/* Legal move hints */
+.marker-legal {
+  fill: rgba(0, 0, 0, 0.22);
+  opacity: 1;
+}
+
+/* Capture squares: reddish tint over the enemy piece */
+.marker-capture {
+  fill: rgba(200, 60, 60, 0.28);
+  opacity: 1;
+}
+
 #level-row {
   display: flex;
   align-items: center;

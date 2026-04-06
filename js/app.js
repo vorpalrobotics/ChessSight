@@ -6,6 +6,8 @@ import { Engine } from './engine.js';
 // Custom marker types for move highlighting
 const MARKER_SELECTED = { class: 'marker-selected', slice: 'markerFrame' };
 const MARKER_TARGET   = { class: 'marker-target',   slice: 'markerSquare' };
+const MARKER_LEGAL    = { class: 'marker-legal',    slice: 'markerDot' };
+const MARKER_CAPTURE  = { class: 'marker-capture',  slice: 'markerSquare' };
 
 // --- Engine difficulty levels ---
 const LEVELS = [
@@ -83,6 +85,8 @@ function initBoard() {
 function clearMoveMarkers() {
   board.removeMarkers(MARKER_SELECTED);
   board.removeMarkers(MARKER_TARGET);
+  board.removeMarkers(MARKER_LEGAL);
+  board.removeMarkers(MARKER_CAPTURE);
 }
 
 function handleMoveInput(event) {
@@ -102,6 +106,11 @@ function handleMoveInput(event) {
     clearMoveMarkers();
     selectedSquare = event.square;
     board.addMarker(MARKER_SELECTED, event.square);
+
+    // Show legal destinations: dot for empty squares, tinted square for captures
+    for (const m of chess.moves({ square: event.square, verbose: true })) {
+      board.addMarker(m.captured ? MARKER_CAPTURE : MARKER_LEGAL, m.to);
+    }
     return true;
   }
 
@@ -129,9 +138,15 @@ function handleMoveInput(event) {
       triggerEval();
       return true;
     }
-    // Invalid move — animate piece back to its source square
+    // Invalid move — clear highlights
     clearMoveMarkers();
-    board.setPosition(chess.fen(), true);
+    if (moveIsDrag) {
+      // Defer setPosition so cm-chessboard can finish drag handling first,
+      // then animate the piece back to its source square
+      const fen = chess.fen();
+      setTimeout(() => board.setPosition(fen, true), 0);
+    }
+    // For click mode the piece hasn't moved visually, nothing more to do
     return false;
   }
 
