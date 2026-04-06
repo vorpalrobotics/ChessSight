@@ -116,11 +116,10 @@ function handleMoveInput(event) {
 
   if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
     selectedSquare = null;
-    const move = chess.move({
-      from: event.squareFrom,
-      to: event.squareTo,
-      promotion: 'q'
-    });
+    let move = null;
+    try {
+      move = chess.move({ from: event.squareFrom, to: event.squareTo, promotion: 'q' });
+    } catch { /* invalid move — handled below */ }
     if (move) {
       pendingBestMove = null;
       bestMoveDisplay.textContent = '';
