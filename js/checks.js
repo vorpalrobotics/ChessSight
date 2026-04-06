@@ -52,13 +52,7 @@ async function loadNextPuzzle() {
   document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
   setStatus('Loading puzzle…');
 
-  let fen;
-  try {
-    fen = await fetchLichessPuzzle();
-  } catch (err) {
-    console.warn('Lichess unavailable, using fallback:', err.message);
-    fen = FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
-  }
+  const fen = await fetchValidFen();
 
   if (!board) {
     board = new Chessboard(document.getElementById('checks-board'), {
@@ -76,6 +70,31 @@ async function loadNextPuzzle() {
   setStatus('');
   puzzleActive = true;
   startTimer();
+}
+
+// Retry up to 5 times to find a position where neither side starts in check.
+// A position with the side-to-move already in check causes the check-counter
+// to over-count: when we flip the FEN to enumerate the OTHER side's moves,
+// the opponent king is already attacked, so almost every move appears to
+// "give check".
+async function fetchValidFen() {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const fen = await fetchLichessPuzzle();
+      if (!sideToMoveInCheck(fen)) return fen;
+      console.log('Skipping position where side-to-move is in check');
+    } catch (err) {
+      console.warn('Lichess unavailable, using fallback:', err.message);
+      break;
+    }
+  }
+  return FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
+}
+
+function sideToMoveInCheck(fen) {
+  const tmp = new Chess();
+  try { tmp.load(fen); } catch { return true; }
+  return tmp.inCheck();
 }
 
 async function fetchLichessPuzzle() {
