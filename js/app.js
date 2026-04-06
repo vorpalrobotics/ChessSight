@@ -4,9 +4,10 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
+import { initLoose, startLoose } from './loose.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -23,6 +24,11 @@ document.getElementById('mode-checks').addEventListener('click', async () => {
 document.getElementById('mode-captures').addEventListener('click', async () => {
   showScreen('screen-captures');
   await startCaptures();
+});
+
+document.getElementById('mode-loose').addEventListener('click', async () => {
+  showScreen('screen-loose');
+  await startLoose();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -386,3 +392,4 @@ export async function startEngineMode() {
 // --- Boot ---
 initChecks(showScreen);
 initCaptures(showScreen);
+initLoose(showScreen);

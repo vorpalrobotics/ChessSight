@@ -28,6 +28,11 @@
         <span class="mode-name">Captures</span>
         <span class="mode-desc">Count capturing moves for each side</span>
       </button>
+      <button class="mode-card" id="mode-loose">
+        <span class="mode-icon">◎</span>
+        <span class="mode-name">Loose Pieces</span>
+        <span class="mode-desc">Count undefended pieces for each side</span>
+      </button>
     </div>
   </div>
 
@@ -99,7 +104,41 @@
     <button id="btn-captures-next">NEXT ›</button>
   </div>
 
-  <!-- ── Screen 4: Drill summary ── -->
+  <!-- ── Screen 4: Loose Pieces drill ── -->
+  <div id="screen-loose" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Loose Pieces</h2>
+        <span id="loose-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="loose-timer">0:00</span>
+        <span id="loose-misses">Misses: 0</span>
+        <button id="btn-loose-done">DONE</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="loose-board"></div>
+    </div>
+
+    <div class="drill-answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">W</span>
+        <div class="digit-buttons" id="loose-digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B</span>
+        <div class="digit-buttons" id="loose-digits-black"></div>
+      </div>
+    </div>
+
+    <div id="loose-status"></div>
+    <div id="loose-result" class="hidden"></div>
+    <button id="btn-loose-next">NEXT ›</button>
+  </div>
+
+  <!-- ── Screen 5: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>
