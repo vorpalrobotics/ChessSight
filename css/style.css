@@ -87,8 +87,8 @@ header h1 {
   transition: border-color 0.2s, transform 0.15s, background 0.15s;
 }
 .mode-card:hover {
-  border-color: var(--accent);
-  background: var(--surface2);
+  border-color: var(--surface2);
+  background: #2a2d3a;
   transform: translateY(-3px);
 }
 .mode-icon {
@@ -528,7 +528,7 @@ button {
   transition: background 0.15s;
 }
 
-button:hover:not(:disabled):not(.digit-btn) {
+button:hover:not(:disabled):not(.digit-btn):not(.mode-card) {
   background: var(--accent);
 }
 
