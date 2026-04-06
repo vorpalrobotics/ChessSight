@@ -2,6 +2,16 @@ import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/np
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 
+// --- Engine difficulty levels ---
+const LEVELS = [
+  { label: 'Beginner', skill:  1, depth:  5 },
+  { label: 'Easy',     skill:  5, depth:  8 },
+  { label: 'Medium',   skill: 10, depth: 10 },
+  { label: 'Hard',     skill: 15, depth: 14 },
+  { label: 'Expert',   skill: 20, depth: 18 },
+  { label: 'Max',      skill: 20, depth: 20 },
+];
+
 // --- State ---
 const chess = new Chess();
 const engine = new Engine();
@@ -9,6 +19,7 @@ let board = null;
 let orientation = COLOR.white;
 let playerColor = COLOR.white;   // which side the human plays
 let pendingBestMove = null;
+let currentLevel = LEVELS[3];   // default: Hard
 
 // --- DOM refs ---
 const evalFill        = document.getElementById('eval-fill');
@@ -20,6 +31,7 @@ const moveList        = document.getElementById('move-list');
 const fenInput        = document.getElementById('fen-input');
 const btnHint         = document.getElementById('btn-hint');
 const btnStop         = document.getElementById('btn-stop');
+const levelSelect     = document.getElementById('level-select');
 
 // Show errors on-screen (no dev tools needed)
 function dbg(msg) {
@@ -78,7 +90,7 @@ async function triggerEval() {
   pendingBestMove = null;
 
   try {
-    const { score, bestMove } = await engine.evaluate(chess.fen());
+    const { score, bestMove } = await engine.evaluate(chess.fen(), currentLevel.depth);
     pendingBestMove = bestMove;
     updateEvalBar(score);
     engineStatus.textContent = formatScore(score);
@@ -202,6 +214,11 @@ btnStop.addEventListener('click', () => {
   engineStatus.textContent = 'Stopped';
 });
 
+levelSelect.addEventListener('change', () => {
+  currentLevel = LEVELS[parseInt(levelSelect.value, 10)];
+  if (engine.ready) engine.setSkillLevel(currentLevel.skill);
+});
+
 document.getElementById('btn-load-fen').addEventListener('click', loadFen);
 fenInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadFen(); });
 
@@ -244,6 +261,7 @@ async function main() {
   dbg('Fetching Stockfish...');
   try {
     await engine.init();
+    engine.setSkillLevel(currentLevel.skill);
     engineStatus.textContent = 'Ready';
     dbg('Engine ready');
     triggerEval();

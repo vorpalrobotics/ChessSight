@@ -85,6 +85,10 @@ export class Engine {
     });
   }
 
+  setSkillLevel(skill) {
+    this._send(`setoption name Skill Level value ${skill}`);
+  }
+
   stop() {
     this._send('stop');
     this._listener = null;
