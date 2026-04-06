@@ -128,6 +128,31 @@ main {
   font-family: monospace;
 }
 
+#level-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+#level-select {
+  flex: 1;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--surface2);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#level-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 #controls {
   display: grid;
   grid-template-columns: 1fr 1fr;

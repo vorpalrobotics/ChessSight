@@ -2,12 +2,24 @@ import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/np
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 
+// --- Engine difficulty levels ---
+const LEVELS = [
+  { label: 'Beginner', skill:  1, depth:  5 },
+  { label: 'Easy',     skill:  5, depth:  8 },
+  { label: 'Medium',   skill: 10, depth: 10 },
+  { label: 'Hard',     skill: 15, depth: 14 },
+  { label: 'Expert',   skill: 20, depth: 18 },
+  { label: 'Max',      skill: 20, depth: 20 },
+];
+
 // --- State ---
 const chess = new Chess();
 const engine = new Engine();
 let board = null;
 let orientation = COLOR.white;
+let playerColor = COLOR.white;   // which side the human plays
 let pendingBestMove = null;
+let currentLevel = LEVELS[3];   // default: Hard
 
 // --- DOM refs ---
 const evalFill        = document.getElementById('eval-fill');
@@ -19,6 +31,7 @@ const moveList        = document.getElementById('move-list');
 const fenInput        = document.getElementById('fen-input');
 const btnHint         = document.getElementById('btn-hint');
 const btnStop         = document.getElementById('btn-stop');
+const levelSelect     = document.getElementById('level-select');
 
 // Show errors on-screen (no dev tools needed)
 function dbg(msg) {
@@ -38,7 +51,7 @@ function initBoard() {
     }
   });
 
-  board.enableMoveInput(handleMoveInput, COLOR.white);
+  board.enableMoveInput(handleMoveInput, playerColor);
 }
 
 function handleMoveInput(event) {
@@ -77,14 +90,37 @@ async function triggerEval() {
   pendingBestMove = null;
 
   try {
-    const { score, bestMove } = await engine.evaluate(chess.fen());
+    const { score, bestMove } = await engine.evaluate(chess.fen(), currentLevel.depth);
     pendingBestMove = bestMove;
     updateEvalBar(score);
     engineStatus.textContent = formatScore(score);
+
+    // Play engine counter-move if it's the engine's turn
+    const engineTurnChar = playerColor === COLOR.white ? 'b' : 'w';
+    if (chess.turn() === engineTurnChar && bestMove && !chess.isGameOver()) {
+      await playEngineMove(bestMove);
+    }
   } catch {
     engineStatus.textContent = 'Engine error';
   } finally {
     btnStop.disabled = true;
+  }
+}
+
+async function playEngineMove(move) {
+  // Brief pause so the human can see their own move before engine responds
+  await new Promise(r => setTimeout(r, 400));
+
+  const from = move.slice(0, 2);
+  const to = move.slice(2, 4);
+  const promotion = move.length > 4 ? move[4] : 'q';
+
+  const result = chess.move({ from, to, promotion });
+  if (result) {
+    board.setPosition(chess.fen(), true);
+    renderMoveList();
+    // Evaluate the position after engine's move (won't loop — now human's turn)
+    triggerEval();
   }
 }
 
@@ -138,7 +174,15 @@ function renderMoveList() {
 // --- Controls ---
 document.getElementById('btn-flip').addEventListener('click', () => {
   orientation = orientation === COLOR.white ? COLOR.black : COLOR.white;
+  playerColor = playerColor === COLOR.white ? COLOR.black : COLOR.white;
   board.setOrientation(orientation, true);
+  board.disableMoveInput();
+  board.enableMoveInput(handleMoveInput, playerColor);
+  // If it's now the engine's turn after switching sides, let it move
+  const engineTurnChar = playerColor === COLOR.white ? 'b' : 'w';
+  if (chess.turn() === engineTurnChar) {
+    triggerEval();
+  }
 });
 
 document.getElementById('btn-reset').addEventListener('click', () => {
@@ -147,6 +191,8 @@ document.getElementById('btn-reset').addEventListener('click', () => {
   pendingBestMove = null;
   bestMoveDisplay.textContent = '';
   board.setPosition(chess.fen(), true);
+  board.disableMoveInput();
+  board.enableMoveInput(handleMoveInput, playerColor);
   renderMoveList();
   triggerEval();
 });
@@ -166,6 +212,11 @@ btnStop.addEventListener('click', () => {
   engine.stop();
   btnStop.disabled = true;
   engineStatus.textContent = 'Stopped';
+});
+
+levelSelect.addEventListener('change', () => {
+  currentLevel = LEVELS[parseInt(levelSelect.value, 10)];
+  if (engine.ready) engine.setSkillLevel(currentLevel.skill);
 });
 
 document.getElementById('btn-load-fen').addEventListener('click', loadFen);
@@ -210,6 +261,7 @@ async function main() {
   dbg('Fetching Stockfish...');
   try {
     await engine.init();
+    engine.setSkillLevel(currentLevel.skill);
     engineStatus.textContent = 'Ready';
     dbg('Engine ready');
     triggerEval();
