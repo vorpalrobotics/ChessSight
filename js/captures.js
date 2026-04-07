@@ -1,8 +1,13 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
+import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
+const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
+
+const ARROW_WHITE_CAP = { class: 'arrow-white-cap' };
+const ARROW_BLACK_CAP = { class: 'arrow-black-cap' };
 
 const FALLBACK_FENS = [
   'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
@@ -27,6 +32,8 @@ let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
+let currentFen = '';
+let showingCaptures = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;       // injected by app.js for screen transitions
 
@@ -37,6 +44,10 @@ export function initCaptures(navigateFn) {
   createDigitButtons();
   document.getElementById('btn-captures-done').addEventListener('click', showSummary);
   document.getElementById('btn-captures-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-captures-show').addEventListener('click', () => {
+    if (showingCaptures) hideCaptures();
+    else showCaptures();
+  });
 }
 
 export async function startCaptures() {
@@ -55,12 +66,14 @@ async function loadNextPuzzle() {
 
   const { fen, puzzleId } = await fetchValidFen();
   currentPuzzleId = puzzleId;
+  currentFen = fen;
 
   if (!board) {
     board = new Chessboard(document.getElementById('captures-board'), {
       position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
+      extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL } }],
     });
   } else {
     board.setPosition(fen, false);
@@ -136,6 +149,36 @@ function countCapturesForColor(fen, colorChar) {
   try { tmp.load(modFen); } catch { return 0; }
   const count = tmp.moves({ verbose: true }).filter(m => m.captured).length;
   return Math.min(count, 9); // 9 means "9 or more" — matches the "9+" button
+}
+
+// Returns [{from, to}] for every capturing move available to colorChar.
+function getCapturesForColor(fen, colorChar) {
+  const parts = fen.split(' ');
+  parts[1] = colorChar;
+  parts[3] = '-';
+  const modFen = parts.join(' ');
+  const tmp = new Chess();
+  try { tmp.load(modFen); } catch { return []; }
+  return tmp.moves({ verbose: true })
+    .filter(m => m.captured)
+    .map(m => ({ from: m.from, to: m.to }));
+}
+
+function showCaptures() {
+  if (!board || !currentFen) return;
+  board.removeArrows();
+  for (const m of getCapturesForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
+  for (const m of getCapturesForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
+  showingCaptures = true;
+  document.getElementById('btn-captures-show').classList.add('active');
+}
+
+function hideCaptures() {
+  if (!board) return;
+  board.removeArrows();
+  showingCaptures = false;
+  const btn = document.getElementById('btn-captures-show');
+  if (btn) btn.classList.remove('active');
 }
 
 // --- Digit button interaction ---
@@ -242,6 +285,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  hideCaptures();
   document.getElementById('captures-timer').textContent = '0:00';
   document.getElementById('captures-misses').textContent = 'Misses: 0';
   const result = document.getElementById('captures-result');
