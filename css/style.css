@@ -375,6 +375,7 @@ header h1 {
   font-family: monospace;
 }
 
+#btn-under-show,
 #btn-loose-show,
 #btn-checks-show,
 #btn-captures-show {
@@ -387,6 +388,7 @@ header h1 {
   color: var(--text-muted);
   border-radius: 6px;
 }
+#btn-under-show.active,
 #btn-loose-show.active,
 #btn-checks-show.active,
 #btn-captures-show.active {
@@ -394,6 +396,7 @@ header h1 {
   border-color: #3a80d0;
   color: #fff;
 }
+#btn-under-show:hover:not(:disabled),
 #btn-loose-show:hover:not(:disabled),
 #btn-checks-show:hover:not(:disabled),
 #btn-captures-show:hover:not(:disabled) {

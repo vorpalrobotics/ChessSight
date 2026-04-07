@@ -27,6 +27,8 @@ let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
+let currentFen = '';
+let showingUnder = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 
@@ -37,6 +39,10 @@ export function initUnder(navigateFn) {
   createDigitButtons();
   document.getElementById('btn-under-done').addEventListener('click', showSummary);
   document.getElementById('btn-under-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-under-show').addEventListener('click', () => {
+    if (showingUnder) hideUnder();
+    else showUnder();
+  });
 }
 
 export async function startUnder() {
@@ -55,6 +61,7 @@ async function loadNextPuzzle() {
 
   const { fen, puzzleId } = await fetchValidFen();
   currentPuzzleId = puzzleId;
+  currentFen = fen;
 
   if (!board) {
     board = new Chessboard(document.getElementById('under-board'), {
@@ -145,6 +152,88 @@ function countUnderguardedForColor(fen, colorChar) {
   }
 
   return Math.min(count, 9);
+}
+
+// Returns square names for underguarded pieces of colorChar.
+function getUnderguardedForColor(fen, colorChar) {
+  const tmp = new Chess();
+  try { tmp.load(fen); } catch { return []; }
+  const enemy = colorChar === 'w' ? 'b' : 'w';
+  const squares = [];
+  for (const file of 'abcdefgh') {
+    for (let rank = 1; rank <= 8; rank++) {
+      const sq = file + rank;
+      const piece = tmp.get(sq);
+      if (!piece || piece.color !== colorChar || piece.type === 'k') continue;
+      if (tmp.attackers(sq, enemy).length >= tmp.attackers(sq, colorChar).length) squares.push(sq);
+    }
+  }
+  return squares;
+}
+
+function showUnder() {
+  if (!board || !currentFen) return;
+  clearUnderOverlay();
+  drawUnderOverlay(
+    getUnderguardedForColor(currentFen, 'w'),
+    getUnderguardedForColor(currentFen, 'b')
+  );
+  showingUnder = true;
+  document.getElementById('btn-under-show').classList.add('active');
+}
+
+function hideUnder() {
+  clearUnderOverlay();
+  showingUnder = false;
+  const btn = document.getElementById('btn-under-show');
+  if (btn) btn.classList.remove('active');
+}
+
+function drawUnderOverlay(whiteSqs, blackSqs) {
+  const boardEl = document.getElementById('under-board');
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+
+  const layer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  layer.setAttribute('class', 'under-overlay');
+  svg.appendChild(layer);
+
+  [['w', whiteSqs, 'loose-marker-white'], ['b', blackSqs, 'loose-marker-black']].forEach(([, squares, cls]) => {
+    squares.forEach((sq, i) => {
+      const file = sq.charCodeAt(0) - 97;
+      const rank = parseInt(sq[1]);
+      const x = file * sqSize;
+      const y = (8 - rank) * sqSize;
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x + 2);
+      rect.setAttribute('y', y + 2);
+      rect.setAttribute('width', sqSize - 4);
+      rect.setAttribute('height', sqSize - 4);
+      rect.setAttribute('rx', 4);
+      rect.setAttribute('class', cls);
+      layer.appendChild(rect);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + sqSize * 0.22);
+      text.setAttribute('y', y + sqSize * 0.28);
+      text.setAttribute('font-size', sqSize * 0.3);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('class', 'loose-label');
+      text.textContent = i + 1;
+      layer.appendChild(text);
+    });
+  });
+}
+
+function clearUnderOverlay() {
+  const boardEl = document.getElementById('under-board');
+  if (boardEl) boardEl.querySelectorAll('.under-overlay').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---
@@ -250,6 +339,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  hideUnder();
   document.getElementById('under-timer').textContent = '0:00';
   document.getElementById('under-misses').textContent = 'Misses: 0';
   const result = document.getElementById('under-result');
