@@ -166,6 +166,14 @@ function getThreatsForColor(fen, colorChar) {
     const movedPiece = tmp.get(m.to);
     const movedValue = movedPiece ? PIECE_VALUES[movedPiece.type] : PIECE_VALUES[m.piece];
 
+    // Landing square safety: discard moves where a cheaper enemy piece can
+    // immediately recapture the threatening piece (the threat isn't real).
+    const isSafeLanding = !tmp.attackers(m.to, enemy).some(sq => {
+      const p = tmp.get(sq);
+      return p && PIECE_VALUES[p.type] < movedValue;
+    });
+    if (!isSafeLanding) { tmp.undo(); continue; }
+
     let isThreat = false;
 
     // Types 1 & 2: moved piece attacks a qualifying enemy non-king piece

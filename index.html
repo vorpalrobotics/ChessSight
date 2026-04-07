@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v47</title>
+  <title>ChessSight v48</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -281,7 +281,7 @@
     <div id="threats-status"></div>
     <div id="threats-result" class="hidden"></div>
     <button id="btn-threats-next">NEXT ›</button>
-    <p class="drill-rule">Count moves that create a threat. A threat is a move where the piece lands on a square from which it attacks a loose (undefended) enemy piece, attacks an enemy piece of strictly greater value (P=1, N/B=3, R=5, Q=9), or sets up checkmate in 1. Kings are excluded from the first two categories — those are checks. Pawn promotions to the same square count as one move.</p>
+    <p class="drill-rule">Count moves that create a threat. A threat is a move where the piece lands safely (not immediately recapturable by a cheaper enemy piece) on a square from which it attacks a loose (undefended) enemy piece, attacks an enemy piece of strictly greater value (P=1, N/B=3, R=5, Q=9), or sets up checkmate in 1. Kings are excluded from the first two categories — those are checks. Pawn promotions to the same square count as one move.</p>
   </div>
 
   <!-- ── Screen 7: Drill summary ── -->

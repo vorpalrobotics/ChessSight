@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v47**
+**Current version: v48**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
@@ -51,4 +51,6 @@ A threat move is a legal move where, after making it, the moved piece:
 - Sets up checkmate in 1 (colorChar has a mating move available)
 Kings are excluded from the first two categories (those are checks).
 Pawn promotions to the same square count as one threat move.
+The threatening piece's landing square must be safe: no enemy piece of strictly
+lesser value may immediately recapture it (same rule as forks v46).
 (P=1, N/B=3, R=5, Q=9)
