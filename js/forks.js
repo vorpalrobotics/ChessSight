@@ -10,10 +10,9 @@ const ARROW_WHITE_CAP = { class: 'arrow-white-cap' };
 const ARROW_BLACK_CAP = { class: 'arrow-black-cap' };
 
 // P=1, N=3, B=3, R=5, Q=9, K=Infinity
-// A target qualifies if: it's the king, OR its value >= forking piece value
-// (profitable/even trade if defended), OR it's loose (free capture).
-// A defended piece worth LESS than the forking piece does NOT qualify —
-// capturing it would lose material.
+// A target qualifies if: it's the king, OR its value is STRICTLY GREATER than
+// the forking piece (profitable capture even if defended), OR it's loose (free capture).
+// A defended piece worth equal or less than the forking piece does NOT qualify.
 const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: Infinity };
 
 const FALLBACK_FENS = [
@@ -146,10 +145,10 @@ function parsePuzzleFen(data) {
 // A fork: the moved piece NEWLY attacks 2+ enemy pieces after the move, where
 // each newly-attacked piece qualifies as a real threat:
 //   - the king (must always respond), OR
-//   - value >= forking piece value (capturing is profitable or break-even
+//   - strictly greater value than the forking piece (profitable capture
 //     even if defended), OR
 //   - loose (zero defenders — can be taken for free regardless of value)
-// A defended piece worth LESS than the forking piece does NOT qualify.
+// A defended piece worth equal or less than the forking piece does NOT qualify.
 // "Newly attacked" means the piece was NOT already attacked by the moving piece
 // before the move (the move itself must create the threat).
 function getForksForColor(fen, colorChar) {
@@ -195,8 +194,8 @@ function getForksForColor(fen, colorChar) {
         // King always qualifies
         if (piece.type === 'k') { qualifyingTargets++; continue; }
 
-        // Qualifies if value >= forking piece (profitable/even capture) OR loose (free capture)
-        const isProfitable = PIECE_VALUES[piece.type] >= movedValue;
+        // Qualifies if value strictly > forking piece (profitable capture) OR loose (free capture)
+        const isProfitable = PIECE_VALUES[piece.type] > movedValue;
         const isLoose = tmp.attackers(sq, enemy).length === 0;
         if (isProfitable || isLoose) qualifyingTargets++;
       }

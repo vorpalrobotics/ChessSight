@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v43</title>
+  <title>ChessSight v44</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -281,7 +281,7 @@
     <div id="forks-status"></div>
     <div id="forks-result" class="hidden"></div>
     <button id="btn-forks-next">NEXT ›</button>
-    <p class="drill-rule">Count moves that newly attack two or more enemy pieces at once. Each target must be the king, worth at least as much as the forking piece (P=1, N/B=3, R=5, Q=9), or completely undefended. A defended piece worth less than the forking piece does not count — you would lose material capturing it. Only newly-created attacks count. Pawn promotions to the same square count as one fork move.</p>
+    <p class="drill-rule">Count moves that newly attack two or more enemy pieces at once. Each target must be the king, strictly greater in value than the forking piece (P=1, N/B=3, R=5, Q=9), or completely undefended. A defended piece worth equal to or less than the forking piece does not count. Only newly-created attacks count. Pawn promotions to the same square count as one fork move.</p>
   </div>
 
   <!-- ── Screen 7: Drill summary ── -->
