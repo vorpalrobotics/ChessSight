@@ -140,10 +140,13 @@ function parsePuzzleFen(data) {
 // --- Fork detection ---
 
 // Returns [{from, to}] for every move by colorChar that creates a fork.
-// A fork: the moved piece attacks 2+ enemy pieces, each of which is:
-//   - the king (always qualifies), OR
-//   - of value <= the moving piece's value, OR
-//   - underguarded in the post-move position (enemy attackers >= friendly defenders)
+// A fork: the moved piece NEWLY attacks 2+ enemy pieces after the move, where
+// each newly-attacked piece qualifies as:
+//   - the king (always), OR
+//   - strictly lower value than the moving piece, OR
+//   - loose (zero defenders) in the post-move position
+// "Newly attacked" means the piece was NOT already attacked by the moving piece
+// before the move (the move itself must create the threat).
 function getForksForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
@@ -156,8 +159,18 @@ function getForksForColor(fen, colorChar) {
   const forkMoves = [];
 
   for (const move of tmp.moves({ verbose: true })) {
-    tmp.move(move);
+    // Pre-move: record enemy squares already attacked by the piece at move.from
+    const preAttacked = new Set();
+    for (const file of 'abcdefgh') {
+      for (let rank = 1; rank <= 8; rank++) {
+        const sq = `${file}${rank}`;
+        const p = tmp.get(sq);
+        if (!p || p.color !== enemy) continue;
+        if (tmp.attackers(sq, colorChar).includes(move.from)) preAttacked.add(sq);
+      }
+    }
 
+    tmp.move(move);
     const movedValue = PIECE_VALUES[move.piece];
     let qualifyingTargets = 0;
 
@@ -167,24 +180,23 @@ function getForksForColor(fen, colorChar) {
         const piece = tmp.get(sq);
         if (!piece || piece.color !== enemy) continue;
 
-        // Does the moved piece (now at move.to) attack this square?
+        // Only count newly-attacked squares (move creates the threat)
+        if (preAttacked.has(sq)) continue;
+
+        // Moved piece must attack this square in the post-move position
         if (!tmp.attackers(sq, colorChar).includes(move.to)) continue;
 
         // King always qualifies
         if (piece.type === 'k') { qualifyingTargets++; continue; }
 
-        // Lower-or-equal value qualifies
-        if (PIECE_VALUES[piece.type] <= movedValue) { qualifyingTargets++; continue; }
-
-        // Underguarded: enemy attackers of sq >= friendly defenders of sq (post-move)
-        const attackers = tmp.attackers(sq, colorChar).length;
-        const defenders = tmp.attackers(sq, enemy).length;
-        if (attackers >= defenders) qualifyingTargets++;
+        // Qualifies if strictly lower value OR loose (no defenders)
+        const isLowerValue = PIECE_VALUES[piece.type] < movedValue;
+        const isLoose = tmp.attackers(sq, enemy).length === 0;
+        if (isLowerValue || isLoose) qualifyingTargets++;
       }
     }
 
     tmp.undo();
-
     if (qualifyingTargets >= 2) forkMoves.push({ from: move.from, to: move.to });
   }
 
@@ -307,8 +319,8 @@ function labelArrows() {
       const x2 = parseFloat(line.getAttribute('x2'));
       const y2 = parseFloat(line.getAttribute('y2'));
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', (x1 + x2) / 2);
-      text.setAttribute('y', (y1 + y2) / 2);
+      text.setAttribute('x', x1 + (x2 - x1) * 0.75);
+      text.setAttribute('y', y1 + (y2 - y1) * 0.75);
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('class', 'arrow-label');

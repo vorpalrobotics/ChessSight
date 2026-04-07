@@ -192,8 +192,8 @@ function labelArrows() {
       const x2 = parseFloat(line.getAttribute('x2'));
       const y2 = parseFloat(line.getAttribute('y2'));
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', (x1 + x2) / 2);
-      text.setAttribute('y', (y1 + y2) / 2);
+      text.setAttribute('x', x1 + (x2 - x1) * 0.75);
+      text.setAttribute('y', y1 + (y2 - y1) * 0.75);
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('dominant-baseline', 'central');
       text.setAttribute('class', 'arrow-label');
