@@ -140,18 +140,9 @@ function parsePuzzleFen(data) {
 
 // --- Capture counting ---
 
-function countCapturesForColor(fen, colorChar) {
-  const parts = fen.split(' ');
-  parts[1] = colorChar;
-  parts[3] = '-'; // clear en passant (only valid for original side-to-move)
-  const modFen = parts.join(' ');
-  const tmp = new Chess();
-  try { tmp.load(modFen); } catch { return 0; }
-  const count = tmp.moves({ verbose: true }).filter(m => m.captured).length;
-  return Math.min(count, 9); // 9 means "9 or more" — matches the "9+" button
-}
-
 // Returns [{from, to}] for every capturing move available to colorChar.
+// Pawn promotions by capture to the same destination square count once:
+// the first promotion piece encountered records the (from, to) pair.
 function getCapturesForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
@@ -159,18 +150,33 @@ function getCapturesForColor(fen, colorChar) {
   const modFen = parts.join(' ');
   const tmp = new Chess();
   try { tmp.load(modFen); } catch { return []; }
+  const found = new Set();
   return tmp.moves({ verbose: true })
-    .filter(m => m.captured)
+    .filter(m => {
+      if (!m.captured) return false;
+      const key = m.from + m.to;
+      if (found.has(key)) return false;
+      found.add(key);
+      return true;
+    })
     .map(m => ({ from: m.from, to: m.to }));
+}
+
+function countCapturesForColor(fen, colorChar) {
+  return Math.min(getCapturesForColor(fen, colorChar).length, 9);
 }
 
 function showCaptures() {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearNoMovesMessage('captures-board');
   for (const m of getCapturesForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
   for (const m of getCapturesForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  // Labels are injected after cm-chessboard finishes its async redraw
-  setTimeout(labelArrows, 50);
+  if (answerW === 0 && answerB === 0) {
+    setTimeout(() => showNoMovesMessage('captures-board'), 50);
+  } else {
+    setTimeout(labelArrows, 50);
+  }
   showingCaptures = true;
   document.getElementById('btn-captures-show').classList.add('active');
 }
@@ -179,6 +185,7 @@ function hideCaptures() {
   if (!board) return;
   board.removeArrows();
   clearArrowLabels();
+  clearNoMovesMessage('captures-board');
   showingCaptures = false;
   const btn = document.getElementById('btn-captures-show');
   if (btn) btn.classList.remove('active');
@@ -213,6 +220,28 @@ function labelArrows() {
 function clearArrowLabels() {
   const boardEl = document.getElementById('captures-board');
   if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
+}
+
+function showNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
+  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'board-none-msg');
+  text.textContent = 'None by either side';
+  svg.appendChild(text);
+}
+
+function clearNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  if (boardEl) boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---

@@ -129,21 +129,9 @@ function parsePuzzleFen(data) {
 
 // --- Check counting ---
 
-function countChecksForColor(fen, colorChar) {
-  const parts = fen.split(' ');
-  parts[1] = colorChar;
-  parts[3] = '-';
-  const modFen = parts.join(' ');
-  const tmp = new Chess();
-  try { tmp.load(modFen); } catch { return 0; }
-  let count = 0;
-  for (const m of tmp.moves({ verbose: true })) {
-    try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
-  }
-  return Math.min(count, 9);
-}
-
 // Returns [{from, to}] for every move by colorChar that delivers check.
+// Pawn promotions to the same destination square count as one move:
+// if any promotion piece gives check, we count that (from, to) once.
 function getChecksForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
@@ -151,19 +139,31 @@ function getChecksForColor(fen, colorChar) {
   const modFen = parts.join(' ');
   const tmp = new Chess();
   try { tmp.load(modFen); } catch { return []; }
+  const found = new Set();
   const result = [];
   for (const m of tmp.moves({ verbose: true })) {
-    try { tmp.move(m); if (tmp.inCheck()) result.push({ from: m.from, to: m.to }); tmp.undo(); } catch { /* skip */ }
+    const key = m.from + m.to;
+    if (found.has(key)) continue;
+    try { tmp.move(m); if (tmp.inCheck()) { found.add(key); result.push({ from: m.from, to: m.to }); } tmp.undo(); } catch { /* skip */ }
   }
   return result;
+}
+
+function countChecksForColor(fen, colorChar) {
+  return Math.min(getChecksForColor(fen, colorChar).length, 9);
 }
 
 function showChecks() {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearNoMovesMessage('checks-board');
   for (const m of getChecksForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
   for (const m of getChecksForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  setTimeout(labelArrows, 50);
+  if (answerW === 0 && answerB === 0) {
+    setTimeout(() => showNoMovesMessage('checks-board'), 50);
+  } else {
+    setTimeout(labelArrows, 50);
+  }
   showingChecks = true;
   document.getElementById('btn-checks-show').classList.add('active');
 }
@@ -172,6 +172,7 @@ function hideChecks() {
   if (!board) return;
   board.removeArrows();
   clearArrowLabels();
+  clearNoMovesMessage('checks-board');
   showingChecks = false;
   const btn = document.getElementById('btn-checks-show');
   if (btn) btn.classList.remove('active');
@@ -206,6 +207,28 @@ function labelArrows() {
 function clearArrowLabels() {
   const boardEl = document.getElementById('checks-board');
   if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
+}
+
+function showNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
+  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'board-none-msg');
+  text.textContent = 'None by either side';
+  svg.appendChild(text);
+}
+
+function clearNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  if (boardEl) boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---

@@ -174,10 +174,12 @@ function getUnderguardedForColor(fen, colorChar) {
 function showUnder() {
   if (!board || !currentFen) return;
   clearUnderOverlay();
-  drawUnderOverlay(
-    getUnderguardedForColor(currentFen, 'w'),
-    getUnderguardedForColor(currentFen, 'b')
-  );
+  const whiteSqs = getUnderguardedForColor(currentFen, 'w');
+  const blackSqs = getUnderguardedForColor(currentFen, 'b');
+  drawUnderOverlay(whiteSqs, blackSqs);
+  if (whiteSqs.length === 0 && blackSqs.length === 0) {
+    setTimeout(() => showNoMovesMessage('under-board'), 50);
+  }
   showingUnder = true;
   document.getElementById('btn-under-show').classList.add('active');
 }
@@ -233,7 +235,27 @@ function drawUnderOverlay(whiteSqs, blackSqs) {
 
 function clearUnderOverlay() {
   const boardEl = document.getElementById('under-board');
-  if (boardEl) boardEl.querySelectorAll('.under-overlay').forEach(el => el.remove());
+  if (boardEl) {
+    boardEl.querySelectorAll('.under-overlay').forEach(el => el.remove());
+    boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
+  }
+}
+
+function showNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
+  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'board-none-msg');
+  text.textContent = 'None by either side';
+  svg.appendChild(text);
 }
 
 // --- Digit button interaction ---

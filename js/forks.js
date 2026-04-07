@@ -157,6 +157,7 @@ function getForksForColor(fen, colorChar) {
 
   const enemy = colorChar === 'w' ? 'b' : 'w';
   const forkMoves = [];
+  const forkFound = new Set(); // dedup pawn promotions: count (from,to) once
 
   for (const move of tmp.moves({ verbose: true })) {
     // Pre-move: record enemy squares already attacked by the piece at move.from
@@ -197,7 +198,13 @@ function getForksForColor(fen, colorChar) {
     }
 
     tmp.undo();
-    if (qualifyingTargets >= 2) forkMoves.push({ from: move.from, to: move.to });
+    if (qualifyingTargets >= 2) {
+      const key = move.from + move.to;
+      if (!forkFound.has(key)) {
+        forkFound.add(key);
+        forkMoves.push({ from: move.from, to: move.to });
+      }
+    }
   }
 
   return forkMoves;
@@ -288,9 +295,14 @@ async function restartDrill() {
 function showForks() {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearNoMovesMessage('forks-board');
   for (const m of getForksForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
   for (const m of getForksForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  setTimeout(labelArrows, 50);
+  if (answerW === 0 && answerB === 0) {
+    setTimeout(() => showNoMovesMessage('forks-board'), 50);
+  } else {
+    setTimeout(labelArrows, 50);
+  }
   showingForks = true;
   document.getElementById('btn-forks-show').classList.add('active');
 }
@@ -299,6 +311,7 @@ function hideForks() {
   if (!board) return;
   board.removeArrows();
   clearArrowLabels();
+  clearNoMovesMessage('forks-board');
   showingForks = false;
   const btn = document.getElementById('btn-forks-show');
   if (btn) btn.classList.remove('active');
@@ -333,6 +346,28 @@ function labelArrows() {
 function clearArrowLabels() {
   const boardEl = document.getElementById('forks-board');
   if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
+}
+
+function showNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
+  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'board-none-msg');
+  text.textContent = 'None by either side';
+  svg.appendChild(text);
+}
+
+function clearNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  if (boardEl) boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
 }
 
 // --- UI helpers ---

@@ -169,10 +169,12 @@ function getLoosePiecesForColor(fen, colorChar) {
 function showLoose() {
   if (!board || !currentFen) return;
   clearLooseOverlay();
-  drawLooseOverlay(
-    getLoosePiecesForColor(currentFen, 'w'),
-    getLoosePiecesForColor(currentFen, 'b')
-  );
+  const whiteSqs = getLoosePiecesForColor(currentFen, 'w');
+  const blackSqs = getLoosePiecesForColor(currentFen, 'b');
+  drawLooseOverlay(whiteSqs, blackSqs);
+  if (whiteSqs.length === 0 && blackSqs.length === 0) {
+    setTimeout(() => showNoMovesMessage('loose-board'), 50);
+  }
   showingLoose = true;
   document.getElementById('btn-loose-show').classList.add('active');
 }
@@ -228,7 +230,27 @@ function drawLooseOverlay(whiteSqs, blackSqs) {
 
 function clearLooseOverlay() {
   const boardEl = document.getElementById('loose-board');
-  if (boardEl) boardEl.querySelectorAll('.loose-overlay').forEach(el => el.remove());
+  if (boardEl) {
+    boardEl.querySelectorAll('.loose-overlay').forEach(el => el.remove());
+    boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
+  }
+}
+
+function showNoMovesMessage(boardId) {
+  const boardEl = document.getElementById(boardId);
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
+  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'board-none-msg');
+  text.textContent = 'None by either side';
+  svg.appendChild(text);
 }
 
 // --- Digit button interaction ---

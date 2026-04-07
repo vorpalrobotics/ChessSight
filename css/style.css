@@ -516,6 +516,17 @@ header h1 {
   font-family: system-ui, sans-serif;
 }
 
+.board-none-msg {
+  font-size: 20px;
+  font-weight: 700;
+  fill: white;
+  stroke: rgba(0, 0, 0, 0.92);
+  stroke-width: 5px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+
 /* Loose pieces SHOW overlay */
 .loose-marker-white {
   fill: rgba(196, 169, 110, 0.1);
@@ -668,6 +679,15 @@ header h1 {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+}
+
+.drill-rule {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  text-align: center;
+  max-width: calc(var(--board-size) + 4px);
+  padding: 0 0.5rem;
 }
 
 /* ── Summary screen ── */
