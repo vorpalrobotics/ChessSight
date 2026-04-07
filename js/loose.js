@@ -27,6 +27,8 @@ let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
+let currentFen = '';
+let showingLoose = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 
@@ -37,6 +39,10 @@ export function initLoose(navigateFn) {
   createDigitButtons();
   document.getElementById('btn-loose-done').addEventListener('click', showSummary);
   document.getElementById('btn-loose-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-loose-show').addEventListener('click', () => {
+    if (showingLoose) hideLoose();
+    else showLoose();
+  });
 }
 
 export async function startLoose() {
@@ -55,6 +61,7 @@ async function loadNextPuzzle() {
 
   const { fen, puzzleId } = await fetchValidFen();
   currentPuzzleId = puzzleId;
+  currentFen = fen;
 
   if (!board) {
     board = new Chessboard(document.getElementById('loose-board'), {
@@ -141,6 +148,87 @@ function countLoosePiecesForColor(fen, colorChar) {
     }
   }
   return Math.min(count, 9);
+}
+
+// Returns square names (e.g. ['e4','f3']) for loose pieces of colorChar.
+function getLoosePiecesForColor(fen, colorChar) {
+  const tmp = new Chess();
+  try { tmp.load(fen); } catch { return []; }
+  const squares = [];
+  for (const file of 'abcdefgh') {
+    for (let rank = 1; rank <= 8; rank++) {
+      const sq = file + rank;
+      const piece = tmp.get(sq);
+      if (!piece || piece.color !== colorChar || piece.type === 'k') continue;
+      if (tmp.attackers(sq, colorChar).length === 0) squares.push(sq);
+    }
+  }
+  return squares;
+}
+
+function showLoose() {
+  if (!board || !currentFen) return;
+  clearLooseOverlay();
+  drawLooseOverlay(
+    getLoosePiecesForColor(currentFen, 'w'),
+    getLoosePiecesForColor(currentFen, 'b')
+  );
+  showingLoose = true;
+  document.getElementById('btn-loose-show').classList.add('active');
+}
+
+function hideLoose() {
+  clearLooseOverlay();
+  showingLoose = false;
+  const btn = document.getElementById('btn-loose-show');
+  if (btn) btn.classList.remove('active');
+}
+
+function drawLooseOverlay(whiteSqs, blackSqs) {
+  const boardEl = document.getElementById('loose-board');
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+
+  const layer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  layer.setAttribute('class', 'loose-overlay');
+  svg.appendChild(layer);
+
+  [['w', whiteSqs, 'loose-marker-white'], ['b', blackSqs, 'loose-marker-black']].forEach(([, squares, cls]) => {
+    squares.forEach((sq, i) => {
+      const file = sq.charCodeAt(0) - 97;  // 'a'=0
+      const rank = parseInt(sq[1]);         // 1-8
+      const x = file * sqSize;
+      const y = (8 - rank) * sqSize;
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x + 2);
+      rect.setAttribute('y', y + 2);
+      rect.setAttribute('width', sqSize - 4);
+      rect.setAttribute('height', sqSize - 4);
+      rect.setAttribute('rx', 4);
+      rect.setAttribute('class', cls);
+      layer.appendChild(rect);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + sqSize * 0.22);
+      text.setAttribute('y', y + sqSize * 0.28);
+      text.setAttribute('font-size', sqSize * 0.3);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('class', 'loose-label');
+      text.textContent = i + 1;
+      layer.appendChild(text);
+    });
+  });
+}
+
+function clearLooseOverlay() {
+  const boardEl = document.getElementById('loose-board');
+  if (boardEl) boardEl.querySelectorAll('.loose-overlay').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---
@@ -246,6 +334,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  hideLoose();
   document.getElementById('loose-timer').textContent = '0:00';
   document.getElementById('loose-misses').textContent = 'Misses: 0';
   const result = document.getElementById('loose-result');

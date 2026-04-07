@@ -375,6 +375,7 @@ header h1 {
   font-family: monospace;
 }
 
+#btn-loose-show,
 #btn-checks-show,
 #btn-captures-show {
   font-size: 0.78rem;
@@ -386,12 +387,14 @@ header h1 {
   color: var(--text-muted);
   border-radius: 6px;
 }
+#btn-loose-show.active,
 #btn-checks-show.active,
 #btn-captures-show.active {
   background: #1a5ca8;
   border-color: #3a80d0;
   color: #fff;
 }
+#btn-loose-show:hover:not(:disabled),
 #btn-checks-show:hover:not(:disabled),
 #btn-captures-show:hover:not(:disabled) {
   background: #1a5ca8 !important;
@@ -430,6 +433,30 @@ header h1 {
   fill: white;
   stroke: rgba(0, 0, 0, 0.85);
   stroke-width: 3px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+
+/* Loose pieces SHOW overlay */
+.loose-marker-white {
+  fill: rgba(196, 169, 110, 0.1);
+  stroke: #c4a96e;
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+  pointer-events: none;
+}
+.loose-marker-black {
+  fill: rgba(136, 152, 168, 0.1);
+  stroke: #8898a8;
+  stroke-width: 3px;
+  pointer-events: none;
+}
+.loose-label {
+  font-weight: 700;
+  fill: white;
+  stroke: rgba(0, 0, 0, 0.85);
+  stroke-width: 2px;
   paint-order: stroke fill;
   pointer-events: none;
   font-family: system-ui, sans-serif;
