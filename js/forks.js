@@ -150,7 +150,8 @@ function parsePuzzleFen(data) {
 //   - loose (zero defenders — can be taken for free regardless of value)
 // A defended piece worth equal or less than the forking piece does NOT qualify.
 // Additionally, the forking move must land on a safe square: no enemy piece
-// worth ≤ the forking piece (and no enemy king) may immediately recapture.
+// worth strictly less than the forking piece may immediately recapture
+// (equal-value defenders are allowed — that's a normal trade, not losing the piece).
 function getForksForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
@@ -176,13 +177,14 @@ function getForksForColor(fen, colorChar) {
     }
 
     tmp.move(move);
-    // Landing square safety check: if any enemy piece worth ≤ the forking piece
-    // (or the enemy king) can immediately recapture, the move is not a real fork.
+    // Landing square safety check: skip moves where a CHEAPER enemy piece
+    // can immediately recapture (e.g. knight landing on a pawn-guarded square).
+    // Equal-value or higher-value defenders are ignored — that's a normal trade.
     const landingPiece = tmp.get(move.to);
     const movedValue = landingPiece ? PIECE_VALUES[landingPiece.type] : PIECE_VALUES[move.piece];
     const isSafeLanding = !tmp.attackers(move.to, enemy).some(sq => {
       const p = tmp.get(sq);
-      return p && (p.type === 'k' || PIECE_VALUES[p.type] <= movedValue);
+      return p && PIECE_VALUES[p.type] < movedValue;
     });
     if (!isSafeLanding) { tmp.undo(); continue; }
 
