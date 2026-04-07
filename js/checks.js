@@ -1,8 +1,13 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
+import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
+const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
+
+const ARROW_WHITE_CAP = { class: 'arrow-white-cap' };
+const ARROW_BLACK_CAP = { class: 'arrow-black-cap' };
 
 const FALLBACK_FENS = [
   'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
@@ -27,6 +32,8 @@ let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
+let currentFen = '';
+let showingChecks = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 
@@ -37,6 +44,10 @@ export function initChecks(navigateFn) {
   createDigitButtons();
   document.getElementById('btn-checks-done').addEventListener('click', showSummary);
   document.getElementById('btn-checks-next').addEventListener('click', loadNextPuzzle);
+  document.getElementById('btn-checks-show').addEventListener('click', () => {
+    if (showingChecks) hideChecks();
+    else showChecks();
+  });
 }
 
 export async function startChecks() {
@@ -55,12 +66,14 @@ async function loadNextPuzzle() {
 
   const { fen, puzzleId } = await fetchValidFen();
   currentPuzzleId = puzzleId;
+  currentFen = fen;
 
   if (!board) {
     board = new Chessboard(document.getElementById('checks-board'), {
       position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
+      extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL, headSize: 6 } }],
     });
   } else {
     board.setPosition(fen, false);
@@ -128,6 +141,71 @@ function countChecksForColor(fen, colorChar) {
     try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
   }
   return Math.min(count, 9);
+}
+
+// Returns [{from, to}] for every move by colorChar that delivers check.
+function getChecksForColor(fen, colorChar) {
+  const parts = fen.split(' ');
+  parts[1] = colorChar;
+  parts[3] = '-';
+  const modFen = parts.join(' ');
+  const tmp = new Chess();
+  try { tmp.load(modFen); } catch { return []; }
+  const result = [];
+  for (const m of tmp.moves({ verbose: true })) {
+    try { tmp.move(m); if (tmp.inCheck()) result.push({ from: m.from, to: m.to }); tmp.undo(); } catch { /* skip */ }
+  }
+  return result;
+}
+
+function showChecks() {
+  if (!board || !currentFen) return;
+  board.removeArrows();
+  for (const m of getChecksForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
+  for (const m of getChecksForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
+  setTimeout(labelArrows, 50);
+  showingChecks = true;
+  document.getElementById('btn-checks-show').classList.add('active');
+}
+
+function hideChecks() {
+  if (!board) return;
+  board.removeArrows();
+  clearArrowLabels();
+  showingChecks = false;
+  const btn = document.getElementById('btn-checks-show');
+  if (btn) btn.classList.remove('active');
+}
+
+function labelArrows() {
+  clearArrowLabels();
+  const boardEl = document.getElementById('checks-board');
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  ['arrow-white-cap', 'arrow-black-cap'].forEach(cls => {
+    let n = 1;
+    boardEl.querySelectorAll(`.arrow.${cls}`).forEach(group => {
+      const line = group.querySelector('.arrow-line');
+      if (!line) return;
+      const x1 = parseFloat(line.getAttribute('x1'));
+      const y1 = parseFloat(line.getAttribute('y1'));
+      const x2 = parseFloat(line.getAttribute('x2'));
+      const y2 = parseFloat(line.getAttribute('y2'));
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', (x1 + x2) / 2);
+      text.setAttribute('y', (y1 + y2) / 2);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('class', 'arrow-label');
+      text.textContent = n++;
+      svg.appendChild(text);
+    });
+  });
+}
+
+function clearArrowLabels() {
+  const boardEl = document.getElementById('checks-board');
+  if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---
@@ -235,6 +313,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  hideChecks();
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
   const result = document.getElementById('checks-result');
