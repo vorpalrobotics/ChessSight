@@ -397,6 +397,9 @@ header h1 {
 }
 
 /* Custom arrow colors for Captures SHOW feature */
+.cm-chessboard .arrow-white-cap {
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.7));
+}
 .cm-chessboard .arrow-white-cap .arrow-head {
   fill: #c4a96e;
   fill-rule: nonzero;
@@ -404,7 +407,7 @@ header h1 {
 .cm-chessboard .arrow-white-cap .arrow-line {
   stroke: #c4a96e;
   stroke-linecap: round;
-  stroke-width: 4px !important;
+  stroke-width: 5px !important;
   opacity: 0.9;
 }
 .cm-chessboard .arrow-black-cap .arrow-head {
@@ -414,7 +417,7 @@ header h1 {
 .cm-chessboard .arrow-black-cap .arrow-line {
   stroke: #8898a8;
   stroke-linecap: round;
-  stroke-width: 4px !important;
+  stroke-width: 5px !important;
   opacity: 0.9;
 }
 
