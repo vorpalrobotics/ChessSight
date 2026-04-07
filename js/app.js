@@ -42,6 +42,10 @@ document.getElementById('btn-menu').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
+document.getElementById('btn-home').addEventListener('click', () => {
+  showScreen('screen-select');
+});
+
 document.getElementById('btn-summary-menu').addEventListener('click', () => {
   showScreen('screen-select');
 });

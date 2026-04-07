@@ -11,12 +11,12 @@
 </head>
 <body>
   <header>
-    <div style="display:flex;align-items:center;gap:0.5rem;">
+    <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <h1>ChessSight</h1>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
-      <button id="btn-menu" class="hidden">Choose Drill</button>
+      <button id="btn-menu" class="hidden">&#8592; Back</button>
       <div class="hamburger-menu">
         <button id="btn-hamburger" aria-label="Menu">&#9776;</button>
         <div id="hamburger-dropdown" class="hamburger-dropdown hidden">
@@ -33,6 +33,7 @@
       <button class="modal-close" id="btn-modal-close">&times;</button>
       <h2>About ChessSight</h2>
       <p class="modal-copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
+      <p style="font-size:0.85rem;font-weight:700;color:var(--text-muted);margin-bottom:0.5rem;">Attributions:</p>
       <div class="modal-attributions">
         <p><strong>Chess engine:</strong> <a href="https://stockfishchess.org/" target="_blank" rel="noopener">Stockfish</a> &mdash; a free, open-source UCI chess engine (MIT / GPL licensed).</p>
         <p><strong>Chessboard UI:</strong> <a href="https://github.com/shaack/cm-chessboard" target="_blank" rel="noopener">cm-chessboard</a> by Stefan Haack &mdash; a responsive SVG chessboard library (MIT licensed).</p>
@@ -246,7 +247,7 @@
       </div>
       <div id="summary-actions">
         <button id="btn-summary-again">Drill Again</button>
-        <button id="btn-summary-menu">Choose Drill</button>
+        <button id="btn-summary-menu">&#8592; Back</button>
       </div>
     </div>
   </div>
