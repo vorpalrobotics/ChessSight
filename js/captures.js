@@ -169,6 +169,8 @@ function showCaptures() {
   board.removeArrows();
   for (const m of getCapturesForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
   for (const m of getCapturesForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
+  // Labels are injected after cm-chessboard finishes its async redraw
+  setTimeout(labelArrows, 50);
   showingCaptures = true;
   document.getElementById('btn-captures-show').classList.add('active');
 }
@@ -176,9 +178,41 @@ function showCaptures() {
 function hideCaptures() {
   if (!board) return;
   board.removeArrows();
+  clearArrowLabels();
   showingCaptures = false;
   const btn = document.getElementById('btn-captures-show');
   if (btn) btn.classList.remove('active');
+}
+
+function labelArrows() {
+  clearArrowLabels();
+  const boardEl = document.getElementById('captures-board');
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  ['arrow-white-cap', 'arrow-black-cap'].forEach(cls => {
+    let n = 1;
+    boardEl.querySelectorAll(`.arrow.${cls}`).forEach(group => {
+      const line = group.querySelector('.arrow-line');
+      if (!line) return;
+      const x1 = parseFloat(line.getAttribute('x1'));
+      const y1 = parseFloat(line.getAttribute('y1'));
+      const x2 = parseFloat(line.getAttribute('x2'));
+      const y2 = parseFloat(line.getAttribute('y2'));
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', (x1 + x2) / 2);
+      text.setAttribute('y', (y1 + y2) / 2);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('class', 'arrow-label');
+      text.textContent = n++;
+      svg.appendChild(text);
+    });
+  });
+}
+
+function clearArrowLabels() {
+  const boardEl = document.getElementById('captures-board');
+  if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
 }
 
 // --- Digit button interaction ---

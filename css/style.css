@@ -421,6 +421,17 @@ header h1 {
   opacity: 0.9;
 }
 
+.arrow-label {
+  font-size: 14px;
+  font-weight: 700;
+  fill: white;
+  stroke: rgba(0, 0, 0, 0.85);
+  stroke-width: 3px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+
 #btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done {
   background: var(--surface2);
   color: var(--text-muted);
