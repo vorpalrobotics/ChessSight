@@ -73,7 +73,7 @@ async function loadNextPuzzle() {
       position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
-      extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL } }],
+      extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL, headSize: 5 } }],
     });
   } else {
     board.setPosition(fen, false);
