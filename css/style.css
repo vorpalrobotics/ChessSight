@@ -372,7 +372,7 @@ header h1 {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-forks {
+#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -447,7 +447,7 @@ header h1 {
   font-family: monospace;
 }
 
-#btn-forks-show,
+#btn-threats-show,
 #btn-under-show,
 #btn-loose-show,
 #btn-checks-show,
@@ -461,7 +461,7 @@ header h1 {
   color: var(--text-muted);
   border-radius: 6px;
 }
-#btn-forks-show.active,
+#btn-threats-show.active,
 #btn-under-show.active,
 #btn-loose-show.active,
 #btn-checks-show.active,
@@ -470,7 +470,7 @@ header h1 {
   border-color: #3a80d0;
   color: #fff;
 }
-#btn-forks-show:hover:not(:disabled),
+#btn-threats-show:hover:not(:disabled),
 #btn-under-show:hover:not(:disabled),
 #btn-loose-show:hover:not(:disabled),
 #btn-checks-show:hover:not(:disabled),
@@ -551,7 +551,7 @@ header h1 {
   font-family: system-ui, sans-serif;
 }
 
-#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-forks-done {
+#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-threats-done {
   background: var(--surface2);
   color: var(--text-muted);
   font-weight: 700;
@@ -564,7 +564,7 @@ header h1 {
 #btn-captures-done:hover:not(:disabled),
 #btn-loose-done:hover:not(:disabled),
 #btn-under-done:hover:not(:disabled),
-#btn-forks-done:hover:not(:disabled) {
+#btn-threats-done:hover:not(:disabled) {
   background: #7a1a2e;
   color: #fff;
   border-color: var(--accent);
@@ -660,7 +660,7 @@ header h1 {
   text-align: center;
 }
 
-#btn-checks-next, #btn-captures-next, #btn-loose-next, #btn-under-next, #btn-forks-next {
+#btn-checks-next, #btn-captures-next, #btn-loose-next, #btn-under-next, #btn-threats-next {
   margin-top: 0.25rem;
   padding: 0.5rem 2.5rem;
   font-size: 0.95rem;
@@ -675,7 +675,7 @@ header h1 {
 #btn-captures-next:hover:not(:disabled),
 #btn-loose-next:hover:not(:disabled),
 #btn-under-next:hover:not(:disabled),
-#btn-forks-next:hover:not(:disabled) {
+#btn-threats-next:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;

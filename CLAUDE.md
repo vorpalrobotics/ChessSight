@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v46**
+**Current version: v47**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
@@ -44,14 +44,11 @@ Compound key `[date, drill]` in store `drillDays`.
 - **History** — Chart.js progress charts (avg time + accuracy per drill)
 - **Debug** — raw IDB data table (remove before customer release)
 
-## Fork drill definition
-A fork move attacks 2+ enemy pieces that are each a real threat:
-- The king (always qualifies), OR
-- Strictly greater value than the forking piece — profitable capture even if defended, OR
-- Loose (zero defenders) — free capture regardless of value
-A defended piece worth equal to or less than the forking piece does NOT qualify.
-AND the attack must be newly created by the move (piece did not already attack
-that square before moving).
-AND the forking piece's landing square must be safe (no enemy piece worth
-strictly less than the forking piece may immediately recapture).
-(P=1, N/B=3, R=5, Q=9, K=∞)
+## Threats drill definition
+A threat move is a legal move where, after making it, the moved piece:
+- Attacks an enemy piece of strictly greater value (lesser attacks greater), OR
+- Attacks a loose (zero-defender) enemy piece (free capture next turn), OR
+- Sets up checkmate in 1 (colorChar has a mating move available)
+Kings are excluded from the first two categories (those are checks).
+Pawn promotions to the same square count as one threat move.
+(P=1, N/B=3, R=5, Q=9)
