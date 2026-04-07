@@ -149,8 +149,8 @@ function parsePuzzleFen(data) {
 //     even if defended), OR
 //   - loose (zero defenders — can be taken for free regardless of value)
 // A defended piece worth equal or less than the forking piece does NOT qualify.
-// "Newly attacked" means the piece was NOT already attacked by the moving piece
-// before the move (the move itself must create the threat).
+// Additionally, the forking move must land on a safe square: no enemy piece
+// worth ≤ the forking piece (and no enemy king) may immediately recapture.
 function getForksForColor(fen, colorChar) {
   const parts = fen.split(' ');
   parts[1] = colorChar;
@@ -176,7 +176,16 @@ function getForksForColor(fen, colorChar) {
     }
 
     tmp.move(move);
-    const movedValue = PIECE_VALUES[move.piece];
+    // Landing square safety check: if any enemy piece worth ≤ the forking piece
+    // (or the enemy king) can immediately recapture, the move is not a real fork.
+    const landingPiece = tmp.get(move.to);
+    const movedValue = landingPiece ? PIECE_VALUES[landingPiece.type] : PIECE_VALUES[move.piece];
+    const isSafeLanding = !tmp.attackers(move.to, enemy).some(sq => {
+      const p = tmp.get(sq);
+      return p && (p.type === 'k' || PIECE_VALUES[p.type] <= movedValue);
+    });
+    if (!isSafeLanding) { tmp.undo(); continue; }
+
     let qualifyingTargets = 0;
 
     for (const file of 'abcdefgh') {

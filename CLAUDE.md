@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v44**
+**Current version: v45**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
@@ -51,4 +51,7 @@ A fork move attacks 2+ enemy pieces that are each a real threat:
 - Loose (zero defenders) — free capture regardless of value
 A defended piece worth equal to or less than the forking piece does NOT qualify.
 AND the attack must be newly created by the move (piece did not already attack
-that square before moving). (P=1, N/B=3, R=5, Q=9, K=∞)
+that square before moving).
+AND the forking piece's landing square must be safe (no enemy piece worth ≤ the
+forking piece, and no enemy king, may immediately recapture).
+(P=1, N/B=3, R=5, Q=9, K=∞)
