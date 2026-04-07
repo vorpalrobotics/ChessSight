@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v42**
+**Current version: v43**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
@@ -45,9 +45,10 @@ Compound key `[date, drill]` in store `drillDays`.
 - **Debug** — raw IDB data table (remove before customer release)
 
 ## Fork drill definition
-A fork move attacks 2+ enemy pieces that are each:
+A fork move attacks 2+ enemy pieces that are each a real threat:
 - The king (always qualifies), OR
-- Strictly lower value than the forking piece (P=1, N/B=3, R=5, Q=9, K=∞), OR
-- Loose (zero defenders in the post-move position)
+- Value >= forking piece value — profitable or break-even capture even if defended, OR
+- Loose (zero defenders) — free capture regardless of value
+A defended piece worth LESS than the forking piece does NOT qualify (capturing loses material).
 AND the attack must be newly created by the move (piece did not already attack
-that square before moving).
+that square before moving). (P=1, N/B=3, R=5, Q=9, K=∞)
