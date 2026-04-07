@@ -68,6 +68,11 @@
         <span class="mode-name">Underguarded</span>
         <span class="mode-desc">Count pieces with attackers &gt;= defenders</span>
       </button>
+      <button class="mode-card" id="mode-forks">
+        <span class="mode-icon">♞</span>
+        <span class="mode-name">Forks</span>
+        <span class="mode-desc">Count moves that fork two or more pieces</span>
+      </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
   </div>
@@ -232,7 +237,47 @@
     <button id="btn-under-next">NEXT ›</button>
   </div>
 
-  <!-- ── Screen 6: Drill summary ── -->
+  <!-- ── Screen 6: Forks drill ── -->
+  <div id="screen-forks" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Count Forks</h2>
+        <span id="forks-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="forks-session-time" class="session-stat"></span>
+        <span id="forks-session-acc" class="session-stat"></span>
+        <button id="btn-forks-done">DONE</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="forks-board"></div>
+    </div>
+
+    <div class="drill-answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">W</span>
+        <div class="digit-buttons" id="forks-digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B</span>
+        <div class="digit-buttons" id="forks-digits-black"></div>
+      </div>
+    </div>
+
+    <div class="drill-current-stats">
+      <span id="forks-timer">0:00</span>
+      <span id="forks-misses">Misses: 0</span>
+      <button id="btn-forks-show">SHOW</button>
+    </div>
+
+    <div id="forks-status"></div>
+    <div id="forks-result" class="hidden"></div>
+    <button id="btn-forks-next">NEXT ›</button>
+  </div>
+
+  <!-- ── Screen 7: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>

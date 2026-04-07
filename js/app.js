@@ -6,10 +6,11 @@ import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
 import { initLoose, startLoose } from './loose.js';
 import { initUnder, startUnder } from './under.js';
+import { initForks, startForks } from './forks.js';
 import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-forks', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -36,6 +37,11 @@ document.getElementById('mode-loose').addEventListener('click', async () => {
 document.getElementById('mode-under').addEventListener('click', async () => {
   showScreen('screen-under');
   await startUnder();
+});
+
+document.getElementById('mode-forks').addEventListener('click', async () => {
+  showScreen('screen-forks');
+  await startForks();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -113,7 +119,7 @@ async function renderDataTable() {
     return;
   }
 
-  const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded' };
+  const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', forks: 'Forks' };
 
   const table = document.createElement('table');
   table.className = 'data-table';
@@ -502,3 +508,4 @@ initChecks(showScreen);
 initCaptures(showScreen);
 initLoose(showScreen);
 initUnder(showScreen);
+initForks(showScreen);
