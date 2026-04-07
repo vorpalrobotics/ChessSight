@@ -6,6 +6,7 @@ import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
 import { initLoose, startLoose } from './loose.js';
 import { initUnder, startUnder } from './under.js';
+import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
 const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-summary', 'screen-engine'];
@@ -70,10 +71,77 @@ document.getElementById('btn-modal-close').addEventListener('click', () => {
   modalAbout.classList.add('hidden');
 });
 
-// Close modal on backdrop click
 modalAbout.addEventListener('click', (e) => {
   if (e.target === modalAbout) modalAbout.classList.add('hidden');
 });
+
+// --- Data viewer modal ---
+const modalData = document.getElementById('modal-data');
+
+document.getElementById('btn-data').addEventListener('click', async () => {
+  hamburgerDropdown.classList.add('hidden');
+  await renderDataTable();
+  modalData.classList.remove('hidden');
+});
+
+document.getElementById('btn-data-modal-close').addEventListener('click', () => {
+  modalData.classList.add('hidden');
+});
+
+modalData.addEventListener('click', (e) => {
+  if (e.target === modalData) modalData.classList.add('hidden');
+});
+
+async function renderDataTable() {
+  const wrap = document.getElementById('data-table-wrap');
+  wrap.innerHTML = '';
+
+  let records;
+  try {
+    records = await getAllRecords();
+  } catch (err) {
+    wrap.innerHTML = `<p class="data-empty">Error reading data: ${err.message}</p>`;
+    return;
+  }
+
+  if (records.length === 0) {
+    wrap.innerHTML = '<p class="data-empty">No data saved yet — complete some puzzles first.</p>';
+    return;
+  }
+
+  const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded' };
+
+  const table = document.createElement('table');
+  table.className = 'data-table';
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Date</th><th>Drill</th><th>Positions</th>
+        <th>Total Time</th><th>Correct</th><th>Misses</th><th>Accuracy</th><th>Puzzle IDs</th>
+      </tr>
+    </thead>`;
+
+  const tbody = document.createElement('tbody');
+  for (const r of records) {
+    const total = r.totalCorrect + r.totalMisses;
+    const acc = total > 0 ? Math.round(r.totalCorrect / total * 100) + '%' : '—';
+    const mins = Math.floor(r.totalSeconds / 60);
+    const secs = String(r.totalSeconds % 60).padStart(2, '0');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>${DRILL_LABELS[r.drill] ?? r.drill}</td>
+      <td>${r.positions}</td>
+      <td>${mins}:${secs}</td>
+      <td>${r.totalCorrect}</td>
+      <td>${r.totalMisses}</td>
+      <td>${acc}</td>
+      <td class="puzzle-ids">${r.puzzleIds || '—'}</td>`;
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
 
 // Custom marker types for move highlighting
 const MARKER_SELECTED = { class: 'marker-selected', slice: 'markerFrame' };

@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
+import { upsertDrillDay } from './storage.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -25,6 +26,7 @@ let correctW = false;
 let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
+let currentPuzzleId = '';
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 
@@ -51,7 +53,8 @@ async function loadNextPuzzle() {
   document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
   setStatus('Loading puzzle…');
 
-  const fen = await fetchValidFen();
+  const { fen, puzzleId } = await fetchValidFen();
+  currentPuzzleId = puzzleId;
 
   if (!board) {
     board = new Chessboard(document.getElementById('checks-board'), {
@@ -75,15 +78,15 @@ async function loadNextPuzzle() {
 async function fetchValidFen() {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      const fen = await fetchLichessPuzzle();
-      if (!sideToMoveInCheck(fen)) return fen;
+      const { fen, puzzleId } = await fetchLichessPuzzle();
+      if (!sideToMoveInCheck(fen)) return { fen, puzzleId };
       console.log('Skipping position where side-to-move is in check');
     } catch (err) {
       console.warn('Lichess unavailable, using fallback:', err.message);
       break;
     }
   }
-  return FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
+  return { fen: FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)], puzzleId: '' };
 }
 
 function sideToMoveInCheck(fen) {
@@ -108,7 +111,7 @@ function parsePuzzleFen(data) {
   const puzzleChess = new Chess();
   const ply = Math.min(data.puzzle.initialPly, moves.length);
   for (let i = 0; i < ply; i++) puzzleChess.move(moves[i]);
-  return puzzleChess.fen();
+  return { fen: puzzleChess.fen(), puzzleId: data.puzzle.id ?? '' };
 }
 
 // --- Check counting ---
@@ -157,6 +160,7 @@ function puzzleComplete() {
   puzzleActive = false;
   stopTimer();
   drillResults.push({ seconds, correct: correctAnswers, misses });
+  upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
   const el = document.getElementById('checks-result');
   el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;

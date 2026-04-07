@@ -115,6 +115,59 @@ header h1 {
   max-width: 480px;
   width: 90%;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-box-wide {
+  max-width: 800px;
+}
+
+/* ── Data viewer table ── */
+#data-table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--surface2);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--surface2);
+  color: var(--text);
+  vertical-align: top;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table td.puzzle-ids {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  max-width: 180px;
+  word-break: break-all;
+}
+
+.data-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1.5rem 0;
 }
 
 .modal-box h2 {

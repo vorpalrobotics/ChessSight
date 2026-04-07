@@ -1,0 +1,92 @@
+const DB_NAME = 'ChessSight';
+const DB_VERSION = 1;
+const STORE = 'drillDays';
+
+// Lazy singleton DB connection
+let _dbPromise = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        const store = db.createObjectStore(STORE, { keyPath: ['date', 'drill'] });
+        store.createIndex('date', 'date');
+        store.createIndex('drill', 'drill');
+      }
+    };
+
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+function getDB() {
+  if (!_dbPromise) _dbPromise = openDB();
+  return _dbPromise;
+}
+
+// Returns today's date as "YYYY-MM-DD" in the user's local timezone.
+function localToday() {
+  return new Date().toLocaleDateString('sv'); // 'sv' locale gives YYYY-MM-DD
+}
+
+/**
+ * Upsert one puzzle's worth of results into today's record for a drill.
+ * Call once per completed puzzle.
+ *
+ * @param {string} drill   e.g. 'captures'
+ * @param {{ seconds: number, correct: number, misses: number, puzzleId: string }} result
+ */
+export async function upsertDrillDay(drill, { seconds, correct, misses, puzzleId }) {
+  const db = await getDB();
+  const date = localToday();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+
+    const getReq = store.get([date, drill]);
+    getReq.onsuccess = () => {
+      const rec = getReq.result ?? {
+        date,
+        drill,
+        positions: 0,
+        totalSeconds: 0,
+        totalMisses: 0,
+        totalCorrect: 0,
+        puzzleIds: '',
+      };
+
+      rec.positions    += 1;
+      rec.totalSeconds += seconds;
+      rec.totalMisses  += misses;
+      rec.totalCorrect += correct;
+
+      if (puzzleId) {
+        rec.puzzleIds = rec.puzzleIds ? `${rec.puzzleIds},${puzzleId}` : puzzleId;
+      }
+
+      store.put(rec);
+    };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return every record in the store, sorted newest-date first.
+ */
+export async function getAllRecords() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () =>
+      resolve(req.result.sort((a, b) => b.date.localeCompare(a.date) || a.drill.localeCompare(b.drill)));
+    req.onerror = e => reject(e.target.error);
+  });
+}
