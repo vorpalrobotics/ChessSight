@@ -1,9 +1,6 @@
 import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/markers/Markers.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
-import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js@4/+esm';
-Chart.register(...registerables);
-
 import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
