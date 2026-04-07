@@ -1,6 +1,9 @@
 import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/markers/Markers.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
+import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js@4/+esm';
+Chart.register(...registerables);
+
 import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
@@ -85,21 +88,152 @@ modalAbout.addEventListener('click', (e) => {
   if (e.target === modalAbout) modalAbout.classList.add('hidden');
 });
 
-// --- Data viewer modal ---
-const modalData = document.getElementById('modal-data');
+// --- History modal (charts) ---
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', forks: 'Forks' };
 
-document.getElementById('btn-data').addEventListener('click', async () => {
+const DRILL_COLORS = {
+  checks:   '#e94560',
+  captures: '#3a9fd0',
+  loose:    '#f0a030',
+  under:    '#8bc34a',
+  forks:    '#c980e0',
+};
+
+let chartTime = null, chartAcc = null;
+
+const modalHistory = document.getElementById('modal-history');
+
+document.getElementById('btn-history').addEventListener('click', async () => {
+  hamburgerDropdown.classList.add('hidden');
+  await renderCharts();
+  modalHistory.classList.remove('hidden');
+});
+
+document.getElementById('btn-history-modal-close').addEventListener('click', () => {
+  modalHistory.classList.add('hidden');
+});
+
+modalHistory.addEventListener('click', (e) => {
+  if (e.target === modalHistory) modalHistory.classList.add('hidden');
+});
+
+async function renderCharts() {
+  if (chartTime) { chartTime.destroy(); chartTime = null; }
+  if (chartAcc)  { chartAcc.destroy();  chartAcc  = null; }
+
+  const noData = document.getElementById('chart-no-data');
+  const wrap   = document.getElementById('chart-wrap');
+
+  let records;
+  try { records = await getAllRecords(); }
+  catch (err) {
+    noData.textContent = `Error reading data: ${err.message}`;
+    noData.classList.remove('hidden');
+    wrap.classList.add('hidden');
+    return;
+  }
+
+  if (records.length === 0) {
+    noData.classList.remove('hidden');
+    wrap.classList.add('hidden');
+    return;
+  }
+  noData.classList.add('hidden');
+  wrap.classList.remove('hidden');
+
+  // Collect unique dates sorted ascending
+  const dates = [...new Set(records.map(r => r.date))].sort();
+  const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
+
+  const drills = ['checks', 'captures', 'loose', 'under', 'forks'];
+
+  function makeDatasets(valueFn) {
+    return drills.map(drill => ({
+      label: DRILL_LABELS[drill],
+      data: dates.map(date => {
+        const r = records.find(r => r.date === date && r.drill === drill);
+        return r ? valueFn(r) : null;
+      }),
+      borderColor: DRILL_COLORS[drill],
+      backgroundColor: DRILL_COLORS[drill] + '22',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      spanGaps: false,
+      fill: false,
+    }));
+  }
+
+  const timeDatasets = makeDatasets(r => r.positions > 0 ? Math.round(r.totalSeconds / r.positions) : null);
+  const accDatasets  = makeDatasets(r => {
+    const tot = r.totalCorrect + r.totalMisses;
+    return tot > 0 ? Math.round(r.totalCorrect / tot * 100) : null;
+  });
+
+  // Build shared legend HTML
+  const legend = document.getElementById('chart-legend');
+  legend.innerHTML = drills.map(d =>
+    `<span class="legend-item">
+       <span class="legend-dot" style="background:${DRILL_COLORS[d]}"></span>
+       ${DRILL_LABELS[d]}
+     </span>`
+  ).join('');
+
+  const gridColor = 'rgba(255,255,255,0.07)';
+  const tickColor = '#888';
+
+  function commonOpts(unitLabel, maxY, tickCb) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index', intersect: false,
+          callbacks: { label: ctx => ctx.raw !== null ? `${ctx.dataset.label}: ${tickCb(ctx.raw)}` : null },
+        },
+      },
+      scales: {
+        x: { ticks: { color: tickColor, maxTicksLimit: 10 }, grid: { color: gridColor } },
+        y: {
+          min: 0, ...(maxY !== undefined && { max: maxY }),
+          ticks: { color: tickColor, callback: tickCb },
+          grid: { color: gridColor },
+          title: { display: true, text: unitLabel, color: tickColor, font: { size: 11 } },
+        },
+      },
+    };
+  }
+
+  chartTime = new Chart(document.getElementById('chart-time'), {
+    type: 'line',
+    data: { labels: dateLabels, datasets: timeDatasets },
+    options: commonOpts('seconds', undefined, v => `${v}s`),
+  });
+
+  chartAcc = new Chart(document.getElementById('chart-acc'), {
+    type: 'line',
+    data: { labels: dateLabels, datasets: accDatasets },
+    options: commonOpts('accuracy', 100, v => `${v}%`),
+  });
+}
+
+// --- Debug modal (raw data table) ---
+const modalDebug = document.getElementById('modal-debug');
+
+document.getElementById('btn-debug').addEventListener('click', async () => {
   hamburgerDropdown.classList.add('hidden');
   await renderDataTable();
-  modalData.classList.remove('hidden');
+  modalDebug.classList.remove('hidden');
 });
 
-document.getElementById('btn-data-modal-close').addEventListener('click', () => {
-  modalData.classList.add('hidden');
+document.getElementById('btn-debug-modal-close').addEventListener('click', () => {
+  modalDebug.classList.add('hidden');
 });
 
-modalData.addEventListener('click', (e) => {
-  if (e.target === modalData) modalData.classList.add('hidden');
+modalDebug.addEventListener('click', (e) => {
+  if (e.target === modalDebug) modalDebug.classList.add('hidden');
 });
 
 async function renderDataTable() {
@@ -119,17 +253,13 @@ async function renderDataTable() {
     return;
   }
 
-  const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', forks: 'Forks' };
-
   const table = document.createElement('table');
   table.className = 'data-table';
   table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Date</th><th>Drill</th><th>Positions</th>
-        <th>Total Time</th><th>Correct</th><th>Misses</th><th>Accuracy</th><th>Puzzle IDs</th>
-      </tr>
-    </thead>`;
+    <thead><tr>
+      <th>Date</th><th>Drill</th><th>Positions</th>
+      <th>Total Time</th><th>Correct</th><th>Misses</th><th>Accuracy</th><th>Puzzle IDs</th>
+    </tr></thead>`;
 
   const tbody = document.createElement('tbody');
   for (const r of records) {

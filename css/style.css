@@ -192,6 +192,78 @@ header h1 {
   color: var(--text);
 }
 
+/* ── History charts ── */
+.chart-range-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.range-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--surface2);
+  color: var(--text-muted);
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.range-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.range-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--surface2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-section {
+  margin-bottom: 1.25rem;
+}
+
+.chart-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.chart-container {
+  position: relative;
+  height: 210px;
+}
+
+/* ── About modal text ── */
 .modal-copyright {
   font-size: 0.85rem;
   color: var(--text-muted);

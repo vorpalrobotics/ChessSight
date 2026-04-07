@@ -22,7 +22,8 @@
         <button id="btn-hamburger" aria-label="Menu">&#9776;</button>
         <div id="hamburger-dropdown" class="hamburger-dropdown hidden">
           <button id="btn-about">About</button>
-          <button id="btn-data">Data</button>
+          <button id="btn-history">History</button>
+          <button id="btn-debug">Debug</button>
         </div>
       </div>
     </div>
@@ -357,10 +358,36 @@
     </aside>
   </main>
 
-  <!-- ── Data viewer modal ── -->
-  <div id="modal-data" class="modal-backdrop hidden">
+  <!-- ── History modal (charts) ── -->
+  <div id="modal-history" class="modal-backdrop hidden">
     <div class="modal-box modal-box-wide">
-      <button class="modal-close" id="btn-data-modal-close">&times;</button>
+      <button class="modal-close" id="btn-history-modal-close">&times;</button>
+      <h2>History</h2>
+      <div class="chart-range-buttons">
+        <button class="range-btn active" id="range-all">All</button>
+        <button class="range-btn" disabled>Year</button>
+        <button class="range-btn" disabled>Quarter</button>
+        <button class="range-btn" disabled>Month</button>
+      </div>
+      <div id="chart-no-data" class="data-empty hidden">No data yet — complete some puzzles first.</div>
+      <div id="chart-wrap">
+        <div id="chart-legend" class="chart-legend"></div>
+        <div class="chart-section">
+          <div class="chart-title">Avg Time (sec / puzzle)</div>
+          <div class="chart-container"><canvas id="chart-time"></canvas></div>
+        </div>
+        <div class="chart-section">
+          <div class="chart-title">Accuracy %</div>
+          <div class="chart-container"><canvas id="chart-acc"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Debug modal (raw data table) ── -->
+  <div id="modal-debug" class="modal-backdrop hidden">
+    <div class="modal-box modal-box-wide">
+      <button class="modal-close" id="btn-debug-modal-close">&times;</button>
       <h2>Saved Drill Data</h2>
       <div id="data-table-wrap"></div>
     </div>
