@@ -238,6 +238,7 @@ header h1 {
   color: var(--text);
   border: 2px solid transparent;
   transition: background 0.1s, border-color 0.12s;
+  margin-right: calc(var(--board-size) / 120);
 }
 /* Hover/active: lighter blue — NOT red — so correct answers don't flash red */
 .digit-btn:hover:not(.correct):not(.incorrect),
