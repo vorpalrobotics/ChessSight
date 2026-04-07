@@ -117,8 +117,8 @@ function parsePuzzleFen(data) {
 }
 
 // --- Underguarded piece counting ---
-// A piece is underguarded if enemy attackers outnumber friendly defenders.
-// Piece values are intentionally ignored — only raw counts matter.
+// A piece is underguarded if attackers >= defenders (raw counts, no piece values).
+// This includes loose pieces (0 attackers, 0 defenders) as a special case.
 // Kings are excluded: they cannot meaningfully be "guarded".
 
 function countUnderguardedForColor(fen, colorChar) {
@@ -136,7 +136,7 @@ function countUnderguardedForColor(fen, colorChar) {
 
       const attackers = tmp.attackers(sq, enemy).length;
       const defenders = tmp.attackers(sq, colorChar).length;
-      if (attackers > defenders) count++;
+      if (attackers >= defenders) count++;
     }
   }
 
