@@ -18,13 +18,14 @@ let board = null;
 let timerInterval = null;
 let seconds = 0;
 let misses = 0;
+let correctAnswers = 0;
 let answerW = 0;
 let answerB = 0;
 let correctW = false;
 let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
-const drillResults = [];
+const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 
 // --- Public API ---
@@ -159,6 +160,7 @@ function handleDigitClick(color, value) {
   const correct = isWhite ? answerW : answerB;
   if (value === correct) {
     btn.classList.add('correct');
+    correctAnswers++;
     if (isWhite) correctW = true; else correctB = true;
     if (correctW && correctB) puzzleComplete();
   } else {
@@ -171,10 +173,22 @@ function handleDigitClick(color, value) {
 function puzzleComplete() {
   puzzleActive = false;
   stopTimer();
-  drillResults.push({ seconds, misses });
+  drillResults.push({ seconds, correct: correctAnswers, misses });
+  updateSessionStats();
   const el = document.getElementById('under-result');
   el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
+}
+
+function updateSessionStats() {
+  const count = drillResults.length;
+  if (count === 0) return;
+  const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
+  const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
+  const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
+  const avgSecs = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
+  document.getElementById('under-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
+  document.getElementById('under-session-acc').textContent = `Acc ${accuracy}%`;
 }
 
 // --- Summary ---
@@ -187,12 +201,14 @@ function showSummary() {
   document.getElementById('stat-count').textContent = count;
   if (count > 0) {
     const avgTime = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
-    const avgMisses = drillResults.reduce((s, r) => s + r.misses, 0) / count;
+    const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
+    const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
+    const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
-    document.getElementById('stat-avg-misses').textContent = avgMisses.toFixed(1);
+    document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
-    document.getElementById('stat-avg-misses').textContent = '—';
+    document.getElementById('stat-accuracy').textContent = '—';
   }
   navigate('screen-summary');
 }
@@ -223,11 +239,13 @@ function createDigitButtons() {
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  document.getElementById('under-session-time').textContent = '';
+  document.getElementById('under-session-acc').textContent = '';
 }
 
 function resetUI() {
   correctW = correctB = false;
-  misses = seconds = 0;
+  misses = seconds = correctAnswers = 0;
   document.getElementById('under-timer').textContent = '0:00';
   document.getElementById('under-misses').textContent = 'Misses: 0';
   const result = document.getElementById('under-result');

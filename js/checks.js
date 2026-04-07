@@ -18,14 +18,15 @@ let board = null;
 let timerInterval = null;
 let seconds = 0;
 let misses = 0;
+let correctAnswers = 0;  // correct button presses this puzzle (max 2)
 let answerW = 0;
 let answerB = 0;
 let correctW = false;
 let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
-const drillResults = [];   // { seconds, misses } per completed puzzle
-let navigate = null;       // injected by app.js for screen transitions
+const drillResults = [];   // { seconds, correct, misses } per completed puzzle
+let navigate = null;
 
 // --- Public API ---
 
@@ -71,10 +72,6 @@ async function loadNextPuzzle() {
 }
 
 // Retry up to 5 times to find a position where neither side starts in check.
-// A position with the side-to-move already in check causes the check-counter
-// to over-count: when we flip the FEN to enumerate the OTHER side's moves,
-// the opponent king is already attacked, so almost every move appears to
-// "give check".
 async function fetchValidFen() {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
@@ -127,7 +124,7 @@ function countChecksForColor(fen, colorChar) {
   for (const m of tmp.moves({ verbose: true })) {
     try { tmp.move(m); if (tmp.inCheck()) count++; tmp.undo(); } catch { /* skip */ }
   }
-  return Math.min(count, 9); // 9 means "9 or more" — matches the "9+" button
+  return Math.min(count, 9);
 }
 
 // --- Digit button interaction ---
@@ -139,13 +136,14 @@ function handleDigitClick(color, value) {
   if (!isWhite && correctB) return;
 
   const btn = document.querySelector(
-    `.digit-btn[data-color="${color}"][data-value="${value}"]`
+    `#screen-checks .digit-btn[data-color="${color}"][data-value="${value}"]`
   );
   if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
 
   const correct = isWhite ? answerW : answerB;
   if (value === correct) {
     btn.classList.add('correct');
+    correctAnswers++;
     if (isWhite) correctW = true; else correctB = true;
     if (correctW && correctB) puzzleComplete();
   } else {
@@ -158,29 +156,44 @@ function handleDigitClick(color, value) {
 function puzzleComplete() {
   puzzleActive = false;
   stopTimer();
-  drillResults.push({ seconds, misses });
+  drillResults.push({ seconds, correct: correctAnswers, misses });
+  updateSessionStats();
   const el = document.getElementById('checks-result');
   el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
+}
+
+// --- Session stats (shown above the board during subsequent puzzles) ---
+
+function updateSessionStats() {
+  const count = drillResults.length;
+  if (count === 0) return;
+  const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
+  const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
+  const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
+  const avgSecs = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
+  document.getElementById('checks-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
+  document.getElementById('checks-session-acc').textContent = `Acc ${accuracy}%`;
 }
 
 // --- Summary ---
 
 function showSummary() {
   stopTimer();
-  // Wire "Play Again" to this drill's restart so the shared summary screen works for both drills
   document.getElementById('btn-summary-again').onclick = restartDrill;
 
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
   if (count > 0) {
+    const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
+    const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
+    const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
     const avgTime = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
-    const avgMisses = drillResults.reduce((s, r) => s + r.misses, 0) / count;
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
-    document.getElementById('stat-avg-misses').textContent = avgMisses.toFixed(1);
+    document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
-    document.getElementById('stat-avg-misses').textContent = '—';
+    document.getElementById('stat-accuracy').textContent = '—';
   }
   navigate('screen-summary');
 }
@@ -211,17 +224,19 @@ function createDigitButtons() {
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  document.getElementById('checks-session-time').textContent = '';
+  document.getElementById('checks-session-acc').textContent = '';
 }
 
 function resetUI() {
   correctW = correctB = false;
-  misses = seconds = 0;
+  misses = seconds = correctAnswers = 0;
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
   const result = document.getElementById('checks-result');
   result.classList.add('hidden');
   result.textContent = '';
-  document.querySelectorAll('.digit-btn').forEach(b =>
+  document.querySelectorAll('#screen-checks .digit-btn').forEach(b =>
     b.classList.remove('correct', 'incorrect')
   );
 }

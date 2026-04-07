@@ -66,6 +66,22 @@ header h1 {
   color: var(--text-muted);
 }
 
+.copyright {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+
+.copyright a {
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.copyright a:hover {
+  color: var(--text);
+}
+
 #mode-grid {
   display: flex;
   gap: 1.5rem;
@@ -152,19 +168,33 @@ header h1 {
   flex-shrink: 0;
 }
 
-.drill-top-right span {
+.session-stat {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+/* ── Current-puzzle stats (timer + misses) shown below the digit buttons ── */
+.drill-current-stats {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  width: 100%;
+  max-width: calc(var(--board-size) + 4px);
+}
+
+.drill-current-stats span:first-child {
   font-size: 1rem;
   font-family: monospace;
   min-width: 3em;
   color: var(--text);
 }
 
-.drill-top-right span:last-of-type {
+.drill-current-stats span:last-child {
   font-size: 0.82rem;
   color: var(--text-muted);
   white-space: nowrap;
-  min-width: unset;
-  font-family: inherit;
 }
 
 #btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done {

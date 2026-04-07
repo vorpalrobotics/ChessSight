@@ -14,9 +14,9 @@
     <button id="btn-menu" class="hidden">&#8592; Menu</button>
   </header>
 
-  <!-- ── Screen 1: Mode selection ── -->
+  <!-- ── Screen 1: Drill selection ── -->
   <div id="screen-select" class="screen">
-    <p class="screen-subtitle">Choose a mode</p>
+    <p class="screen-subtitle">Choose a drill</p>
     <div id="mode-grid">
       <button class="mode-card" id="mode-checks">
         <span class="mode-icon">♟</span>
@@ -36,9 +36,10 @@
       <button class="mode-card" id="mode-under">
         <span class="mode-icon">⚠</span>
         <span class="mode-name">Underguarded</span>
-        <span class="mode-desc">Count pieces with more attackers than defenders</span>
+        <span class="mode-desc">Count pieces with attackers &gt;= defenders</span>
       </button>
     </div>
+    <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
   </div>
 
   <!-- ── Screen 2: Checks drill ── -->
@@ -49,8 +50,8 @@
         <span id="checks-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <span id="checks-timer">0:00</span>
-        <span id="checks-misses">Misses: 0</span>
+        <span id="checks-session-time" class="session-stat"></span>
+        <span id="checks-session-acc" class="session-stat"></span>
         <button id="btn-checks-done">DONE</button>
       </div>
     </div>
@@ -70,6 +71,11 @@
       </div>
     </div>
 
+    <div class="drill-current-stats">
+      <span id="checks-timer">0:00</span>
+      <span id="checks-misses">Misses: 0</span>
+    </div>
+
     <div id="checks-status"></div>
     <div id="checks-result" class="hidden"></div>
     <button id="btn-checks-next">NEXT ›</button>
@@ -83,8 +89,8 @@
         <span id="captures-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <span id="captures-timer">0:00</span>
-        <span id="captures-misses">Misses: 0</span>
+        <span id="captures-session-time" class="session-stat"></span>
+        <span id="captures-session-acc" class="session-stat"></span>
         <button id="btn-captures-done">DONE</button>
       </div>
     </div>
@@ -104,6 +110,11 @@
       </div>
     </div>
 
+    <div class="drill-current-stats">
+      <span id="captures-timer">0:00</span>
+      <span id="captures-misses">Misses: 0</span>
+    </div>
+
     <div id="captures-status"></div>
     <div id="captures-result" class="hidden"></div>
     <button id="btn-captures-next">NEXT ›</button>
@@ -117,8 +128,8 @@
         <span id="loose-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <span id="loose-timer">0:00</span>
-        <span id="loose-misses">Misses: 0</span>
+        <span id="loose-session-time" class="session-stat"></span>
+        <span id="loose-session-acc" class="session-stat"></span>
         <button id="btn-loose-done">DONE</button>
       </div>
     </div>
@@ -138,6 +149,11 @@
       </div>
     </div>
 
+    <div class="drill-current-stats">
+      <span id="loose-timer">0:00</span>
+      <span id="loose-misses">Misses: 0</span>
+    </div>
+
     <div id="loose-status"></div>
     <div id="loose-result" class="hidden"></div>
     <button id="btn-loose-next">NEXT ›</button>
@@ -151,8 +167,8 @@
         <span id="under-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <span id="under-timer">0:00</span>
-        <span id="under-misses">Misses: 0</span>
+        <span id="under-session-time" class="session-stat"></span>
+        <span id="under-session-acc" class="session-stat"></span>
         <button id="btn-under-done">DONE</button>
       </div>
     </div>
@@ -170,6 +186,11 @@
         <span class="answer-label">B</span>
         <div class="digit-buttons" id="under-digits-black"></div>
       </div>
+    </div>
+
+    <div class="drill-current-stats">
+      <span id="under-timer">0:00</span>
+      <span id="under-misses">Misses: 0</span>
     </div>
 
     <div id="under-status"></div>
@@ -191,8 +212,8 @@
           <span class="summary-value" id="stat-avg-time">—</span>
         </div>
         <div class="summary-row">
-          <span class="summary-label">Average misses</span>
-          <span class="summary-value" id="stat-avg-misses">—</span>
+          <span class="summary-label">Accuracy</span>
+          <span class="summary-value" id="stat-accuracy">—</span>
         </div>
       </div>
       <div id="summary-actions">
@@ -202,7 +223,7 @@
     </div>
   </div>
 
-  <!-- ── Screen 3: Engine analysis (existing) ── -->
+  <!-- ── Engine analysis (existing) ── -->
   <main id="screen-engine" class="hidden">
     <div id="board-container">
       <div id="eval-bar">
