@@ -50,6 +50,129 @@ header h1 {
   color: var(--text);
 }
 
+/* ── Hamburger menu ── */
+#btn-hamburger {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+#btn-hamburger:hover {
+  color: var(--text);
+}
+
+.hamburger-menu {
+  position: relative;
+}
+
+.hamburger-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: 8px;
+  min-width: 130px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  z-index: 200;
+}
+
+.hamburger-dropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.hamburger-dropdown button:hover {
+  background: var(--surface2);
+}
+
+/* ── About modal ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-box h2 {
+  margin-bottom: 1.25rem;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.9rem;
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+}
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-copyright {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.modal-copyright a {
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+.modal-copyright a:hover { color: var(--text); }
+
+.modal-attributions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border-top: 1px solid var(--surface2);
+  padding-top: 1rem;
+}
+
+.modal-attributions p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.modal-attributions a {
+  color: #7aadde;
+  text-decoration: none;
+}
+.modal-attributions a:hover {
+  text-decoration: underline;
+}
+
 /* ── Mode selection screen ── */
 #screen-select {
   display: flex;
@@ -180,21 +303,23 @@ header h1 {
   display: flex;
   gap: 1.25rem;
   align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: calc(var(--board-size) + 4px);
 }
 
 .drill-current-stats span:first-child {
-  font-size: 1rem;
+  font-size: 1.4rem;
   font-family: monospace;
   min-width: 3em;
   color: var(--text);
 }
 
 .drill-current-stats span:last-child {
-  font-size: 0.82rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   white-space: nowrap;
+  font-family: monospace;
 }
 
 #btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done {

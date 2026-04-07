@@ -11,8 +11,31 @@
 <body>
   <header>
     <h1>ChessSight</h1>
-    <button id="btn-menu" class="hidden">&#8592; Menu</button>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button id="btn-menu" class="hidden">Choose Drill</button>
+      <div class="hamburger-menu">
+        <button id="btn-hamburger" aria-label="Menu">&#9776;</button>
+        <div id="hamburger-dropdown" class="hamburger-dropdown hidden">
+          <button id="btn-about">About</button>
+        </div>
+      </div>
+    </div>
   </header>
+
+  <!-- ── About modal ── -->
+  <div id="modal-about" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="btn-modal-close">&times;</button>
+      <h2>About ChessSight</h2>
+      <p class="modal-copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
+      <div class="modal-attributions">
+        <p><strong>Chess engine:</strong> <a href="https://stockfishchess.org/" target="_blank" rel="noopener">Stockfish</a> &mdash; a free, open-source UCI chess engine (MIT / GPL licensed).</p>
+        <p><strong>Chessboard UI:</strong> <a href="https://github.com/shaack/cm-chessboard" target="_blank" rel="noopener">cm-chessboard</a> by Stefan Haack &mdash; a responsive SVG chessboard library (MIT licensed).</p>
+        <p><strong>Chess logic:</strong> <a href="https://github.com/jhlywa/chess.js" target="_blank" rel="noopener">chess.js</a> by Jeff Hlywa &mdash; a TypeScript chess library for move generation and validation (BSD licensed).</p>
+        <p><strong>Puzzles:</strong> Positions sourced from the <a href="https://lichess.org/" target="_blank" rel="noopener">Lichess</a> open puzzle database, available under Creative Commons CC0.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Screen 1: Drill selection ── -->
   <div id="screen-select" class="screen">
@@ -217,8 +240,8 @@
         </div>
       </div>
       <div id="summary-actions">
-        <button id="btn-summary-again">Play Again</button>
-        <button id="btn-summary-menu">← Menu</button>
+        <button id="btn-summary-again">Drill Again</button>
+        <button id="btn-summary-menu">Choose Drill</button>
       </div>
     </div>
   </div>

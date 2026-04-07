@@ -45,6 +45,36 @@ document.getElementById('btn-summary-menu').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
+// --- Hamburger menu ---
+const hamburgerDropdown = document.getElementById('hamburger-dropdown');
+
+document.getElementById('btn-hamburger').addEventListener('click', (e) => {
+  e.stopPropagation();
+  hamburgerDropdown.classList.toggle('hidden');
+});
+
+// Close dropdown when clicking anywhere else
+document.addEventListener('click', () => {
+  hamburgerDropdown.classList.add('hidden');
+});
+
+// --- About modal ---
+const modalAbout = document.getElementById('modal-about');
+
+document.getElementById('btn-about').addEventListener('click', () => {
+  hamburgerDropdown.classList.add('hidden');
+  modalAbout.classList.remove('hidden');
+});
+
+document.getElementById('btn-modal-close').addEventListener('click', () => {
+  modalAbout.classList.add('hidden');
+});
+
+// Close modal on backdrop click
+modalAbout.addEventListener('click', (e) => {
+  if (e.target === modalAbout) modalAbout.classList.add('hidden');
+});
+
 // Custom marker types for move highlighting
 const MARKER_SELECTED = { class: 'marker-selected', slice: 'markerFrame' };
 const MARKER_TARGET   = { class: 'marker-target',   slice: 'markerSquare' };
