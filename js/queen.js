@@ -74,6 +74,42 @@ function isAdjacent(sq1, sq2) {
   ) === 1;
 }
 
+// Is the black king in checkmate if the white queen is at queenSq?
+// Assumes the queen already gives check (caller verifies condition 1).
+// Does NOT re-check whether the piece can capture the queen (condition 3
+// in computeValidSquares already guarantees it cannot).
+function isCheckmate(queenSq, kingSq, pieceSq, pieceType) {
+  // 1. Queen must give check (piece may block along the line)
+  if (!lineAttacks(queenSq, kingSq, new Set([pieceSq]))) return false;
+
+  // 2. Every square adjacent to the king must be unavailable
+  for (let df = -1; df <= 1; df++) {
+    for (let dr = -1; dr <= 1; dr++) {
+      if (df === 0 && dr === 0) continue;
+      const ef = fileOf(kingSq) + df, er = rankOf(kingSq) + dr;
+      if (ef < 0 || ef > 7 || er < 0 || er > 7) continue;   // off board
+      const adj = sqName(ef, er);
+      if (adj === pieceSq) continue;                          // own piece
+      if (adj === queenSq) continue;                          // queen itself (can't step there)
+      // King can escape if queen doesn't cover adj (king has left kingSq, so only pieceSq blocks)
+      if (!lineAttacks(queenSq, adj, new Set([pieceSq]))) return false;
+    }
+  }
+
+  // 3. Black piece cannot interpose along the check ray
+  const between = squaresBetween(queenSq, kingSq);
+  for (const inter of between) {
+    // Piece path uses kingSq as a potential blocker (king hasn't moved yet)
+    let canBlock = false;
+    if (pieceType === 'r') canBlock = rookAttacks(pieceSq, inter, new Set([kingSq]));
+    else if (pieceType === 'b') canBlock = bishopAttacks(pieceSq, inter, new Set([kingSq]));
+    else if (pieceType === 'n') canBlock = knightAttacks(pieceSq, inter);
+    if (canBlock) return false;
+  }
+
+  return true;
+}
+
 // ─── Valid square logic ────────────────────────────────────────────────────────
 
 // Returns all squares S where the queen creates a tactical threat against the given piece type:
@@ -113,6 +149,9 @@ function computeValidSquares(queenSq, kingSq, pieceSq, pieceType) {
 
       // C. Pin: piece between s and king — condition 3 already excluded counterattack cases
       if (isBetween(pieceSq, s, kingSq)) { valid.push(s); continue; }
+
+      // D. Checkmate: queen at s delivers immediate checkmate
+      if (isCheckmate(s, kingSq, pieceSq, pieceType)) { valid.push(s); continue; }
     }
   }
   return valid;
