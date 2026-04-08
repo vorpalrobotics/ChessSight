@@ -191,7 +191,8 @@ function handleBoardClick(e) {
   // Valid move
   currentPath.push(sq);
   currentPos = sq;
-  drawPathSquare(sq, currentPath.length, 'knight-sq-path');
+  const sqClass = currentPath.length > currentOptimalDist ? 'knight-sq-over' : 'knight-sq-path';
+  drawPathSquare(sq, currentPath.length, sqClass);
 
   if (sq === currentTargetSq) finishPuzzle();
 }

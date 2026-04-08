@@ -1064,6 +1064,23 @@ button:disabled {
   pointer-events: none;
 }
 
+/* Over-optimal path squares — yellow/amber */
+.knight-sq-over {
+  fill: rgba(220, 180, 0, 0.45);
+  stroke: #ddb800;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+.knight-sq-over-num {
+  fill: white;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  pointer-events: none;
+}
+
 /* SHOW extension — amber, continues user's on-track path */
 .knight-sq-extend {
   fill: rgba(255, 150, 0, 0.38);
