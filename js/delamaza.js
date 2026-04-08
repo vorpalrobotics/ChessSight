@@ -271,6 +271,7 @@ function endSession() {
 
   document.getElementById('dlm-drill-area').classList.add('hidden');
   document.getElementById('dlm-end-time').textContent = formatTime(elapsed);
+  document.getElementById('dlm-end-per-pos').textContent = `${(elapsed / 63).toFixed(1)}s`;
   document.getElementById('dlm-end-misses').textContent = sessionMisses;
   const pieceName = { r: 'Rook', b: 'Bishop', n: 'Knight' }[chosenPiece];
   document.getElementById('dlm-end-piece').textContent = pieceName;
