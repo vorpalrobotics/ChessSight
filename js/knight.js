@@ -85,7 +85,7 @@ function generatePosition() {
   for (let attempt = 0; attempt < 300; attempt++) {
     const [startSq, targetSq] = shuffle(ALL_SQS);
     const { dist, path } = bfs(startSq, targetSq);
-    if (dist >= 2 && dist <= 4) return { startSq, targetSq, optimalDist: dist, optimalPath: path };
+    if (dist >= 2 && dist <= 6) return { startSq, targetSq, optimalDist: dist, optimalPath: path };
   }
   // Fallback: a1→c5, distance 2 (a1→b3→c5)
   const { dist, path } = bfs('a1', 'c5');
