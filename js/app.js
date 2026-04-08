@@ -8,10 +8,11 @@ import { initLoose, startLoose } from './loose.js';
 import { initUnder, startUnder } from './under.js';
 import { initThreats, startThreats } from './threats.js';
 import { initQueenAttack, startQueenAttack } from './queen.js';
+import { initKnightRoute, startKnightRoute } from './knight.js';
 import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-threats', 'screen-queen', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-threats', 'screen-queen', 'screen-knight', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -48,6 +49,11 @@ document.getElementById('mode-threats').addEventListener('click', async () => {
 document.getElementById('mode-queen').addEventListener('click', () => {
   showScreen('screen-queen');
   startQueenAttack();
+});
+
+document.getElementById('mode-knight').addEventListener('click', () => {
+  showScreen('screen-knight');
+  startKnightRoute();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -92,7 +98,7 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', threats: 'Threats', queen: 'Queen Attack' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', threats: 'Threats', queen: 'Queen Attack', knight: 'Knight Route' };
 
 const DRILL_COLORS = {
   checks:   '#e94560',
@@ -101,6 +107,7 @@ const DRILL_COLORS = {
   under:    '#8bc34a',
   threats:  '#ff6b35',
   queen:    '#c080ff',
+  knight:   '#4ecdc4',
 };
 
 let chartTime = null, chartAcc = null;
@@ -149,7 +156,7 @@ async function renderCharts() {
   const dates = [...new Set(records.map(r => r.date))].sort();
   const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
 
-  const drills = ['checks', 'captures', 'loose', 'under', 'threats', 'queen'];
+  const drills = ['checks', 'captures', 'loose', 'under', 'threats', 'queen', 'knight'];
 
   function makeDatasets(valueFn) {
     return drills.map(drill => ({
@@ -644,3 +651,4 @@ initLoose(showScreen);
 initUnder(showScreen);
 initThreats(showScreen);
 initQueenAttack(showScreen);
+initKnightRoute(showScreen);

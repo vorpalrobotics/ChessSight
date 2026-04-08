@@ -381,7 +381,7 @@ header h1 {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen {
+#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -460,7 +460,8 @@ header h1 {
 #btn-under-show,
 #btn-loose-show,
 #btn-checks-show,
-#btn-captures-show {
+#btn-captures-show,
+#btn-knight-show {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.25rem 0.75rem;
@@ -474,7 +475,8 @@ header h1 {
 #btn-under-show.active,
 #btn-loose-show.active,
 #btn-checks-show.active,
-#btn-captures-show.active {
+#btn-captures-show.active,
+#btn-knight-show.active {
   background: #1a5ca8;
   border-color: #3a80d0;
   color: #fff;
@@ -483,7 +485,8 @@ header h1 {
 #btn-under-show:hover:not(:disabled),
 #btn-loose-show:hover:not(:disabled),
 #btn-checks-show:hover:not(:disabled),
-#btn-captures-show:hover:not(:disabled) {
+#btn-captures-show:hover:not(:disabled),
+#btn-knight-show:hover:not(:disabled) {
   background: #1a5ca8 !important;
   border-color: #3a80d0;
   color: #fff;
@@ -560,7 +563,7 @@ header h1 {
   font-family: system-ui, sans-serif;
 }
 
-#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-threats-done, #btn-queen-done {
+#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-threats-done, #btn-queen-done, #btn-knight-done {
   background: var(--surface2);
   color: var(--text-muted);
   font-weight: 700;
@@ -574,7 +577,8 @@ header h1 {
 #btn-loose-done:hover:not(:disabled),
 #btn-under-done:hover:not(:disabled),
 #btn-threats-done:hover:not(:disabled),
-#btn-queen-done:hover:not(:disabled) {
+#btn-queen-done:hover:not(:disabled),
+#btn-knight-done:hover:not(:disabled) {
   background: #7a1a2e;
   color: #fff;
   border-color: var(--accent);
@@ -656,14 +660,14 @@ header h1 {
   transition: none;
 }
 
-#checks-status, #captures-status, #loose-status, #under-status, #forks-status, #queen-status {
+#checks-status, #captures-status, #loose-status, #under-status, #forks-status, #queen-status, #knight-status {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
   min-height: 1em;
 }
 
-#checks-result, #captures-result, #loose-result, #under-result, #forks-result, #queen-result {
+#checks-result, #captures-result, #loose-result, #under-result, #forks-result, #queen-result, #knight-result {
   font-size: 1rem;
   font-weight: 700;
   color: #27ae60;
@@ -1026,6 +1030,91 @@ button:disabled {
   stroke: #c0392b;
   stroke-width: 3px;
   pointer-events: none;
+}
+
+/* ── Knight Route drill ── */
+
+/* Target square */
+.knight-target-border {
+  fill: rgba(255, 200, 0, 0.12);
+  stroke: #ffcc00;
+  stroke-width: 3.5px;
+  pointer-events: none;
+}
+.knight-target-icon {
+  fill: #ffcc00;
+  font-family: system-ui, sans-serif;
+  pointer-events: none;
+}
+
+/* User's valid path squares — green with white number */
+.knight-sq-path {
+  fill: rgba(39, 174, 96, 0.45);
+  stroke: #27ae60;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+.knight-sq-path-num {
+  fill: white;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  pointer-events: none;
+}
+
+/* SHOW extension — amber, continues user's on-track path */
+.knight-sq-extend {
+  fill: rgba(255, 150, 0, 0.38);
+  stroke: #ff9600;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+.knight-sq-extend-num {
+  fill: white;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  pointer-events: none;
+}
+
+/* SHOW fresh optimal — dark outline, shown when user is off-track */
+.knight-sq-optimal {
+  fill: rgba(0, 0, 0, 0.18);
+  stroke: #333;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+.knight-sq-optimal-num {
+  fill: #eee;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  stroke: rgba(0, 0, 0, 0.7);
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  pointer-events: none;
+}
+
+/* Invalid click — brief red flash */
+.knight-sq-invalid {
+  fill: rgba(192, 57, 43, 0.5);
+  stroke: #c0392b;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+
+/* "Click anywhere to continue" overlay */
+.knight-continue-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 5px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
 }
 
 .queen-continue-msg {
