@@ -263,7 +263,7 @@ function endSession() {
 
   const pieceKey = { r: 'dlm-rook', b: 'dlm-bishop', n: 'dlm-knight' }[chosenPiece];
   upsertDrillDay(pieceKey, {
-    seconds: elapsed,
+    seconds: Math.round(elapsed / 63),
     correct: Math.max(0, 63 - sessionMisses),
     misses: sessionMisses,
     puzzleId: `${chosenPiece}-full`,
