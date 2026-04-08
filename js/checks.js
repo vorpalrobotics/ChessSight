@@ -2,7 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
-import { scoreCountDifficulty, diffLabel } from './difficulty.js';
+import { scoreChecksDifficulty, diffLabel } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -73,7 +73,7 @@ async function fetchWithDifficulty() {
   const ansW = countChecksForColor(fen, 'w');
   const ansB = countChecksForColor(fen, 'b');
   return { fen, puzzleId, answerW: ansW, answerB: ansB,
-           difficulty: scoreCountDifficulty(fen, ansW + ansB) };
+           difficulty: scoreChecksDifficulty(fen, ansW + ansB) };
 }
 
 // --- Puzzle loading ---

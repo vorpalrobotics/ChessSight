@@ -3,6 +3,26 @@
 
 function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 
+// Checks drill: check count is the dominant driver.
+// Piece density adds only a small bonus scaled to zero when checks are few —
+// in a locked pawn structure, lots of pieces don't make zero checks harder.
+//   0 checks → 1.0 (Easy)
+//   1 check  → 1.5 (Easy)
+//   2 checks → 2.0 (Easy)
+//   3 checks → 2.6 (Medium)
+//   4 checks → 3.2 (Medium)
+//   5 checks → 3.8 (Hard)
+//   6+ checks → 4.4+ (Hard)
+export function scoreChecksDifficulty(fen, totalChecks) {
+  const pieceCount = fen.split(' ')[0].replace(/[^a-zA-Z]/g, '').length;
+  const checkBase  = totalChecks <= 2
+    ? 1.0 + totalChecks * 0.5
+    : 2.0 + (totalChecks - 2) * 0.6;
+  const checkScale = Math.min(1, totalChecks / 3);  // 0 when no checks, 1 at 3+
+  const density    = Math.max(0, (pieceCount - 12) * 0.05) * checkScale;
+  return clamp(checkBase + density, 1, 5);
+}
+
 // Knight Route: driven by path length + pawn obstacles.
 export function scoreKnightDifficulty({ optimalDist, whitePawns, blackPawns }) {
   const distBase  = (optimalDist - 2) / 4 * 3;   // dist 2→0 … dist 6→3
@@ -11,7 +31,7 @@ export function scoreKnightDifficulty({ optimalDist, whitePawns, blackPawns }) {
   return clamp(1 + distBase + wPenalty + bPenalty, 1, 5);
 }
 
-// Count drills (checks / captures / loose / under):
+// Count drills (captures / loose / under):
 // primary driver is total answer count, secondary is board density + queen presence.
 export function scoreCountDifficulty(fen, totalAnswer) {
   const board      = fen.split(' ')[0];
