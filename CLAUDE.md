@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v68**
+**Current version: v69**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
