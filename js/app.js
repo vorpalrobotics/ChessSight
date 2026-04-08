@@ -9,10 +9,11 @@ import { initUnder, startUnder } from './under.js';
 // import { initThreats, startThreats } from './threats.js';  // disabled — drill needs rethink
 import { initQueenAttack, startQueenAttack } from './queen.js';
 import { initKnightRoute, startKnightRoute } from './knight.js';
+import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -51,6 +52,11 @@ document.getElementById('mode-queen').addEventListener('click', () => {
 document.getElementById('mode-knight').addEventListener('click', () => {
   showScreen('screen-knight');
   startKnightRoute();
+});
+
+document.getElementById('mode-dlm').addEventListener('click', () => {
+  showScreen('screen-dlm');
+  startDeLaMaza();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -95,16 +101,19 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', 'dlm-rook': 'Vision: Rook', 'dlm-bishop': 'Vision: Bishop', 'dlm-knight': 'Vision: Knight' };
 
 const DRILL_COLORS = {
-  checks:   '#e94560',
-  captures: '#3a9fd0',
-  loose:    '#f0a030',
-  under:    '#8bc34a',
-  // threats:  '#ff6b35',  // disabled
-  queen:    '#c080ff',
-  knight:   '#4ecdc4',
+  checks:       '#e94560',
+  captures:     '#3a9fd0',
+  loose:        '#f0a030',
+  under:        '#8bc34a',
+  // threats:   '#ff6b35',  // disabled
+  queen:        '#c080ff',
+  knight:       '#4ecdc4',
+  'dlm-rook':   '#ff6688',
+  'dlm-bishop': '#ffaa44',
+  'dlm-knight': '#44ccff',
 };
 
 let chartTime = null, chartAcc = null;
@@ -153,7 +162,7 @@ async function renderCharts() {
   const dates = [...new Set(records.map(r => r.date))].sort();
   const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
 
-  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight'];
+  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'dlm-rook', 'dlm-bishop', 'dlm-knight'];
 
   function makeDatasets(valueFn) {
     return drills.map(drill => ({
@@ -649,3 +658,4 @@ initUnder(showScreen);
 // initThreats(showScreen);  // disabled
 initQueenAttack(showScreen);
 initKnightRoute(showScreen);
+initDeLaMaza(showScreen);

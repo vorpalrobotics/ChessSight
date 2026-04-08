@@ -473,7 +473,8 @@ header h1 {
 #btn-loose-show,
 #btn-checks-show,
 #btn-captures-show,
-#btn-knight-show {
+#btn-knight-show,
+#btn-dlm-show {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.25rem 0.75rem;
@@ -488,7 +489,8 @@ header h1 {
 #btn-loose-show.active,
 #btn-checks-show.active,
 #btn-captures-show.active,
-#btn-knight-show.active {
+#btn-knight-show.active,
+#btn-dlm-show.active {
   background: #1a5ca8;
   border-color: #3a80d0;
   color: #fff;
@@ -498,7 +500,8 @@ header h1 {
 #btn-loose-show:hover:not(:disabled),
 #btn-checks-show:hover:not(:disabled),
 #btn-captures-show:hover:not(:disabled),
-#btn-knight-show:hover:not(:disabled) {
+#btn-knight-show:hover:not(:disabled),
+#btn-dlm-show:hover:not(:disabled) {
   background: #1a5ca8 !important;
   border-color: #3a80d0;
   color: #fff;
@@ -1206,4 +1209,174 @@ button:disabled {
   stroke-width: 3px;
   pointer-events: none;
   animation: queen-sq-flash 0.5s ease-in-out infinite;
+}
+
+/* ── de La Maza Vision Drill ── */
+
+/* Piece selector panel */
+#dlm-piece-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 0;
+}
+
+.dlm-select-heading {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+#dlm-piece-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.dlm-piece-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 80px;
+  padding: 0.75rem 1rem;
+  font-size: 2rem;
+  background: var(--surface2);
+  border: 2px solid var(--text-muted);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dlm-piece-btn span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.dlm-piece-btn:hover {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}
+
+.dlm-piece-btn:hover span {
+  color: #cde;
+}
+
+/* End screen */
+#dlm-end-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+#dlm-end-box {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+#dlm-end-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.dlm-end-piece-label {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.dlm-end-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.dlm-end-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.dlm-end-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.dlm-end-value {
+  font-size: 1.4rem;
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dlm-end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dlm-end-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--text-muted);
+  background: var(--surface2);
+  color: var(--text);
+  letter-spacing: 0.05em;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dlm-end-actions button:hover {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}
+
+/* SVG square overlays */
+.dlm-sq-found {
+  fill: rgba(39, 174, 96, 0.35);
+  stroke: #27ae60;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+
+.dlm-sq-missed {
+  fill: rgba(230, 130, 0, 0.35);
+  stroke: #e68200;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+
+.dlm-sq-invalid {
+  fill: rgba(220, 50, 50, 0.5);
+  stroke: #dc3232;
+  stroke-width: 2px;
+  pointer-events: none;
+  animation: flash-red 0.5s ease-out forwards;
+}
+
+.dlm-board-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 6px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
 }

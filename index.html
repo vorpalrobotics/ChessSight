@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v70</title>
+  <title>ChessSight v71</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -86,6 +86,11 @@
         <span class="mode-icon">♞</span>
         <span class="mode-name">Knight Route</span>
         <span class="mode-desc">Find the shortest knight path to the target</span>
+      </button>
+      <button class="mode-card" id="mode-dlm">
+        <span class="mode-icon">👁</span>
+        <span class="mode-name">Vision Drill</span>
+        <span class="mode-desc">de La Maza: spot every queen fork, pin &amp; skewer</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -338,7 +343,66 @@
     <p class="drill-rule">Route the white knight to the target square (◎) in as few moves as possible. White pawns block the knight's path. Black pawns are also impassable, and the knight cannot move into any square a black pawn attacks (the two diagonals in front of it). Click any reachable square — valid moves turn green with the step number, yellow once you exceed the optimal count. Re-tap your current square to undo the last move. Click SHOW to reveal an optimal solution. You score 1 miss per invalid click plus 1 miss per move beyond the shortest possible route. A ⭐ marks a perfect run.</p>
   </div>
 
-  <!-- ── Screen 9: Drill summary ── -->
+  <!-- ── Screen 9: de La Maza Vision Drill ── -->
+  <div id="screen-dlm" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Vision Drill</h2>
+        <span id="dlm-progress">— / 63</span>
+      </div>
+      <div class="drill-top-right">
+        <button id="btn-dlm-done">DONE</button>
+      </div>
+    </div>
+
+    <!-- Piece selector (shown on entry) -->
+    <div id="dlm-piece-select">
+      <p class="dlm-select-heading">Choose a piece</p>
+      <div id="dlm-piece-buttons">
+        <button class="dlm-piece-btn" id="btn-dlm-rook">♜<span>Rook</span></button>
+        <button class="dlm-piece-btn" id="btn-dlm-bishop">♝<span>Bishop</span></button>
+        <button class="dlm-piece-btn" id="btn-dlm-knight">♞<span>Knight</span></button>
+      </div>
+      <p class="drill-rule">Black king is fixed at D5. The black piece spirals through all 63 other squares. For each position, click every square where a queen placed there would fork, pin, or skewer the king and piece. The queen must be safe (king can't capture it, piece can't immediately recapture). Find all squares to auto-advance; click SHOW to reveal missed squares and move on.</p>
+    </div>
+
+    <!-- Drill area (shown after piece chosen) -->
+    <div id="dlm-drill-area" class="hidden">
+      <div class="drill-board-wrap">
+        <div id="dlm-board"></div>
+      </div>
+      <div class="drill-current-stats">
+        <span id="dlm-timer">0:00</span>
+        <span id="dlm-misses">Misses: 0</span>
+        <button id="btn-dlm-show">SHOW</button>
+      </div>
+    </div>
+
+    <!-- End screen (shown after all 63 positions) -->
+    <div id="dlm-end-screen" class="hidden">
+      <div id="dlm-end-box">
+        <h3>Session Complete</h3>
+        <p class="dlm-end-piece-label"><span id="dlm-end-piece"></span></p>
+        <div class="dlm-end-stats">
+          <div class="dlm-end-row">
+            <span class="dlm-end-label">Total time</span>
+            <span class="dlm-end-value" id="dlm-end-time">—</span>
+          </div>
+          <div class="dlm-end-row">
+            <span class="dlm-end-label">Total misses</span>
+            <span class="dlm-end-value" id="dlm-end-misses">—</span>
+          </div>
+        </div>
+        <div class="dlm-end-actions">
+          <button id="btn-dlm-again">Play Again</button>
+          <button id="btn-dlm-choose">Choose Piece</button>
+          <button id="btn-dlm-end-menu">&#8592; Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Screen 10: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>
