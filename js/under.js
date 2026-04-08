@@ -20,17 +20,14 @@ let board = null;
 let timerInterval = null;
 let seconds = 0;
 let misses = 0;
-let correctAnswers = 0;
-let answerW = 0;
-let answerB = 0;
-let correctW = false;
-let correctB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
 let currentFen = '';
-let showingUnder = false;
-const drillResults = [];   // { seconds, correct, misses } per completed puzzle
+let currentUnderSqs = new Set();  // all underguarded squares for this position
+let foundSqs = new Set();          // correctly identified by user
+let waitingToAdvance = false;
+const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
 
@@ -38,13 +35,10 @@ let puzzleQueue = [];
 
 export function initUnder(navigateFn) {
   navigate = navigateFn;
-  createDigitButtons();
   document.getElementById('btn-under-done').addEventListener('click', showSummary);
-  document.getElementById('btn-under-next').addEventListener('click', loadNextPuzzle);
-  document.getElementById('btn-under-show').addEventListener('click', () => {
-    if (showingUnder) hideUnder();
-    else showUnder();
-  });
+  document.getElementById('btn-under-complete').addEventListener('click', handleComplete);
+  document.getElementById('btn-under-show').addEventListener('click', handleShow);
+  document.getElementById('under-board').addEventListener('click', handleBoardClick);
 }
 
 export async function startUnder() {
@@ -65,10 +59,9 @@ async function fillQueue() {
 
 async function fetchWithDifficulty() {
   const { fen, puzzleId } = await fetchValidFen();
-  const ansW = countUnderguardedForColor(fen, 'w');
-  const ansB = countUnderguardedForColor(fen, 'b');
-  return { fen, puzzleId, answerW: ansW, answerB: ansB,
-           difficulty: scoreCountDifficulty(fen, ansW + ansB) };
+  const underSqs = getUnderguardedPieces(fen);
+  return { fen, puzzleId, underSqs,
+           difficulty: scoreCountDifficulty(fen, underSqs.size) };
 }
 
 // --- Puzzle loading ---
@@ -84,10 +77,10 @@ async function loadNextPuzzle() {
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
-  currentPuzzleId = puzzle.puzzleId;
-  currentFen      = puzzle.fen;
-  answerW         = puzzle.answerW;
-  answerB         = puzzle.answerB;
+  currentPuzzleId  = puzzle.puzzleId;
+  currentFen       = puzzle.fen;
+  currentUnderSqs  = puzzle.underSqs;
+  foundSqs         = new Set();
   showDifficulty('under-diff', puzzle.difficulty);
   if (puzzleQueue.length === 0) fillQueue();
 
@@ -105,6 +98,8 @@ async function loadNextPuzzle() {
   puzzleActive = true;
   startTimer();
 }
+
+// --- Lichess fetch ---
 
 async function fetchValidFen() {
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -152,183 +147,197 @@ function parsePuzzleFen(data) {
   return { fen: puzzleChess.fen(), puzzleId: data.puzzle.id ?? '' };
 }
 
-// --- Underguarded piece counting ---
-// A piece is underguarded if attackers >= defenders (raw counts, no piece values).
-// This includes loose pieces (0 attackers, 0 defenders) as a special case.
-// Kings are excluded: they cannot meaningfully be "guarded".
+// --- Underguarded piece detection ---
+// A piece is underguarded if enemy attackers >= friendly defenders (kings excluded).
 
-function countUnderguardedForColor(fen, colorChar) {
+function getUnderguardedPieces(fen) {
   const tmp = new Chess();
-  try { tmp.load(fen); } catch { return 0; }
-
-  const enemy = colorChar === 'w' ? 'b' : 'w';
-  let count = 0;
-
+  try { tmp.load(fen); } catch { return new Set(); }
+  const result = new Set();
   for (const file of 'abcdefgh') {
     for (let rank = 1; rank <= 8; rank++) {
       const sq = file + rank;
       const piece = tmp.get(sq);
-      if (!piece || piece.color !== colorChar || piece.type === 'k') continue;
-
-      const attackers = tmp.attackers(sq, enemy).length;
-      const defenders = tmp.attackers(sq, colorChar).length;
-      if (attackers >= defenders) count++;
+      if (!piece || piece.type === 'k') continue;
+      const enemy = piece.color === 'w' ? 'b' : 'w';
+      if (tmp.attackers(sq, enemy).length >= tmp.attackers(sq, piece.color).length) {
+        result.add(sq);
+      }
     }
   }
-
-  return Math.min(count, 9);
+  return result;
 }
 
-// Returns square names for underguarded pieces of colorChar.
-function getUnderguardedForColor(fen, colorChar) {
-  const tmp = new Chess();
-  try { tmp.load(fen); } catch { return []; }
-  const enemy = colorChar === 'w' ? 'b' : 'w';
-  const squares = [];
-  for (const file of 'abcdefgh') {
-    for (let rank = 1; rank <= 8; rank++) {
-      const sq = file + rank;
-      const piece = tmp.get(sq);
-      if (!piece || piece.color !== colorChar || piece.type === 'k') continue;
-      if (tmp.attackers(sq, enemy).length >= tmp.attackers(sq, colorChar).length) squares.push(sq);
+// --- Board click handler ---
+
+function handleBoardClick(e) {
+  if (waitingToAdvance) { loadNextPuzzle(); return; }
+  if (!puzzleActive) return;
+
+  const sq = sqFromEvent(e);
+  if (!sq) return;
+
+  // Toggle: un-mark an already-found square
+  if (foundSqs.has(sq)) {
+    foundSqs.delete(sq);
+    removeSqMark(sq);
+    return;
+  }
+
+  if (currentUnderSqs.has(sq)) {
+    foundSqs.add(sq);
+    drawSqMark(sq, 'loose-sq-found');
+  } else {
+    misses++;
+    document.getElementById('under-misses').textContent = `Misses: ${misses}`;
+    flashSq(sq);
+  }
+}
+
+function handleComplete() {
+  if (waitingToAdvance) { loadNextPuzzle(); return; }
+  if (!puzzleActive) return;
+  finishPuzzle();
+}
+
+function handleShow() {
+  if (waitingToAdvance) { loadNextPuzzle(); return; }
+  if (!puzzleActive) return;
+  finishPuzzle();
+}
+
+function finishPuzzle() {
+  puzzleActive = false;
+  stopTimer();
+
+  // Reveal missed underguarded squares in amber
+  for (const sq of currentUnderSqs) {
+    if (!foundSqs.has(sq)) {
+      misses++;
+      drawSqMark(sq, 'loose-sq-missed');
     }
   }
-  return squares;
-}
+  document.getElementById('under-misses').textContent = `Misses: ${misses}`;
 
-function showUnder() {
-  if (!board || !currentFen) return;
-  clearUnderOverlay();
-  const whiteSqs = getUnderguardedForColor(currentFen, 'w');
-  const blackSqs = getUnderguardedForColor(currentFen, 'b');
-  drawUnderOverlay(whiteSqs, blackSqs);
-  if (whiteSqs.length === 0 && blackSqs.length === 0) {
-    setTimeout(() => showNoMovesMessage('under-board'), 50);
+  const correct = foundSqs.size;
+  const total   = currentUnderSqs.size;
+  drillResults.push({ seconds, correct, misses });
+  upsertDrillDay('under', { seconds, correct, misses, puzzleId: currentPuzzleId });
+  updateSessionStats();
+
+  const el = document.getElementById('under-result');
+  if (total === 0) {
+    el.textContent = `✓ ${formatTime(seconds)} · None underguarded · ${misses} miss${misses !== 1 ? 'es' : ''}`;
+  } else {
+    el.textContent = `✓ ${formatTime(seconds)} · ${correct}/${total} found · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   }
-  showingUnder = true;
-  document.getElementById('btn-under-show').classList.add('active');
+  el.classList.remove('hidden');
+
+  drawContinueMsg();
+  document.getElementById('btn-under-complete').textContent = 'CONTINUE';
+  waitingToAdvance = true;
 }
 
-function hideUnder() {
-  clearUnderOverlay();
-  showingUnder = false;
-  const btn = document.getElementById('btn-under-show');
-  if (btn) btn.classList.remove('active');
-}
+// --- SVG helpers ---
 
-function drawUnderOverlay(whiteSqs, blackSqs) {
+function getSvg() {
   const boardEl = document.getElementById('under-board');
-  const svg = boardEl && boardEl.querySelector('svg');
-  if (!svg) return;
+  return boardEl ? boardEl.querySelector('svg') : null;
+}
 
+function sqFromEvent(e) {
+  const boardEl = document.getElementById('under-board');
+  if (!boardEl) return null;
+  const rect = boardEl.getBoundingClientRect();
+  const file    = Math.floor((e.clientX - rect.left)  / rect.width  * 8);
+  const rankIdx = 7 - Math.floor((e.clientY - rect.top) / rect.height * 8);
+  if (file < 0 || file > 7 || rankIdx < 0 || rankIdx > 7) return null;
+  return String.fromCharCode(97 + file) + (rankIdx + 1);
+}
+
+function drawSqMark(sq, cssClass) {
+  const svg = getSvg();
+  if (!svg) return;
   const vb = svg.viewBox.baseVal;
   const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
   const sqSize = boardW / 8;
+  const file = sq.charCodeAt(0) - 97;
+  const rank = parseInt(sq[1]);
+  const x = file * sqSize, y = (8 - rank) * sqSize;
+  const pad = 3;
 
-  const layer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  layer.setAttribute('class', 'under-overlay');
-  svg.appendChild(layer);
-
-  [['w', whiteSqs, 'loose-marker-white'], ['b', blackSqs, 'loose-marker-black']].forEach(([, squares, cls]) => {
-    squares.forEach((sq, i) => {
-      const file = sq.charCodeAt(0) - 97;
-      const rank = parseInt(sq[1]);
-      const x = file * sqSize;
-      const y = (8 - rank) * sqSize;
-
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', x + 2);
-      rect.setAttribute('y', y + 2);
-      rect.setAttribute('width', sqSize - 4);
-      rect.setAttribute('height', sqSize - 4);
-      rect.setAttribute('rx', 4);
-      rect.setAttribute('class', cls);
-      layer.appendChild(rect);
-
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x + sqSize * 0.22);
-      text.setAttribute('y', y + sqSize * 0.28);
-      text.setAttribute('font-size', sqSize * 0.3);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('class', 'loose-label');
-      text.textContent = i + 1;
-      layer.appendChild(text);
-    });
-  });
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x + pad);
+  rect.setAttribute('y', y + pad);
+  rect.setAttribute('width',  sqSize - pad * 2);
+  rect.setAttribute('height', sqSize - pad * 2);
+  rect.setAttribute('rx', 4);
+  rect.setAttribute('class', cssClass);
+  rect.setAttribute('data-under-sq', sq);
+  rect.setAttribute('pointer-events', 'none');
+  svg.appendChild(rect);
 }
 
-function clearUnderOverlay() {
+function removeSqMark(sq) {
   const boardEl = document.getElementById('under-board');
-  if (boardEl) {
-    boardEl.querySelectorAll('.under-overlay').forEach(el => el.remove());
-    boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
-  }
+  if (boardEl) boardEl.querySelectorAll(`[data-under-sq="${sq}"]`).forEach(el => el.remove());
 }
 
-function showNoMovesMessage(boardId) {
-  const boardEl = document.getElementById(boardId);
-  const svg = boardEl && boardEl.querySelector('svg');
+function flashSq(sq) {
+  const svg = getSvg();
   if (!svg) return;
   const vb = svg.viewBox.baseVal;
-  const cx = (vb && vb.width) ? vb.width / 2 : svg.getBoundingClientRect().width / 2;
-  const cy = (vb && vb.height) ? vb.height / 2 : svg.getBoundingClientRect().height / 2;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+  const file = sq.charCodeAt(0) - 97;
+  const rank = parseInt(sq[1]);
+  const x = file * sqSize, y = (8 - rank) * sqSize;
+  const pad = 3;
+
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x + pad);
+  rect.setAttribute('y', y + pad);
+  rect.setAttribute('width',  sqSize - pad * 2);
+  rect.setAttribute('height', sqSize - pad * 2);
+  rect.setAttribute('rx', 4);
+  rect.setAttribute('class', 'loose-sq-invalid');
+  rect.setAttribute('pointer-events', 'none');
+  svg.appendChild(rect);
+  setTimeout(() => rect.remove(), 600);
+}
+
+function clearAllMarks() {
+  const boardEl = document.getElementById('under-board');
+  if (boardEl) boardEl.querySelectorAll('[data-under-sq], .under-continue-msg').forEach(el => el.remove());
+}
+
+function drawContinueMsg() {
+  const svg = getSvg();
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
   const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', cx);
-  text.setAttribute('y', cy);
+  text.setAttribute('x', boardW / 2);
+  text.setAttribute('y', boardW - sqSize * 0.15);
   text.setAttribute('text-anchor', 'middle');
-  text.setAttribute('dominant-baseline', 'central');
-  text.setAttribute('class', 'board-none-msg');
-  text.textContent = 'None by either side';
+  text.setAttribute('font-size', sqSize * 0.48);
+  text.setAttribute('class', 'under-continue-msg');
+  text.textContent = 'Click anywhere to continue';
   svg.appendChild(text);
 }
 
-// --- Digit button interaction ---
-
-function handleDigitClick(color, value) {
-  if (!puzzleActive) return;
-  const isWhite = color === 'w';
-  if (isWhite && correctW) return;
-  if (!isWhite && correctB) return;
-
-  const btn = document.querySelector(
-    `#screen-under .digit-btn[data-color="${color}"][data-value="${value}"]`
-  );
-  if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
-
-  const correct = isWhite ? answerW : answerB;
-  if (value === correct) {
-    btn.classList.add('correct');
-    correctAnswers++;
-    if (isWhite) correctW = true; else correctB = true;
-    if (correctW && correctB) puzzleComplete();
-  } else {
-    btn.classList.add('incorrect');
-    misses++;
-    document.getElementById('under-misses').textContent = `Misses: ${misses}`;
-  }
-}
-
-function puzzleComplete() {
-  puzzleActive = false;
-  stopTimer();
-  drillResults.push({ seconds, correct: correctAnswers, misses });
-  upsertDrillDay('under', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
-  updateSessionStats();
-  const el = document.getElementById('under-result');
-  el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  el.classList.remove('hidden');
-}
+// --- Session stats ---
 
 function updateSessionStats() {
   const count = drillResults.length;
   if (count === 0) return;
   const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
-  const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
-  const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
-  const avgSecs = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
+  const totalMisses  = drillResults.reduce((s, r) => s + r.misses,  0);
+  const accuracy = Math.round(totalCorrect / Math.max(1, totalCorrect + totalMisses) * 100);
+  const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('under-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
-  document.getElementById('under-session-acc').textContent = `Acc ${accuracy}%`;
+  document.getElementById('under-session-acc').textContent  = `Acc ${accuracy}%`;
 }
 
 // --- Summary ---
@@ -336,14 +345,13 @@ function updateSessionStats() {
 function showSummary() {
   stopTimer();
   document.getElementById('btn-summary-again').onclick = restartDrill;
-
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
   if (count > 0) {
-    const avgTime = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
+    const avgTime      = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
-    const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
-    const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
+    const totalMisses  = drillResults.reduce((s, r) => s + r.misses,  0);
+    const accuracy = Math.round(totalCorrect / Math.max(1, totalCorrect + totalMisses) * 100);
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
   } else {
@@ -356,25 +364,10 @@ function showSummary() {
 async function restartDrill() {
   navigate('screen-under');
   resetDrill();
-  await loadNextPuzzle();
+  await startUnder();
 }
 
 // --- UI helpers ---
-
-function createDigitButtons() {
-  [['under-digits-white', 'w'], ['under-digits-black', 'b']].forEach(([containerId, color]) => {
-    const container = document.getElementById(containerId);
-    for (let i = 0; i <= 9; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'digit-btn';
-      btn.dataset.color = color;
-      btn.dataset.value = i;
-      btn.textContent = i === 9 ? '9+' : i;
-      btn.addEventListener('click', () => handleDigitClick(color, i));
-      container.appendChild(btn);
-    }
-  });
-}
 
 function showDifficulty(id, score) {
   const el = document.getElementById(id);
@@ -389,21 +382,19 @@ function resetDrill() {
   drillResults.length = 0;
   puzzleQueue = [];
   document.getElementById('under-session-time').textContent = '';
-  document.getElementById('under-session-acc').textContent = '';
+  document.getElementById('under-session-acc').textContent  = '';
 }
 
 function resetUI() {
-  correctW = correctB = false;
-  misses = seconds = correctAnswers = 0;
-  hideUnder();
-  document.getElementById('under-timer').textContent = '0:00';
-  document.getElementById('under-misses').textContent = 'Misses: 0';
+  misses = seconds = 0;
+  waitingToAdvance = false;
+  clearAllMarks();
+  document.getElementById('under-timer').textContent   = '0:00';
+  document.getElementById('under-misses').textContent  = 'Misses: 0';
+  document.getElementById('btn-under-complete').textContent = 'COMPLETE';
   const result = document.getElementById('under-result');
   result.classList.add('hidden');
   result.textContent = '';
-  document.querySelectorAll('#screen-under .digit-btn').forEach(b =>
-    b.classList.remove('correct', 'incorrect')
-  );
 }
 
 function setStatus(msg) {

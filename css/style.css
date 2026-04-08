@@ -571,7 +571,8 @@ header h1 {
   pointer-events: none;
   animation: flash-red 0.6s ease-out forwards;
 }
-.loose-continue-msg {
+.loose-continue-msg,
+.under-continue-msg {
   font-weight: 700;
   fill: #111;
   stroke: white;
@@ -702,7 +703,7 @@ header h1 {
   text-align: center;
 }
 
-#btn-checks-next, #btn-captures-next, #btn-under-next, #btn-threats-next {
+#btn-checks-next, #btn-captures-next, #btn-threats-next {
   margin-top: 0.25rem;
   padding: 0.5rem 2.5rem;
   font-size: 0.95rem;
@@ -715,7 +716,6 @@ header h1 {
 }
 #btn-checks-next:hover:not(:disabled),
 #btn-captures-next:hover:not(:disabled),
-#btn-under-next:hover:not(:disabled),
 #btn-threats-next:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
@@ -1030,7 +1030,8 @@ button:disabled {
 }
 
 /* ── Loose Pieces drill ── */
-#btn-loose-complete {
+#btn-loose-complete,
+#btn-under-complete {
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.25rem 0.75rem;
@@ -1040,7 +1041,8 @@ button:disabled {
   color: #c080ff;
   border-radius: 6px;
 }
-#btn-loose-complete:hover:not(:disabled) {
+#btn-loose-complete:hover:not(:disabled),
+#btn-under-complete:hover:not(:disabled) {
   background: #7a30a8;
   color: #fff;
 }
