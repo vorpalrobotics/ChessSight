@@ -51,14 +51,18 @@ function bfs(from, to, blocked = new Set()) {
 
 // ─── FEN builder ─────────────────────────────────────────────────────────────
 
-function buildFen(knightSq) {
+function buildFen(knightSq, obstacles = new Set()) {
   const rows = [];
   for (let rank = 7; rank >= 0; rank--) {
     let row = '', empty = 0;
     for (let file = 0; file < 8; file++) {
-      if (sqName(file, rank) === knightSq) {
+      const sq = sqName(file, rank);
+      if (sq === knightSq) {
         if (empty) { row += empty; empty = 0; }
         row += 'N';
+      } else if (obstacles.has(sq)) {
+        if (empty) { row += empty; empty = 0; }
+        row += 'P';
       } else empty++;
     }
     if (empty) row += empty;
@@ -81,15 +85,29 @@ function shuffle(arr) {
   return a;
 }
 
+// Squares eligible for obstacle placement: not on rank 1 or rank 8
+const OBSTACLE_CANDIDATES = ALL_SQS.filter(sq => rankOf(sq) > 0 && rankOf(sq) < 7);
+
 function generatePosition() {
-  for (let attempt = 0; attempt < 300; attempt++) {
+  for (let attempt = 0; attempt < 500; attempt++) {
     const [startSq, targetSq] = shuffle(ALL_SQS);
-    const { dist, path } = bfs(startSq, targetSq);
-    if (dist >= 2 && dist <= 6) return { startSq, targetSq, optimalDist: dist, optimalPath: path };
+
+    // Pick obstacle count: 0/1/2/3 each at 25%
+    const numObstacles = Math.floor(Math.random() * 4);
+    const obstacles = new Set();
+    if (numObstacles > 0) {
+      const candidates = shuffle(OBSTACLE_CANDIDATES.filter(sq => sq !== startSq && sq !== targetSq));
+      for (let i = 0; i < numObstacles && i < candidates.length; i++) {
+        obstacles.add(candidates[i]);
+      }
+    }
+
+    const { dist, path } = bfs(startSq, targetSq, obstacles);
+    if (dist >= 2 && dist <= 6) return { startSq, targetSq, optimalDist: dist, optimalPath: path, obstacles };
   }
-  // Fallback: a1→c5, distance 2 (a1→b3→c5)
+  // Fallback: a1→c5, no obstacles
   const { dist, path } = bfs('a1', 'c5');
-  return { startSq: 'a1', targetSq: 'c5', optimalDist: dist, optimalPath: path };
+  return { startSq: 'a1', targetSq: 'c5', optimalDist: dist, optimalPath: path, obstacles: new Set() };
 }
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -105,8 +123,9 @@ let currentStartSq = '';
 let currentTargetSq = '';
 let currentOptimalDist = 0;
 let currentOptimalPath = [];
-let currentPath = [];   // valid squares clicked by user (not including startSq)
-let currentPos = '';    // knight's current position
+let currentPath = [];      // valid squares clicked by user (not including startSq)
+let currentPos = '';       // knight's current position
+let currentObstacles = new Set();
 let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
@@ -138,17 +157,18 @@ function loadNextPuzzle() {
   currentTargetSq    = pos.targetSq;
   currentOptimalDist = pos.optimalDist;
   currentOptimalPath = pos.optimalPath;
+  currentObstacles   = pos.obstacles;
   currentPath        = [];
   currentPos         = pos.startSq;
 
   if (!board) {
     board = new Chessboard(document.getElementById('knight-board'), {
-      position: buildFen(pos.startSq),
+      position: buildFen(pos.startSq, pos.obstacles),
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
     });
   } else {
-    board.setPosition(buildFen(pos.startSq), false);
+    board.setPosition(buildFen(pos.startSq, pos.obstacles), false);
   }
 
   // Draw target after board has rendered
@@ -180,7 +200,7 @@ function handleBoardClick(e) {
   // Ignore start square and already-visited path squares
   if (sq === currentStartSq || currentPath.includes(sq)) return;
 
-  if (!knightMoves(currentPos).includes(sq)) {
+  if (!knightMoves(currentPos, currentObstacles).includes(sq)) {
     invalidClicks++;
     misses++;
     document.getElementById('knight-misses').textContent = `Misses: ${misses}`;
@@ -246,7 +266,7 @@ function handleShow() {
   // Yes if the remaining distance from currentPos exactly equals remaining budget.
   const remainingBudget = currentOptimalDist - currentPath.length;
   const { dist: remainDist, path: completionPath } =
-    remainingBudget >= 0 ? bfs(currentPos, currentTargetSq) : { dist: Infinity, path: [] };
+    remainingBudget >= 0 ? bfs(currentPos, currentTargetSq, currentObstacles) : { dist: Infinity, path: [] };
   const onOptimal = remainDist === remainingBudget;
 
   if (onOptimal && currentPath.length > 0) {
