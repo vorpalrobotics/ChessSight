@@ -167,7 +167,8 @@ let currentPath = [];      // valid squares clicked by user (not including start
 let currentPos = '';       // knight's current position
 let currentWhitePawns = new Set();
 let currentBlackPawns = new Set();
-let currentObstacles = new Set();  // full blocked set: white + black + attacked
+let currentBlackAttacked = new Set();  // squares attacked by black pawns
+let currentObstacles = new Set();      // full blocked set: white + black + attacked
 let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
@@ -199,9 +200,10 @@ function loadNextPuzzle() {
   currentTargetSq    = pos.targetSq;
   currentOptimalDist = pos.optimalDist;
   currentOptimalPath = pos.optimalPath;
-  currentWhitePawns  = pos.whitePawns;
-  currentBlackPawns  = pos.blackPawns;
-  currentObstacles   = pos.blocked;
+  currentWhitePawns   = pos.whitePawns;
+  currentBlackPawns   = pos.blackPawns;
+  currentBlackAttacked = blackPawnAttacks(pos.blackPawns);
+  currentObstacles    = pos.blocked;
   currentPath        = [];
   currentPos         = pos.startSq;
 
@@ -250,6 +252,11 @@ function handleBoardClick(e) {
     misses++;
     document.getElementById('knight-misses').textContent = `Misses: ${misses}`;
     flashInvalid(sq);
+    // Show contextual message if it was a geometrically valid knight move blocked by a pawn rule
+    if (knightMoves(currentPos).includes(sq)) {
+      if (currentBlackPawns.has(sq))       showBoardMessage('Capture not allowed in this drill');
+      else if (currentBlackAttacked.has(sq)) showBoardMessage('The pawn could capture you there');
+    }
     return;
   }
 
@@ -453,6 +460,25 @@ function clearAllMarks() {
   if (!boardEl) return;
   boardEl.querySelectorAll('[data-knight], [data-knight-sq], .knight-continue-msg')
     .forEach(el => el.remove());
+}
+
+function showBoardMessage(text) {
+  const svg = getSvg();
+  if (!svg) return;
+  svg.querySelectorAll('.knight-board-msg').forEach(el => el.remove());
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+  const msg = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  msg.setAttribute('x', boardW / 2);
+  msg.setAttribute('y', boardW / 2);
+  msg.setAttribute('text-anchor', 'middle');
+  msg.setAttribute('dominant-baseline', 'central');
+  msg.setAttribute('font-size', sqSize * 0.44);
+  msg.setAttribute('class', 'knight-board-msg');
+  msg.textContent = text;
+  svg.appendChild(msg);
+  setTimeout(() => msg.remove(), 2000);
 }
 
 function drawContinueMsg() {

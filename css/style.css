@@ -1133,6 +1133,15 @@ button:disabled {
   pointer-events: none;
   font-family: system-ui, sans-serif;
 }
+.knight-board-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 6px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
 
 .queen-continue-msg {
   font-weight: 700;
