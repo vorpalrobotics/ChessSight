@@ -39,6 +39,28 @@ function rookAttacks(from, to, occupied) {
   return lineAttacks(from, to, occupied);
 }
 
+// Does a bishop (diagonal only) at `from` attack `to`, with `occupied` squares blocking?
+function bishopAttacks(from, to, occupied) {
+  const df = fileOf(to) - fileOf(from), dr = rankOf(to) - rankOf(from);
+  if (df === 0 || dr === 0 || Math.abs(df) !== Math.abs(dr)) return false;
+  return lineAttacks(from, to, occupied);
+}
+
+// Does a knight at `from` attack `to`?
+function knightAttacks(from, to) {
+  const df = Math.abs(fileOf(to) - fileOf(from));
+  const dr = Math.abs(rankOf(to) - rankOf(from));
+  return (df === 1 && dr === 2) || (df === 2 && dr === 1);
+}
+
+// Can the target piece recapture the queen on `targetSq`? (king may block along lines)
+function pieceCanRecapture(pieceType, pieceSq, targetSq, occupied) {
+  if (pieceType === 'r') return rookAttacks(pieceSq, targetSq, occupied);
+  if (pieceType === 'b') return bishopAttacks(pieceSq, targetSq, occupied);
+  if (pieceType === 'n') return knightAttacks(pieceSq, targetSq);
+  return false;
+}
+
 // Is `mid` strictly between `a` and `b` on the same line?
 function isBetween(mid, a, b) {
   return squaresBetween(a, b).includes(mid);
@@ -54,44 +76,43 @@ function isAdjacent(sq1, sq2) {
 
 // ─── Valid square logic ────────────────────────────────────────────────────────
 
-// Returns all squares S where the queen creates a tactical threat:
-//   A. Fork   — queen at S attacks king AND rook simultaneously (different lines)
-//   B. Skewer — king is between S and rook (queen checks king; rook exposed on king's retreat)
-//   C. Pin    — rook is between S and king on the same line (diagonal pins pass condition 3;
-//               rank/file "pins" are automatically excluded because the rook would attack S)
+// Returns all squares S where the queen creates a tactical threat against the given piece type:
+//   A. Fork   — queen at S attacks king AND piece simultaneously
+//   B. Skewer — king between S and piece (queen checks king; piece exposed on king's retreat)
+//   C. Pin    — piece between S and king on same line; condition 3 filters cases where the
+//               piece counterattacks S (e.g. rook pins diagonally pass; along rank/file fail;
+//               bishop is opposite; knight never counterattacks along a line)
 //
 // Always required:
-//   1. Queen can reach S from its starting square (king/rook may block the path)
+//   1. Queen can reach S from its starting square (king/piece may block the path)
 //   2. S is not adjacent to the king (king cannot capture the queen there)
-//   3. Rook cannot immediately recapture (rook attacks S only along ranks/files; king may block)
-function computeValidSquares(queenSq, kingSq, rookSq) {
+//   3. Target piece cannot immediately recapture (king may block sliding pieces)
+function computeValidSquares(queenSq, kingSq, pieceSq, pieceType) {
   const valid = [];
   for (let f = 0; f < 8; f++) {
     for (let r = 0; r < 8; r++) {
       const s = sqName(f, r);
-      if (s === queenSq || s === kingSq || s === rookSq) continue;
+      if (s === queenSq || s === kingSq || s === pieceSq) continue;
 
-      // 1. Queen can reach s (path clear of king and rook)
-      if (!lineAttacks(queenSq, s, new Set([kingSq, rookSq]))) continue;
+      // 1. Queen can reach s (path clear of king and piece)
+      if (!lineAttacks(queenSq, s, new Set([kingSq, pieceSq]))) continue;
 
       // 2. King cannot capture the queen at s
       if (isAdjacent(s, kingSq)) continue;
 
-      // 3. Rook cannot immediately recapture (king may block along rook's rank/file)
-      if (rookAttacks(rookSq, s, new Set([kingSq]))) continue;
+      // 3. Target piece cannot immediately recapture (king may block)
+      if (pieceCanRecapture(pieceType, pieceSq, s, new Set([kingSq]))) continue;
 
-      // A. Fork: queen at s directly attacks both king and rook
-      const attacksKing = lineAttacks(s, kingSq, new Set([rookSq]));
-      const attacksRook = lineAttacks(s, rookSq, new Set([kingSq]));
-      if (attacksKing && attacksRook) { valid.push(s); continue; }
+      // A. Fork: queen at s directly attacks both king and piece
+      const attacksKing  = lineAttacks(s, kingSq,  new Set([pieceSq]));
+      const attacksPiece = lineAttacks(s, pieceSq, new Set([kingSq]));
+      if (attacksKing && attacksPiece) { valid.push(s); continue; }
 
-      // B. Skewer: king between s and rook on same line
-      //    Queen checks king; rook is exposed when king moves away.
-      if (isBetween(kingSq, s, rookSq)) { valid.push(s); continue; }
+      // B. Skewer: king between s and piece — queen checks king; piece exposed on retreat
+      if (isBetween(kingSq, s, pieceSq)) { valid.push(s); continue; }
 
-      // C. Pin: rook between s and king on same line
-      //    Rank/file cases fail condition 3 (rook attacks s); diagonal cases pass.
-      if (isBetween(rookSq, s, kingSq)) { valid.push(s); continue; }
+      // C. Pin: piece between s and king — condition 3 already excluded counterattack cases
+      if (isBetween(pieceSq, s, kingSq)) { valid.push(s); continue; }
     }
   }
   return valid;
@@ -100,8 +121,8 @@ function computeValidSquares(queenSq, kingSq, rookSq) {
 // ─── FEN builder ──────────────────────────────────────────────────────────────
 
 // Builds a display FEN with just the three pieces (no kings required for rendering).
-function buildFen(queenSq, kingSq, rookSq) {
-  const pieces = { [queenSq]: 'Q', [kingSq]: 'k', [rookSq]: 'r' };
+function buildFen(queenSq, kingSq, pieceSq, pieceType) {
+  const pieces = { [queenSq]: 'Q', [kingSq]: 'k', [pieceSq]: pieceType };
   const rows = [];
   for (let rank = 7; rank >= 0; rank--) {
     let row = '', empty = 0;
@@ -129,18 +150,21 @@ function shuffle(arr) {
   return a;
 }
 
+const PIECE_TYPES = ['r', 'n', 'b'];
+
 function generatePosition() {
   for (let attempt = 0; attempt < 300; attempt++) {
-    const [kingSq, rookSq, queenSq] = shuffle(ALL_SQS);
-    // Queen must not currently attack king or rook
-    if (lineAttacks(queenSq, kingSq, new Set([rookSq]))) continue;
-    if (lineAttacks(queenSq, rookSq, new Set([kingSq]))) continue;
-    const valid = computeValidSquares(queenSq, kingSq, rookSq);
-    if (valid.length > 0) return { queenSq, kingSq, rookSq, valid };
+    const [kingSq, pieceSq, queenSq] = shuffle(ALL_SQS);
+    const pieceType = PIECE_TYPES[Math.floor(Math.random() * 3)];
+    // Queen must not currently attack king or piece
+    if (lineAttacks(queenSq, kingSq, new Set([pieceSq]))) continue;
+    if (lineAttacks(queenSq, pieceSq, new Set([kingSq]))) continue;
+    const valid = computeValidSquares(queenSq, kingSq, pieceSq, pieceType);
+    if (valid.length > 0) return { queenSq, kingSq, pieceSq, pieceType, valid };
   }
-  // Fallback: verified position — queen h1, king e5, rook e8 (h5 is a fork square)
-  const q = 'h1', k = 'e5', r = 'e8';
-  return { queenSq: q, kingSq: k, rookSq: r, valid: computeValidSquares(q, k, r) };
+  // Fallback: verified position with rook
+  const q = 'h1', k = 'e5', p = 'e8';
+  return { queenSq: q, kingSq: k, pieceSq: p, pieceType: 'r', valid: computeValidSquares(q, k, p, 'r') };
 }
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -153,7 +177,8 @@ let puzzleActive = false;
 let puzzleCount = 0;
 let currentQueenSq = '';
 let currentKingSq = '';
-let currentRookSq = '';
+let currentPieceSq = '';
+let currentPieceType = '';
 let currentValid = [];       // valid squares for current puzzle
 let foundSquares = new Set();
 let markedSquares = new Set(); // all squares already given feedback (avoid re-marking)
@@ -184,12 +209,13 @@ function loadNextPuzzle() {
   document.getElementById('queen-puzzle-num').textContent = `#${puzzleCount}`;
 
   const pos = generatePosition();
-  currentQueenSq = pos.queenSq;
-  currentKingSq  = pos.kingSq;
-  currentRookSq  = pos.rookSq;
-  currentValid   = pos.valid;
+  currentQueenSq  = pos.queenSq;
+  currentKingSq   = pos.kingSq;
+  currentPieceSq  = pos.pieceSq;
+  currentPieceType = pos.pieceType;
+  currentValid    = pos.valid;
 
-  const fen = buildFen(pos.queenSq, pos.kingSq, pos.rookSq);
+  const fen = buildFen(pos.queenSq, pos.kingSq, pos.pieceSq, pos.pieceType);
 
   if (!board) {
     board = new Chessboard(document.getElementById('queen-board'), {
@@ -222,7 +248,7 @@ function handleBoardClick(e) {
   const sq = sqName(file, rankIdx);
 
   // Ignore clicks on occupied squares
-  if (sq === currentQueenSq || sq === currentKingSq || sq === currentRookSq) return;
+  if (sq === currentQueenSq || sq === currentKingSq || sq === currentPieceSq) return;
   // Ignore already-marked squares
   if (markedSquares.has(sq)) return;
   markedSquares.add(sq);
@@ -255,7 +281,7 @@ function finishPuzzle() {
   const found = foundSquares.size;
   const total = currentValid.length;
   drillResults.push({ seconds, correct: found, misses });
-  upsertDrillDay('queen', { seconds, correct: found, misses, puzzleId: `${currentQueenSq}-${currentKingSq}-${currentRookSq}` });
+  upsertDrillDay('queen', { seconds, correct: found, misses, puzzleId: `${currentQueenSq}-${currentKingSq}-${currentPieceSq}-${currentPieceType}` });
   updateSessionStats();
 
   const el = document.getElementById('queen-result');

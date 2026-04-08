@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v52</title>
+  <title>ChessSight v53</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -78,7 +78,7 @@
       <button class="mode-card" id="mode-queen">
         <span class="mode-icon">♛</span>
         <span class="mode-name">Queen Attack</span>
-        <span class="mode-desc">Find all fork / skewer / pin squares</span>
+        <span class="mode-desc">Fork, skewer, or pin a rook, bishop, or knight</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -315,7 +315,7 @@
 
     <div id="queen-status"></div>
     <div id="queen-result" class="hidden"></div>
-    <p class="drill-rule">Click every square where the white queen can move to create a fork (attacks both king and rook), skewer (queen checks king, exposing rook behind it), or diagonal pin (rook pinned to king along a diagonal). The square must be reachable by the queen, not adjacent to the king, and not attackable by the rook. Click COMPLETE when you believe you have found all such squares — any you missed will flash.</p>
+    <p class="drill-rule">A black king and one random black piece (rook, bishop, or knight) are placed on the board with a white queen that doesn't yet attack either. Click every square where the queen can move to fork (attacks both pieces), skewer (checks king, exposing the piece behind it), or pin the piece to the king. The square must be reachable by the queen, not adjacent to the king, and not immediately recapturable by the black piece. Click COMPLETE when you believe you have found all such squares — any you missed will flash.</p>
   </div>
 
   <!-- ── Screen 8: Drill summary ── -->
