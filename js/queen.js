@@ -157,6 +157,7 @@ let currentRookSq = '';
 let currentValid = [];       // valid squares for current puzzle
 let foundSquares = new Set();
 let markedSquares = new Set(); // all squares already given feedback (avoid re-marking)
+let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
 
@@ -209,6 +210,7 @@ function loadNextPuzzle() {
 // ─── Board click handler ──────────────────────────────────────────────────────
 
 function handleBoardClick(e) {
+  if (waitingToAdvance) { loadNextPuzzle(); return; }
   if (!puzzleActive) return;
   const boardEl = document.getElementById('queen-board');
   const rect = boardEl.getBoundingClientRect();
@@ -246,11 +248,9 @@ function finishPuzzle() {
   puzzleActive = false;
   stopTimer();
 
-  // Flash any squares the user missed
   const missed = currentValid.filter(sq => !foundSquares.has(sq));
   misses += missed.length;
   document.getElementById('queen-misses').textContent = `Misses: ${misses}`;
-  missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
 
   const found = foundSquares.size;
   const total = currentValid.length;
@@ -262,7 +262,13 @@ function finishPuzzle() {
   el.textContent = `✓ ${formatTime(seconds)} · ${found}/${total} squares · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
 
-  setTimeout(loadNextPuzzle, 6000);
+  if (missed.length > 0) {
+    missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
+    setStatus('Click anywhere to continue.');
+    waitingToAdvance = true;
+  } else {
+    loadNextPuzzle();
+  }
 }
 
 // ─── SVG square overlay ───────────────────────────────────────────────────────
@@ -349,6 +355,7 @@ function resetDrill() {
 
 function resetUI() {
   misses = seconds = 0;
+  waitingToAdvance = false;
   foundSquares.clear();
   markedSquares.clear();
   clearMarks();
