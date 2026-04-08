@@ -92,13 +92,19 @@ function generatePosition() {
   for (let attempt = 0; attempt < 500; attempt++) {
     const [startSq, targetSq] = shuffle(ALL_SQS);
 
-    // Pick obstacle count: 0/1/2/3 each at 25%
-    const numObstacles = Math.floor(Math.random() * 4);
+    // Pick obstacle count: uniform 0–8
+    const numObstacles = Math.floor(Math.random() * 9);
     const obstacles = new Set();
     if (numObstacles > 0) {
+      const fileCounts = new Array(8).fill(0);
       const candidates = shuffle(OBSTACLE_CANDIDATES.filter(sq => sq !== startSq && sq !== targetSq));
-      for (let i = 0; i < numObstacles && i < candidates.length; i++) {
-        obstacles.add(candidates[i]);
+      for (const sq of candidates) {
+        if (obstacles.size >= numObstacles) break;
+        const f = fileOf(sq);
+        if (fileCounts[f] < 3) {
+          obstacles.add(sq);
+          fileCounts[f]++;
+        }
       }
     }
 
