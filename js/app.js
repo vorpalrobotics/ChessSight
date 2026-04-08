@@ -7,10 +7,11 @@ import { initCaptures, startCaptures } from './captures.js';
 import { initLoose, startLoose } from './loose.js';
 import { initUnder, startUnder } from './under.js';
 import { initThreats, startThreats } from './threats.js';
+import { initQueenAttack, startQueenAttack } from './queen.js';
 import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-threats', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-threats', 'screen-queen', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -42,6 +43,11 @@ document.getElementById('mode-under').addEventListener('click', async () => {
 document.getElementById('mode-threats').addEventListener('click', async () => {
   showScreen('screen-threats');
   await startThreats();
+});
+
+document.getElementById('mode-queen').addEventListener('click', () => {
+  showScreen('screen-queen');
+  startQueenAttack();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -86,7 +92,7 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', threats: 'Threats' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', threats: 'Threats', queen: 'Queen Attack' };
 
 const DRILL_COLORS = {
   checks:   '#e94560',
@@ -94,6 +100,7 @@ const DRILL_COLORS = {
   loose:    '#f0a030',
   under:    '#8bc34a',
   threats:  '#ff6b35',
+  queen:    '#c080ff',
 };
 
 let chartTime = null, chartAcc = null;
@@ -142,7 +149,7 @@ async function renderCharts() {
   const dates = [...new Set(records.map(r => r.date))].sort();
   const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
 
-  const drills = ['checks', 'captures', 'loose', 'under', 'threats'];
+  const drills = ['checks', 'captures', 'loose', 'under', 'threats', 'queen'];
 
   function makeDatasets(valueFn) {
     return drills.map(drill => ({
@@ -636,3 +643,4 @@ initCaptures(showScreen);
 initLoose(showScreen);
 initUnder(showScreen);
 initThreats(showScreen);
+initQueenAttack(showScreen);

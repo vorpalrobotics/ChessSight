@@ -372,7 +372,7 @@ header h1 {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats {
+#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -551,7 +551,7 @@ header h1 {
   font-family: system-ui, sans-serif;
 }
 
-#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-threats-done {
+#btn-checks-done, #btn-captures-done, #btn-loose-done, #btn-under-done, #btn-threats-done, #btn-queen-done {
   background: var(--surface2);
   color: var(--text-muted);
   font-weight: 700;
@@ -564,7 +564,8 @@ header h1 {
 #btn-captures-done:hover:not(:disabled),
 #btn-loose-done:hover:not(:disabled),
 #btn-under-done:hover:not(:disabled),
-#btn-threats-done:hover:not(:disabled) {
+#btn-threats-done:hover:not(:disabled),
+#btn-queen-done:hover:not(:disabled) {
   background: #7a1a2e;
   color: #fff;
   border-color: var(--accent);
@@ -646,14 +647,14 @@ header h1 {
   transition: none;
 }
 
-#checks-status, #captures-status, #loose-status, #under-status, #forks-status {
+#checks-status, #captures-status, #loose-status, #under-status, #forks-status, #queen-status {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
   min-height: 1em;
 }
 
-#checks-result, #captures-result, #loose-result, #under-result, #forks-result {
+#checks-result, #captures-result, #loose-result, #under-result, #forks-result, #queen-result {
   font-size: 1rem;
   font-weight: 700;
   color: #27ae60;
@@ -986,4 +987,44 @@ button:disabled {
   background: var(--accent);
   color: white;
   border-radius: 3px;
+}
+
+/* ── Queen Attack drill ── */
+#btn-queen-complete {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  letter-spacing: 0.06em;
+  background: #5c2080;
+  border: 1px solid #c080ff;
+  color: #c080ff;
+  border-radius: 6px;
+}
+#btn-queen-complete:hover:not(:disabled) {
+  background: #7a30a8;
+  color: #fff;
+}
+
+/* SVG square overlays */
+.queen-sq-correct {
+  fill: rgba(39, 174, 96, 0.35);
+  stroke: #27ae60;
+  stroke-width: 3px;
+  pointer-events: none;
+}
+.queen-sq-incorrect {
+  fill: rgba(192, 57, 43, 0.35);
+  stroke: #c0392b;
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+@keyframes queen-sq-flash {
+  0%, 100% { fill: rgba(192, 57, 43, 0.35); stroke: #c0392b; }
+  50%       { fill: rgba(255, 100, 60, 0.7); stroke: #ff6040; }
+}
+.queen-sq-missed {
+  stroke-width: 3px;
+  pointer-events: none;
+  animation: queen-sq-flash 0.5s ease-in-out 4;
 }

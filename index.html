@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v48</title>
+  <title>ChessSight v49</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -74,6 +74,11 @@
         <span class="mode-icon">⚡</span>
         <span class="mode-name">Threats</span>
         <span class="mode-desc">Count threat moves for each side</span>
+      </button>
+      <button class="mode-card" id="mode-queen">
+        <span class="mode-icon">♛</span>
+        <span class="mode-name">Queen Attack</span>
+        <span class="mode-desc">Find all fork / skewer / pin squares</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -284,7 +289,36 @@
     <p class="drill-rule">Count moves that create a threat. A threat is a move where the piece lands safely (not immediately recapturable by a cheaper enemy piece) on a square from which it attacks a loose (undefended) enemy piece, attacks an enemy piece of strictly greater value (P=1, N/B=3, R=5, Q=9), or sets up checkmate in 1. Kings are excluded from the first two categories — those are checks. Pawn promotions to the same square count as one move.</p>
   </div>
 
-  <!-- ── Screen 7: Drill summary ── -->
+  <!-- ── Screen 7: Queen Attack drill ── -->
+  <div id="screen-queen" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Queen Attack</h2>
+        <span id="queen-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="queen-session-time" class="session-stat"></span>
+        <span id="queen-session-acc" class="session-stat"></span>
+        <button id="btn-queen-done">DONE</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="queen-board"></div>
+    </div>
+
+    <div class="drill-current-stats">
+      <span id="queen-timer">0:00</span>
+      <span id="queen-misses">Misses: 0</span>
+      <button id="btn-queen-complete">COMPLETE</button>
+    </div>
+
+    <div id="queen-status"></div>
+    <div id="queen-result" class="hidden"></div>
+    <p class="drill-rule">Click every square where the white queen can move to create a fork (attacks both king and rook), skewer (queen checks king, exposing rook behind it), or diagonal pin (rook pinned to king along a diagonal). The square must be reachable by the queen, not adjacent to the king, and not attackable by the rook. Click COMPLETE when done.</p>
+  </div>
+
+  <!-- ── Screen 8: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>

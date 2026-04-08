@@ -10,7 +10,7 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v48**
+**Current version: v49**
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
@@ -24,7 +24,7 @@ Current version after the most recent commit is tracked in this file:
 
 ## Architecture
 - `js/app.js` — screen routing, engine mode, hamburger/modals, Chart.js history
-- `js/checks.js`, `captures.js`, `loose.js`, `under.js`, `forks.js` — drill modules
+- `js/checks.js`, `captures.js`, `loose.js`, `under.js`, `threats.js`, `queen.js` — drill modules
 - `js/storage.js` — IndexedDB helpers (`upsertDrillDay`, `getAllRecords`)
 - `css/style.css` — all styles (dark theme, CSS custom properties)
 - `index.html` — single-page app, all screens as `div.screen`
