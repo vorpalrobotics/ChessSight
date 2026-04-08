@@ -1019,6 +1019,16 @@ button:disabled {
   pointer-events: none;
 }
 
+.queen-continue-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 5px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+
 @keyframes queen-sq-flash {
   0%, 100% { fill: rgba(192, 57, 43, 0.35); stroke: #c0392b; }
   50%       { fill: rgba(255, 100, 60, 0.7); stroke: #ff6040; }

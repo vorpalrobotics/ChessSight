@@ -227,7 +227,7 @@ function loadNextPuzzle() {
     board.setPosition(fen, false);
   }
 
-  if (currentValid.length === 0) setStatus('No valid squares — click COMPLETE.');
+  if (currentValid.length === 0) setStatus('No valid squares for this position.');
 
   puzzleActive = true;
   startTimer();
@@ -290,7 +290,7 @@ function finishPuzzle() {
 
   if (missed.length > 0) {
     missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
-    setStatus('Click anywhere to continue.');
+    drawContinueMsg();
     waitingToAdvance = true;
   } else {
     loadNextPuzzle();
@@ -324,9 +324,26 @@ function drawMark(sq, cssClass) {
   svg.appendChild(rect);
 }
 
+function drawContinueMsg() {
+  const boardEl = document.getElementById('queen-board');
+  const svg = boardEl && boardEl.querySelector('svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', boardW / 2);
+  text.setAttribute('y', boardW - sqSize * 0.15);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('font-size', sqSize * 0.48);
+  text.setAttribute('class', 'queen-continue-msg');
+  text.textContent = 'Click anywhere to continue';
+  svg.appendChild(text);
+}
+
 function clearMarks() {
   const boardEl = document.getElementById('queen-board');
-  if (boardEl) boardEl.querySelectorAll('.queen-sq-correct,.queen-sq-incorrect,.queen-sq-missed')
+  if (boardEl) boardEl.querySelectorAll('.queen-sq-correct,.queen-sq-incorrect,.queen-sq-missed,.queen-continue-msg')
     .forEach(el => el.remove());
 }
 
