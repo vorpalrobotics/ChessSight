@@ -305,6 +305,7 @@ function handleBoardClick(e) {
 // ─── COMPLETE button ──────────────────────────────────────────────────────────
 
 function handleComplete() {
+  if (waitingToAdvance) { loadNextPuzzle(); return; }
   if (!puzzleActive) return;
   finishPuzzle();
 }
@@ -330,6 +331,7 @@ function finishPuzzle() {
   if (missed.length > 0) {
     missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
     drawContinueMsg();
+    document.getElementById('btn-queen-complete').textContent = 'CONTINUE';
     waitingToAdvance = true;
   } else {
     loadNextPuzzle();
@@ -441,8 +443,9 @@ function resetUI() {
   foundSquares.clear();
   markedSquares.clear();
   clearMarks();
-  document.getElementById('queen-timer').textContent  = '0:00';
-  document.getElementById('queen-misses').textContent = 'Misses: 0';
+  document.getElementById('queen-timer').textContent    = '0:00';
+  document.getElementById('queen-misses').textContent   = 'Misses: 0';
+  document.getElementById('btn-queen-complete').textContent = 'COMPLETE';
   setStatus('');
   const result = document.getElementById('queen-result');
   result.classList.add('hidden');
