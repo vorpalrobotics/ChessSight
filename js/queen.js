@@ -262,7 +262,7 @@ function finishPuzzle() {
   el.textContent = `✓ ${formatTime(seconds)} · ${found}/${total} squares · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
 
-  setTimeout(loadNextPuzzle, 2000);
+  setTimeout(loadNextPuzzle, 6000);
 }
 
 // ─── SVG square overlay ───────────────────────────────────────────────────────

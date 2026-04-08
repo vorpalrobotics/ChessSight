@@ -1026,5 +1026,5 @@ button:disabled {
 .queen-sq-missed {
   stroke-width: 3px;
   pointer-events: none;
-  animation: queen-sq-flash 0.5s ease-in-out 4;
+  animation: queen-sq-flash 0.5s ease-in-out 12;
 }
