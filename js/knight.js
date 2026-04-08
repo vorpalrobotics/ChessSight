@@ -49,21 +49,33 @@ function bfs(from, to, blocked = new Set()) {
   return { dist: Infinity, path: [] };
 }
 
+// Returns squares attacked by black pawns (diagonally toward rank 1)
+function blackPawnAttacks(blackPawns) {
+  const attacked = new Set();
+  for (const sq of blackPawns) {
+    const f = fileOf(sq), r = rankOf(sq);
+    if (r > 0) {
+      if (f > 0) attacked.add(sqName(f - 1, r - 1));
+      if (f < 7) attacked.add(sqName(f + 1, r - 1));
+    }
+  }
+  return attacked;
+}
+
 // ─── FEN builder ─────────────────────────────────────────────────────────────
 
-function buildFen(knightSq, obstacles = new Set()) {
+function buildFen(knightSq, whitePawns = new Set(), blackPawns = new Set()) {
   const rows = [];
   for (let rank = 7; rank >= 0; rank--) {
     let row = '', empty = 0;
     for (let file = 0; file < 8; file++) {
       const sq = sqName(file, rank);
-      if (sq === knightSq) {
-        if (empty) { row += empty; empty = 0; }
-        row += 'N';
-      } else if (obstacles.has(sq)) {
-        if (empty) { row += empty; empty = 0; }
-        row += 'P';
-      } else empty++;
+      let piece = null;
+      if (sq === knightSq)       piece = 'N';
+      else if (whitePawns.has(sq)) piece = 'P';
+      else if (blackPawns.has(sq)) piece = 'p';
+      if (piece) { if (empty) { row += empty; empty = 0; } row += piece; }
+      else empty++;
     }
     if (empty) row += empty;
     rows.push(row);
@@ -88,32 +100,54 @@ function shuffle(arr) {
 // Squares eligible for obstacle placement: not on rank 1 or rank 8
 const OBSTACLE_CANDIDATES = ALL_SQS.filter(sq => rankOf(sq) > 0 && rankOf(sq) < 7);
 
+function placePawns(count, candidates) {
+  const pawns = new Set();
+  const fileCounts = new Array(8).fill(0);
+  for (const sq of shuffle(candidates)) {
+    if (pawns.size >= count) break;
+    const f = fileOf(sq);
+    if (fileCounts[f] < 3) { pawns.add(sq); fileCounts[f]++; }
+  }
+  return pawns;
+}
+
 function generatePosition() {
-  for (let attempt = 0; attempt < 500; attempt++) {
+  for (let attempt = 0; attempt < 1000; attempt++) {
     const [startSq, targetSq] = shuffle(ALL_SQS);
 
-    // Pick obstacle count: uniform 0–8
-    const numObstacles = Math.floor(Math.random() * 9);
-    const obstacles = new Set();
-    if (numObstacles > 0) {
-      const fileCounts = new Array(8).fill(0);
-      const candidates = shuffle(OBSTACLE_CANDIDATES.filter(sq => sq !== startSq && sq !== targetSq));
-      for (const sq of candidates) {
-        if (obstacles.size >= numObstacles) break;
-        const f = fileOf(sq);
-        if (fileCounts[f] < 3) {
-          obstacles.add(sq);
-          fileCounts[f]++;
-        }
-      }
-    }
+    // White pawns: 0–8, not on start/target
+    const numWhite = Math.floor(Math.random() * 9);
+    const whitePawns = placePawns(numWhite,
+      OBSTACLE_CANDIDATES.filter(sq => sq !== startSq && sq !== targetSq));
 
-    const { dist, path } = bfs(startSq, targetSq, obstacles);
-    if (dist >= 2 && dist <= 6) return { startSq, targetSq, optimalDist: dist, optimalPath: path, obstacles };
+    // Black pawns: 0–8, not on start/target/white pawn squares,
+    // and not where they'd attack a white pawn
+    const numBlack = Math.floor(Math.random() * 9);
+    const blackCandidates = OBSTACLE_CANDIDATES.filter(sq => {
+      if (sq === startSq || sq === targetSq || whitePawns.has(sq)) return false;
+      const f = fileOf(sq), r = rankOf(sq);
+      if (r > 0) {
+        if (f > 0 && whitePawns.has(sqName(f - 1, r - 1))) return false;
+        if (f < 7 && whitePawns.has(sqName(f + 1, r - 1))) return false;
+      }
+      return true;
+    });
+    const blackPawns = placePawns(numBlack, blackCandidates);
+
+    // Blocked = white pawn squares + black pawn squares + squares black pawns attack
+    const attacked = blackPawnAttacks(blackPawns);
+    const blocked = new Set([...whitePawns, ...blackPawns, ...attacked]);
+
+    const { dist, path } = bfs(startSq, targetSq, blocked);
+    if (dist >= 2 && dist <= 6) {
+      return { startSq, targetSq, optimalDist: dist, optimalPath: path,
+               whitePawns, blackPawns, blocked };
+    }
   }
-  // Fallback: a1→c5, no obstacles
+  // Fallback: a1→c5, no pawns
   const { dist, path } = bfs('a1', 'c5');
-  return { startSq: 'a1', targetSq: 'c5', optimalDist: dist, optimalPath: path, obstacles: new Set() };
+  return { startSq: 'a1', targetSq: 'c5', optimalDist: dist, optimalPath: path,
+           whitePawns: new Set(), blackPawns: new Set(), blocked: new Set() };
 }
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -131,7 +165,9 @@ let currentOptimalDist = 0;
 let currentOptimalPath = [];
 let currentPath = [];      // valid squares clicked by user (not including startSq)
 let currentPos = '';       // knight's current position
-let currentObstacles = new Set();
+let currentWhitePawns = new Set();
+let currentBlackPawns = new Set();
+let currentObstacles = new Set();  // full blocked set: white + black + attacked
 let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
@@ -163,18 +199,21 @@ function loadNextPuzzle() {
   currentTargetSq    = pos.targetSq;
   currentOptimalDist = pos.optimalDist;
   currentOptimalPath = pos.optimalPath;
-  currentObstacles   = pos.obstacles;
+  currentWhitePawns  = pos.whitePawns;
+  currentBlackPawns  = pos.blackPawns;
+  currentObstacles   = pos.blocked;
   currentPath        = [];
   currentPos         = pos.startSq;
 
+  const fen = buildFen(pos.startSq, pos.whitePawns, pos.blackPawns);
   if (!board) {
     board = new Chessboard(document.getElementById('knight-board'), {
-      position: buildFen(pos.startSq, pos.obstacles),
+      position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
     });
   } else {
-    board.setPosition(buildFen(pos.startSq, pos.obstacles), false);
+    board.setPosition(fen, false);
   }
 
   // Draw target after board has rendered
