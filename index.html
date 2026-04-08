@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v64</title>
+  <title>ChessSight v65</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v64</span>
+      <h1>ChessSight</h1><span class="version-label">v65</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -70,11 +70,13 @@
         <span class="mode-name">Underguarded</span>
         <span class="mode-desc">Count pieces with attackers &gt;= defenders</span>
       </button>
+      <!-- mode-threats disabled — drill needs rethink
       <button class="mode-card" id="mode-threats">
         <span class="mode-icon">⚡</span>
         <span class="mode-name">Threats</span>
         <span class="mode-desc">Count threat moves for each side</span>
       </button>
+      -->
       <button class="mode-card" id="mode-queen">
         <span class="mode-icon">♛</span>
         <span class="mode-name">Queen Attack</span>
@@ -253,8 +255,8 @@
     <p class="drill-rule">A piece is underguarded when the number of enemy attackers is greater than or equal to the number of friendly defenders (including pieces with zero of each, which are also loose). Kings are excluded.</p>
   </div>
 
-  <!-- ── Screen 6: Threats drill ── -->
-  <div id="screen-threats" class="screen hidden">
+  <!-- ── Screen 6: Threats drill — disabled, needs rethink ── -->
+  <!-- <div id="screen-threats" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Count Threats</h2>
@@ -292,7 +294,7 @@
     <div id="threats-result" class="hidden"></div>
     <button id="btn-threats-next">NEXT ›</button>
     <p class="drill-rule">Count moves that create a threat. A threat is a move where the piece lands safely (not immediately recapturable by a cheaper enemy piece) on a square from which it attacks a loose (undefended) enemy piece, attacks an enemy piece of strictly greater value (P=1, N/B=3, R=5, Q=9), or sets up checkmate in 1. Kings are excluded from the first two categories — those are checks. Pawn promotions to the same square count as one move.</p>
-  </div>
+  </div> -->
 
   <!-- ── Screen 7: Queen Attack drill ── -->
   <div id="screen-queen" class="screen hidden">
