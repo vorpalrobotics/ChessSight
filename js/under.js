@@ -1,6 +1,7 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
+import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -31,6 +32,7 @@ let currentFen = '';
 let showingUnder = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
+let puzzleQueue = [];
 
 // --- Public API ---
 
@@ -47,7 +49,26 @@ export function initUnder(navigateFn) {
 
 export async function startUnder() {
   resetDrill();
+  setStatus('Loading session…');
+  await fillQueue();
   await loadNextPuzzle();
+}
+
+async function fillQueue() {
+  const results = await Promise.allSettled(
+    Array.from({ length: 5 }, () => fetchWithDifficulty())
+  );
+  const valid = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+  valid.sort((a, b) => a.difficulty - b.difficulty);
+  puzzleQueue.push(...valid);
+}
+
+async function fetchWithDifficulty() {
+  const { fen, puzzleId } = await fetchValidFen();
+  const ansW = countUnderguardedForColor(fen, 'w');
+  const ansB = countUnderguardedForColor(fen, 'b');
+  return { fen, puzzleId, answerW: ansW, answerB: ansB,
+           difficulty: scoreCountDifficulty(fen, ansW + ansB) };
 }
 
 // --- Puzzle loading ---
@@ -57,24 +78,28 @@ async function loadNextPuzzle() {
   resetUI();
   puzzleCount++;
   document.getElementById('under-puzzle-num').textContent = `#${puzzleCount}`;
-  setStatus('Loading puzzle…');
 
-  const { fen, puzzleId } = await fetchValidFen();
-  currentPuzzleId = puzzleId;
-  currentFen = fen;
+  if (puzzleQueue.length === 0) {
+    setStatus('Loading…');
+    await fillQueue();
+  }
+  const puzzle = puzzleQueue.shift();
+  currentPuzzleId = puzzle.puzzleId;
+  currentFen      = puzzle.fen;
+  answerW         = puzzle.answerW;
+  answerB         = puzzle.answerB;
+  showDifficulty('under-diff', puzzle.difficulty);
+  if (puzzleQueue.length === 0) fillQueue();
 
   if (!board) {
     board = new Chessboard(document.getElementById('under-board'), {
-      position: fen,
+      position: currentFen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
     });
   } else {
-    board.setPosition(fen, false);
+    board.setPosition(currentFen, false);
   }
-
-  answerW = countUnderguardedForColor(fen, 'w');
-  answerB = countUnderguardedForColor(fen, 'b');
 
   setStatus('');
   puzzleActive = true;
@@ -351,9 +376,18 @@ function createDigitButtons() {
   });
 }
 
+function showDifficulty(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const { text, cls } = diffLabel(score);
+  el.textContent = text;
+  el.className = `drill-difficulty ${cls}`;
+}
+
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  puzzleQueue = [];
   document.getElementById('under-session-time').textContent = '';
   document.getElementById('under-session-acc').textContent = '';
 }

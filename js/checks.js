@@ -2,6 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
+import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -36,6 +37,7 @@ let currentFen = '';
 let showingChecks = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
+let puzzleQueue = [];
 
 // --- Public API ---
 
@@ -52,7 +54,26 @@ export function initChecks(navigateFn) {
 
 export async function startChecks() {
   resetDrill();
+  setStatus('Loading session…');
+  await fillQueue();
   await loadNextPuzzle();
+}
+
+async function fillQueue() {
+  const results = await Promise.allSettled(
+    Array.from({ length: 5 }, () => fetchWithDifficulty())
+  );
+  const valid = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+  valid.sort((a, b) => a.difficulty - b.difficulty);
+  puzzleQueue.push(...valid);
+}
+
+async function fetchWithDifficulty() {
+  const { fen, puzzleId } = await fetchValidFen();
+  const ansW = countChecksForColor(fen, 'w');
+  const ansB = countChecksForColor(fen, 'b');
+  return { fen, puzzleId, answerW: ansW, answerB: ansB,
+           difficulty: scoreCountDifficulty(fen, ansW + ansB) };
 }
 
 // --- Puzzle loading ---
@@ -62,25 +83,30 @@ async function loadNextPuzzle() {
   resetUI();
   puzzleCount++;
   document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
-  setStatus('Loading puzzle…');
 
-  const { fen, puzzleId } = await fetchValidFen();
-  currentPuzzleId = puzzleId;
-  currentFen = fen;
+  if (puzzleQueue.length === 0) {
+    setStatus('Loading…');
+    await fillQueue();
+  }
+  const puzzle = puzzleQueue.shift();
+  currentPuzzleId = puzzle.puzzleId;
+  currentFen      = puzzle.fen;
+  answerW         = puzzle.answerW;
+  answerB         = puzzle.answerB;
+  showDifficulty('checks-diff', puzzle.difficulty);
+  // Pre-fetch next batch in background when queue is empty
+  if (puzzleQueue.length === 0) fillQueue();
 
   if (!board) {
     board = new Chessboard(document.getElementById('checks-board'), {
-      position: fen,
+      position: currentFen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
       extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL, headSize: 6 } }],
     });
   } else {
-    board.setPosition(fen, false);
+    board.setPosition(currentFen, false);
   }
-
-  answerW = countChecksForColor(fen, 'w');
-  answerB = countChecksForColor(fen, 'b');
 
   setStatus('');
   puzzleActive = true;
@@ -326,9 +352,18 @@ function createDigitButtons() {
   });
 }
 
+function showDifficulty(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const { text, cls } = diffLabel(score);
+  el.textContent = text;
+  el.className = `drill-difficulty ${cls}`;
+}
+
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  puzzleQueue = [];
   document.getElementById('checks-session-time').textContent = '';
   document.getElementById('checks-session-acc').textContent = '';
 }

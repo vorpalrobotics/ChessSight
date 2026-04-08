@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { scoreKnightDifficulty, diffLabel } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -172,6 +173,7 @@ let currentObstacles = new Set();      // full blocked set: white + black + atta
 let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
+let puzzleQueue = [];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -184,7 +186,14 @@ export function initKnightRoute(navigateFn) {
 
 export function startKnightRoute() {
   resetDrill();
+  fillQueue();
   loadNextPuzzle();
+}
+
+function fillQueue() {
+  const batch = Array.from({ length: 10 }, () => generatePosition());
+  batch.sort((a, b) => scoreKnightDifficulty(a) - scoreKnightDifficulty(b));
+  puzzleQueue.push(...batch);
 }
 
 // ─── Puzzle loading ───────────────────────────────────────────────────────────
@@ -195,7 +204,9 @@ function loadNextPuzzle() {
   puzzleCount++;
   document.getElementById('knight-puzzle-num').textContent = `#${puzzleCount}`;
 
-  const pos = generatePosition();
+  if (puzzleQueue.length === 0) fillQueue();
+  const pos = puzzleQueue.shift();
+  showDifficulty('knight-diff', scoreKnightDifficulty(pos));
   currentStartSq     = pos.startSq;
   currentTargetSq    = pos.targetSq;
   currentOptimalDist = pos.optimalDist;
@@ -540,9 +551,18 @@ function restartDrill() {
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 
+function showDifficulty(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const { text, cls } = diffLabel(score);
+  el.textContent = text;
+  el.className = `drill-difficulty ${cls}`;
+}
+
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  puzzleQueue = [];
   document.getElementById('knight-session-time').textContent = '';
   document.getElementById('knight-session-acc').textContent  = '';
 }

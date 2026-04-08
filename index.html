@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v65</title>
+  <title>ChessSight v66</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v65</span>
+      <h1>ChessSight</h1><span class="version-label">v66</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -97,6 +97,7 @@
       <div class="drill-top-left">
         <h2>Count Checks</h2>
         <span id="checks-puzzle-num">#1</span>
+        <span id="checks-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="checks-session-time" class="session-stat"></span>
@@ -138,6 +139,7 @@
       <div class="drill-top-left">
         <h2>Count Captures</h2>
         <span id="captures-puzzle-num">#1</span>
+        <span id="captures-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="captures-session-time" class="session-stat"></span>
@@ -179,6 +181,7 @@
       <div class="drill-top-left">
         <h2>Loose Pieces</h2>
         <span id="loose-puzzle-num">#1</span>
+        <span id="loose-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="loose-session-time" class="session-stat"></span>
@@ -220,6 +223,7 @@
       <div class="drill-top-left">
         <h2>Underguarded</h2>
         <span id="under-puzzle-num">#1</span>
+        <span id="under-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="under-session-time" class="session-stat"></span>
@@ -302,6 +306,7 @@
       <div class="drill-top-left">
         <h2>Queen Attack</h2>
         <span id="queen-puzzle-num">#1</span>
+        <span id="queen-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="queen-session-time" class="session-stat"></span>
@@ -331,6 +336,7 @@
       <div class="drill-top-left">
         <h2>Knight Route</h2>
         <span id="knight-puzzle-num">#1</span>
+        <span id="knight-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <span id="knight-session-time" class="session-stat"></span>

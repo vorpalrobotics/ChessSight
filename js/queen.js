@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { scoreQueenDifficulty, diffLabel } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -224,6 +225,7 @@ let markedSquares = new Set(); // all squares already given feedback (avoid re-m
 let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
+let puzzleQueue = [];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -236,7 +238,14 @@ export function initQueenAttack(navigateFn) {
 
 export function startQueenAttack() {
   resetDrill();
+  fillQueue();
   loadNextPuzzle();
+}
+
+function fillQueue() {
+  const batch = Array.from({ length: 10 }, () => generatePosition());
+  batch.sort((a, b) => scoreQueenDifficulty(a) - scoreQueenDifficulty(b));
+  puzzleQueue.push(...batch);
 }
 
 // ─── Puzzle loading ───────────────────────────────────────────────────────────
@@ -247,7 +256,9 @@ function loadNextPuzzle() {
   puzzleCount++;
   document.getElementById('queen-puzzle-num').textContent = `#${puzzleCount}`;
 
-  const pos = generatePosition();
+  if (puzzleQueue.length === 0) fillQueue();
+  const pos = puzzleQueue.shift();
+  showDifficulty('queen-diff', scoreQueenDifficulty(pos));
   currentQueenSq  = pos.queenSq;
   currentKingSq   = pos.kingSq;
   currentPieceSq  = pos.pieceSq;
@@ -430,9 +441,18 @@ function restartDrill() {
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 
+function showDifficulty(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const { text, cls } = diffLabel(score);
+  el.textContent = text;
+  el.className = `drill-difficulty ${cls}`;
+}
+
 function resetDrill() {
   puzzleCount = 0;
   drillResults.length = 0;
+  puzzleQueue = [];
   document.getElementById('queen-session-time').textContent = '';
   document.getElementById('queen-session-acc').textContent  = '';
 }

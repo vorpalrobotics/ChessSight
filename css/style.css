@@ -432,6 +432,18 @@ header h1 {
   font-family: monospace;
 }
 
+.drill-difficulty {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.03em;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.diff-easy   { background: #1a4a1a; color: #6fcf6f; }
+.diff-medium { background: #4a3800; color: #f0c040; }
+.diff-hard   { background: #4a1010; color: #f07070; }
+
 /* ── Current-puzzle stats (timer + misses) shown below the digit buttons ── */
 .drill-current-stats {
   display: flex;
