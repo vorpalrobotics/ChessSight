@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v67</title>
+  <title>ChessSight v68</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v67</span>
+      <h1>ChessSight</h1><span class="version-label">v68</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -194,17 +194,6 @@
       <div id="loose-board"></div>
     </div>
 
-    <div class="drill-answer-panel">
-      <div class="answer-row">
-        <span class="answer-label">W</span>
-        <div class="digit-buttons" id="loose-digits-white"></div>
-      </div>
-      <div class="answer-row">
-        <span class="answer-label">B</span>
-        <div class="digit-buttons" id="loose-digits-black"></div>
-      </div>
-    </div>
-
     <div class="drill-current-stats">
       <span id="loose-timer">0:00</span>
       <span id="loose-misses">Misses: 0</span>
@@ -213,8 +202,8 @@
 
     <div id="loose-status"></div>
     <div id="loose-result" class="hidden"></div>
-    <button id="btn-loose-next">NEXT ›</button>
-    <p class="drill-rule">A piece is loose when it has zero friendly defenders on its square. Kings are excluded. Count loose pieces for each side independently.</p>
+    <button id="btn-loose-complete">COMPLETE</button>
+    <p class="drill-rule">A piece is loose when it has zero friendly defenders on its square. Kings are excluded. Click every loose piece you can find on the board — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
   </div>
 
   <!-- ── Screen 5: Underguarded drill ── -->

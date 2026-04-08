@@ -551,20 +551,36 @@ header h1 {
   font-family: system-ui, sans-serif;
 }
 
-/* Loose pieces SHOW overlay */
-.loose-marker-white {
-  fill: rgba(196, 169, 110, 0.1);
-  stroke: #c4a96e;
-  stroke-width: 3px;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+/* Loose pieces board-click overlays */
+.loose-sq-found {
+  fill: rgba(39, 174, 96, 0.35);
+  stroke: #27ae60;
+  stroke-width: 2.5px;
   pointer-events: none;
 }
-.loose-marker-black {
-  fill: rgba(136, 152, 168, 0.1);
-  stroke: #8898a8;
-  stroke-width: 3px;
+.loose-sq-missed {
+  fill: rgba(230, 130, 0, 0.35);
+  stroke: #e68200;
+  stroke-width: 2.5px;
   pointer-events: none;
 }
+.loose-sq-invalid {
+  fill: rgba(220, 50, 50, 0.5);
+  stroke: #dc3232;
+  stroke-width: 2px;
+  pointer-events: none;
+  animation: flash-red 0.6s ease-out forwards;
+}
+.loose-continue-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 5px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+/* kept for any lingering references */
 .loose-label {
   font-weight: 700;
   fill: white;
@@ -686,7 +702,7 @@ header h1 {
   text-align: center;
 }
 
-#btn-checks-next, #btn-captures-next, #btn-loose-next, #btn-under-next, #btn-threats-next {
+#btn-checks-next, #btn-captures-next, #btn-under-next, #btn-threats-next {
   margin-top: 0.25rem;
   padding: 0.5rem 2.5rem;
   font-size: 0.95rem;
@@ -699,7 +715,6 @@ header h1 {
 }
 #btn-checks-next:hover:not(:disabled),
 #btn-captures-next:hover:not(:disabled),
-#btn-loose-next:hover:not(:disabled),
 #btn-under-next:hover:not(:disabled),
 #btn-threats-next:hover:not(:disabled) {
   background: var(--accent);
@@ -1012,6 +1027,22 @@ button:disabled {
   background: var(--accent);
   color: white;
   border-radius: 3px;
+}
+
+/* ── Loose Pieces drill ── */
+#btn-loose-complete {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid #c080ff;
+  color: #c080ff;
+  border-radius: 6px;
+}
+#btn-loose-complete:hover:not(:disabled) {
+  background: #7a30a8;
+  color: #fff;
 }
 
 /* ── Queen Attack drill ── */
