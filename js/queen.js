@@ -228,10 +228,6 @@ function handleBoardClick(e) {
   if (currentValid.includes(sq)) {
     foundSquares.add(sq);
     drawMark(sq, 'queen-sq-correct');
-    if (foundSquares.size === currentValid.length) {
-      // All squares found — auto-complete
-      finishPuzzle(false);
-    }
   } else {
     misses++;
     document.getElementById('queen-misses').textContent = `Misses: ${misses}`;
@@ -243,21 +239,18 @@ function handleBoardClick(e) {
 
 function handleComplete() {
   if (!puzzleActive) return;
-  finishPuzzle(true);
+  finishPuzzle();
 }
 
-// called by both auto-complete and COMPLETE button
-function finishPuzzle(fromButton) {
+function finishPuzzle() {
   puzzleActive = false;
   stopTimer();
 
-  if (fromButton) {
-    // Flash any squares the user missed
-    const missed = currentValid.filter(sq => !foundSquares.has(sq));
-    misses += missed.length;
-    document.getElementById('queen-misses').textContent = `Misses: ${misses}`;
-    missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
-  }
+  // Flash any squares the user missed
+  const missed = currentValid.filter(sq => !foundSquares.has(sq));
+  misses += missed.length;
+  document.getElementById('queen-misses').textContent = `Misses: ${misses}`;
+  missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
 
   const found = foundSquares.size;
   const total = currentValid.length;
@@ -269,7 +262,7 @@ function finishPuzzle(fromButton) {
   el.textContent = `✓ ${formatTime(seconds)} · ${found}/${total} squares · ${misses} miss${misses !== 1 ? 'es' : ''}`;
   el.classList.remove('hidden');
 
-  setTimeout(loadNextPuzzle, fromButton ? 2000 : 1500);
+  setTimeout(loadNextPuzzle, 2000);
 }
 
 // ─── SVG square overlay ───────────────────────────────────────────────────────
