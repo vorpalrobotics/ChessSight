@@ -10,7 +10,11 @@ Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v86**
+**Current version: v0.0.86**
+
+## Version format
+Version is `v0.0.N` where N increments by 1 each commit. Update both
+`<title>ChessSight vX.X.N</title>` and `<span class="version-label">vX.X.N</span>` in index.html.
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
