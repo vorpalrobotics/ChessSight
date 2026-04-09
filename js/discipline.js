@@ -358,8 +358,8 @@ function looseDone() {
   for (const sq of turnLooseSqs) {
     if (!foundLooseSqs.has(sq)) { looseMisses++; missed++; drawSqMark(sq, 'loose-sq-missed'); }
   }
-  flashFoundSquares();
   if (missed === 0) {
+    flashFoundSquares();
     setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 2000);
   } else {
     setFeedback(`${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.`, 'error');
