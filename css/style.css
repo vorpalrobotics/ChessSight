@@ -561,6 +561,14 @@ header h1 {
   stroke-width: 2.5px;
   pointer-events: none;
 }
+@keyframes loose-found-pulse {
+  0%, 100% { fill: rgba(39, 174, 96, 0.35); stroke: #27ae60; }
+  50%       { fill: rgba(80, 220, 130, 0.65); stroke: #50dc82; }
+}
+.loose-sq-found.pulsing {
+  animation: loose-found-pulse 0.5s ease-in-out infinite;
+}
+
 @keyframes disc-missed-flash {
   0%, 100% { fill: rgba(220, 50, 50, 0.55); stroke: #dc3232; }
   50%       { fill: rgba(230, 130, 0, 0.55); stroke: #e68200; }
@@ -1528,6 +1536,25 @@ button:disabled {
   color: var(--text-muted);
   text-align: center;
   margin: 0;
+}
+
+.disc-candidates-list {
+  list-style: disc;
+  padding-left: 1.4rem;
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--text);
+  text-align: left;
+  max-width: calc(var(--board-size) + 4px);
+}
+
+.disc-candidates-cta {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 0.6rem;
+  text-align: center;
+  letter-spacing: 0.05em;
 }
 
 .disc-panel-msg {

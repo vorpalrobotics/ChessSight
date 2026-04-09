@@ -289,8 +289,10 @@ function enterPhase(phase) {
 
   } else if (phase === PHASE.CANDIDATES) {
     showPanel('candidates');
-    setPhaseIndicator('STEP 4 / 4 — CONSIDER CANDIDATES');
-    setFeedback('Think about your moves and opponent responses, then click when ready.');
+    setPhaseIndicator('STEP 4 / 4 — MAKE YOUR MOVE');
+    setFeedback('');
+    updateBookBtn(false);
+    board.enableMoveInput(handleMoveInput, playerSide === 'w' ? COLOR.white : COLOR.black);
 
   } else if (phase === PHASE.MOVE) {
     enterMovePhase();
@@ -357,13 +359,19 @@ function looseDone() {
   for (const sq of turnLooseSqs) {
     if (!foundLooseSqs.has(sq)) { looseMisses++; missed++; drawSqMark(sq, 'loose-sq-missed'); }
   }
+  flashFoundSquares();
   if (missed === 0) {
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CANDIDATES); }, 500);
+    setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 2000);
   } else {
     setFeedback(`${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.`, 'error');
     showContinueMsg();
     waitingLooseContinue = true;
   }
+}
+
+function flashFoundSquares() {
+  const boardEl = document.getElementById('disc-board');
+  if (boardEl) boardEl.querySelectorAll('.loose-sq-found').forEach(el => el.classList.add('pulsing'));
 }
 
 // ─── Phase: Candidates ────────────────────────────────────────────────────────
