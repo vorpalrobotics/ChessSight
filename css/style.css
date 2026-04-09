@@ -1380,3 +1380,295 @@ button:disabled {
   pointer-events: none;
   font-family: system-ui, sans-serif;
 }
+
+/* ── Move Discipline drill ── */
+
+/* Setup */
+.disc-setup-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 0 0.5rem;
+}
+
+.disc-setup-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.disc-setup-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  min-width: 6em;
+  text-align: right;
+}
+
+#disc-skill-display {
+  font-family: monospace;
+  font-size: 1.1rem;
+  min-width: 1.5em;
+  text-align: center;
+}
+
+.disc-slider {
+  width: 160px;
+  accent-color: #c080ff;
+}
+
+.disc-side-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.disc-side-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--text-muted);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.disc-side-btn.active,
+.disc-side-btn:hover {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}
+
+.disc-start-btn {
+  margin-top: 0.5rem;
+  padding: 0.6rem 2.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: #27ae60;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.disc-start-btn:hover { background: #219a52; }
+
+/* In-game top bar extras */
+.disc-book-btn {
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: var(--surface2);
+  border: 1px solid #c080ff;
+  border-radius: 6px;
+  color: #c080ff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.disc-book-btn:hover { background: #7a30a8; color: #fff; border-color: #7a30a8; }
+
+.disc-resign-btn {
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: var(--surface2);
+  border: 1px solid #e94560;
+  border-radius: 6px;
+  color: #e94560;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.disc-resign-btn:hover { background: #8b1a2a; color: #fff; border-color: #8b1a2a; }
+
+/* Phase indicator */
+.disc-phase-indicator {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  padding: 0.3rem 0;
+}
+
+/* Answer panels */
+.disc-panel {
+  width: 100%;
+  max-width: calc(var(--board-size) + 4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0 0.3rem;
+}
+
+.disc-panel-q {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.disc-panel-msg {
+  font-size: 1rem;
+  color: var(--text);
+  font-style: italic;
+  margin: 0.4rem 0;
+  text-align: center;
+}
+
+.disc-answer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.disc-side-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  min-width: 2.8em;
+  text-align: right;
+}
+
+.disc-white-lbl { color: #e8e8e8; }
+.disc-black-lbl { color: #888; }
+
+/* Digit buttons */
+.disc-digits {
+  display: flex;
+  gap: 3px;
+  border-radius: 6px;
+  padding: 2px;
+  transition: background 0.3s;
+}
+
+.disc-digit-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--text-muted);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  padding: 0;
+}
+
+.disc-digit-btn:hover  { background: #1a5ca8; border-color: #3a80d0; color: #fff; }
+.disc-digit-btn.selected { background: #3a9fd0; border-color: #3a9fd0; color: #fff; }
+
+/* Flash wrong answer row */
+@keyframes disc-row-flash {
+  0%, 100% { background: transparent; }
+  40%       { background: rgba(220, 50, 50, 0.3); border-radius: 6px; }
+}
+
+.disc-row-flash { animation: disc-row-flash 0.6s ease-out; }
+
+/* Submit / action buttons inside panels */
+.disc-submit-btn {
+  padding: 0.3rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: var(--surface2);
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.disc-submit-btn:hover:not(:disabled),
+.disc-submit-btn:not([disabled]) { border-color: #3a80d0; color: #cde; }
+
+.disc-submit-btn:hover:not(:disabled) { background: #1a5ca8; color: #fff; }
+.disc-submit-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* Feedback line */
+.disc-feedback {
+  min-height: 1.3em;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 0.15rem 0;
+}
+
+.disc-feedback-error { color: #e94560; }
+
+/* Game over */
+#disc-game-over {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1.5rem 1rem;
+}
+
+#disc-over-box {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+#disc-over-result {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+.disc-over-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.4rem;
+  text-align: left;
+}
+
+.disc-over-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.disc-over-row span:first-child { color: var(--text-muted); }
+.disc-over-row span:last-child  { font-family: monospace; color: var(--text); font-weight: 600; }
+
+.disc-over-actions {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+.disc-over-actions button {
+  padding: 0.45rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--text-muted);
+  background: var(--surface2);
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.disc-over-actions button:hover {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}

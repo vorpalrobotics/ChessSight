@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v75</title>
+  <title>ChessSight v76</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -91,6 +91,11 @@
         <span class="mode-icon">👁</span>
         <span class="mode-name">Vision Drill</span>
         <span class="mode-desc">de La Maza: spot every queen fork, pin &amp; skewer</span>
+      </button>
+      <button class="mode-card" id="mode-discipline">
+        <span class="mode-icon">🧠</span>
+        <span class="mode-name">Move Discipline</span>
+        <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -403,7 +408,133 @@
     </div>
   </div>
 
-  <!-- ── Screen 10: Drill summary ── -->
+  <!-- ── Screen 10: Move Discipline ── -->
+  <div id="screen-discipline" class="screen hidden">
+
+    <!-- Setup panel -->
+    <div id="disc-setup">
+      <div class="drill-top">
+        <div class="drill-top-left"><h2>Move Discipline</h2></div>
+      </div>
+      <div class="disc-setup-body">
+        <div class="disc-setup-row">
+          <span class="disc-setup-label">Engine Skill</span>
+          <span id="disc-skill-display">10</span>
+          <input type="range" id="disc-skill-slider" min="0" max="20" value="10" step="1" class="disc-slider">
+        </div>
+        <div class="disc-setup-row">
+          <span class="disc-setup-label">Play as</span>
+          <div class="disc-side-buttons">
+            <button id="btn-disc-white"  class="disc-side-btn active">White</button>
+            <button id="btn-disc-black"  class="disc-side-btn">Black</button>
+            <button id="btn-disc-random" class="disc-side-btn">Random</button>
+          </div>
+        </div>
+        <button id="btn-disc-start" class="disc-start-btn">START GAME</button>
+      </div>
+      <p class="drill-rule">Before each move you must: (1) count checking moves for both sides, (2) count capturing moves for both sides, (3) click every loose piece, and (4) confirm you have considered candidates. BOOK skips the pre-move steps for your first 5 turns. When only one legal move exists it is made for you. Enter 0 where there are none — the habit matters.</p>
+    </div>
+
+    <!-- Game area -->
+    <div id="disc-game-area" class="hidden">
+      <div class="drill-top">
+        <div class="drill-top-left">
+          <h2>Move Discipline</h2>
+          <span id="disc-turn-num">Turn 1</span>
+        </div>
+        <div class="drill-top-right">
+          <button id="btn-disc-book"   class="disc-book-btn hidden">BOOK</button>
+          <button id="btn-disc-resign" class="disc-resign-btn">Resign</button>
+        </div>
+      </div>
+
+      <div id="disc-phase-indicator" class="disc-phase-indicator"></div>
+
+      <div class="drill-board-wrap">
+        <div id="disc-board"></div>
+      </div>
+
+      <!-- Checks panel -->
+      <div id="disc-panel-checks" class="disc-panel hidden">
+        <p class="disc-panel-q">How many checking moves does each side have?</p>
+        <div class="disc-answer-row">
+          <span class="disc-side-label disc-white-lbl">White</span>
+          <div class="disc-digits" id="disc-checks-w-digits"></div>
+        </div>
+        <div class="disc-answer-row">
+          <span class="disc-side-label disc-black-lbl">Black</span>
+          <div class="disc-digits" id="disc-checks-b-digits"></div>
+        </div>
+        <button id="btn-disc-checks-submit" class="disc-submit-btn" disabled>SUBMIT</button>
+      </div>
+
+      <!-- Captures panel -->
+      <div id="disc-panel-captures" class="disc-panel hidden">
+        <p class="disc-panel-q">How many capturing moves does each side have?</p>
+        <div class="disc-answer-row">
+          <span class="disc-side-label disc-white-lbl">White</span>
+          <div class="disc-digits" id="disc-captures-w-digits"></div>
+        </div>
+        <div class="disc-answer-row">
+          <span class="disc-side-label disc-black-lbl">Black</span>
+          <div class="disc-digits" id="disc-captures-b-digits"></div>
+        </div>
+        <button id="btn-disc-captures-submit" class="disc-submit-btn" disabled>SUBMIT</button>
+      </div>
+
+      <!-- Loose pieces panel -->
+      <div id="disc-panel-loose" class="disc-panel hidden">
+        <p class="disc-panel-q">Click every loose piece on the board — both colors, kings excluded.</p>
+        <button id="btn-disc-loose-done" class="disc-submit-btn">DONE</button>
+      </div>
+
+      <!-- Candidates panel -->
+      <div id="disc-panel-candidates" class="disc-panel hidden">
+        <p class="disc-panel-q">Consider your candidate moves and opponent responses.</p>
+        <button id="btn-disc-candidates" class="disc-submit-btn">&#10003; Done Thinking</button>
+      </div>
+
+      <!-- Move panel -->
+      <div id="disc-panel-move" class="disc-panel hidden">
+        <p class="disc-panel-msg">Make your move.</p>
+      </div>
+
+      <!-- Engine thinking panel -->
+      <div id="disc-panel-engine" class="disc-panel hidden">
+        <p class="disc-panel-msg">Engine is thinking…</p>
+      </div>
+
+      <!-- Forced move panel -->
+      <div id="disc-panel-forced" class="disc-panel hidden">
+        <p class="disc-panel-msg">Only one legal move — making it for you.</p>
+      </div>
+
+      <div id="disc-feedback" class="disc-feedback"></div>
+    </div>
+
+    <!-- Game over panel -->
+    <div id="disc-game-over" class="hidden">
+      <div id="disc-over-box">
+        <h3 id="disc-over-result">Game Over</h3>
+        <div class="disc-over-stats">
+          <div class="disc-over-row"><span>Turns played</span>         <span id="disc-stat-turns">—</span></div>
+          <div class="disc-over-row"><span>Checks</span>               <span id="disc-stat-checks">—</span></div>
+          <div class="disc-over-row"><span>Captures</span>             <span id="disc-stat-captures">—</span></div>
+          <div class="disc-over-row"><span>Loose pieces missed</span>  <span id="disc-stat-loose">—</span></div>
+          <div class="disc-over-row"><span>Book moves used</span>      <span id="disc-stat-book">—</span></div>
+          <div class="disc-over-row"><span>Forced moves</span>         <span id="disc-stat-forced">—</span></div>
+          <div class="disc-over-row"><span>Game time</span>            <span id="disc-stat-time">—</span></div>
+        </div>
+        <div class="disc-over-actions">
+          <button id="btn-disc-again">Play Again</button>
+          <button id="btn-disc-over-menu">&#8592; Menu</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Screen 11: Drill summary ── -->
   <div id="screen-summary" class="screen hidden">
     <div id="summary-box">
       <h2>Drill Summary</h2>

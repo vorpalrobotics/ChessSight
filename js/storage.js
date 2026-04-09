@@ -1,6 +1,7 @@
 const DB_NAME = 'ChessSight';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = 'drillDays';
+const GAME_STORE = 'disciplineGames';
 
 // Lazy singleton DB connection
 let _dbPromise = null;
@@ -11,10 +12,15 @@ function openDB() {
 
     req.onupgradeneeded = e => {
       const db = e.target.result;
+      // v1: drill-day accumulation store
       if (!db.objectStoreNames.contains(STORE)) {
         const store = db.createObjectStore(STORE, { keyPath: ['date', 'drill'] });
         store.createIndex('date', 'date');
         store.createIndex('drill', 'drill');
+      }
+      // v2: per-game discipline records
+      if (!db.objectStoreNames.contains(GAME_STORE)) {
+        db.createObjectStore(GAME_STORE, { keyPath: 'id', autoIncrement: true });
       }
     };
 
@@ -74,6 +80,33 @@ export async function upsertDrillDay(drill, { seconds, correct, misses, puzzleId
 
     tx.oncomplete = () => resolve();
     tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Save one complete discipline game record.
+ * Each game gets its own row (auto-increment id).
+ */
+export async function addDisciplineGame(data) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(GAME_STORE, 'readwrite');
+    tx.objectStore(GAME_STORE).add(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return every discipline game record, newest first.
+ */
+export async function getDisciplineGames() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(GAME_STORE, 'readonly');
+    const req = tx.objectStore(GAME_STORE).getAll();
+    req.onsuccess = () => resolve(req.result.reverse());
+    req.onerror   = e => reject(e.target.error);
   });
 }
 

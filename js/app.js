@@ -10,10 +10,11 @@ import { initUnder, startUnder } from './under.js';
 import { initQueenAttack, startQueenAttack } from './queen.js';
 import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
+import { initDiscipline, startDiscipline } from './discipline.js';
 import { getAllRecords } from './storage.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -57,6 +58,11 @@ document.getElementById('mode-knight').addEventListener('click', () => {
 document.getElementById('mode-dlm').addEventListener('click', () => {
   showScreen('screen-dlm');
   startDeLaMaza();
+});
+
+document.getElementById('mode-discipline').addEventListener('click', () => {
+  showScreen('screen-discipline');
+  startDiscipline();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -659,3 +665,4 @@ initUnder(showScreen);
 initQueenAttack(showScreen);
 initKnightRoute(showScreen);
 initDeLaMaza(showScreen);
+initDiscipline(showScreen);
