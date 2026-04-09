@@ -3,6 +3,7 @@ import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensi
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
+import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -53,6 +54,7 @@ export function initCaptures(navigateFn) {
 }
 
 export async function startCaptures() {
+  registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
   await fillQueue();

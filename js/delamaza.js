@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -154,6 +155,7 @@ let foundSqs = new Set();
 let puzzleActive = false;
 let autoAdvanceTimer = null;
 let sessionTimerInterval = null;
+let pauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -209,7 +211,18 @@ function beginSession() {
   document.getElementById('dlm-misses').textContent = 'Misses: 0';
   sessionStart = Date.now();
   sessionTimerInterval = setInterval(updateTimerDisplay, 1000);
+  registerPause(pauseSession, resumeSession);
   loadPosition();
+}
+
+function pauseSession() {
+  if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+  pauseStart = Date.now();
+}
+
+function resumeSession() {
+  sessionStart += Date.now() - pauseStart;
+  sessionTimerInterval = setInterval(updateTimerDisplay, 1000);
 }
 
 function stopSession() {

@@ -12,16 +12,33 @@ import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
 import { getAllRecords } from './storage.js';
+import { togglePause, clearPause } from './pause.js';
 
 // --- Screen management ---
 const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
+
+const btnPause = document.getElementById('btn-pause');
+const pauseOverlay = document.getElementById('pause-overlay');
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
     document.getElementById(s).classList.toggle('hidden', s !== id)
   );
-  document.getElementById('btn-menu').classList.toggle('hidden', id === 'screen-select');
+  const isSelect = id === 'screen-select';
+  document.getElementById('btn-menu').classList.toggle('hidden', isSelect);
+  btnPause.classList.toggle('hidden', isSelect);
+  if (isSelect) {
+    clearPause();
+    pauseOverlay.classList.add('hidden');
+    btnPause.textContent = '⏸';
+  }
 }
+
+btnPause.addEventListener('click', () => {
+  const paused = togglePause();
+  btnPause.textContent = paused ? '▶' : '⏸';
+  pauseOverlay.classList.toggle('hidden', !paused);
+});
 
 document.getElementById('mode-checks').addEventListener('click', async () => {
   showScreen('screen-checks');

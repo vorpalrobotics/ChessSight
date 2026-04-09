@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.0.93</title>
+  <title>ChessSight v0.0.94</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,9 +15,10 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.0.93</span>
+      <h1>ChessSight</h1><span class="version-label">v0.0.94</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button id="btn-pause" class="hidden" aria-label="Pause">⏸</button>
       <button id="btn-menu" class="hidden">&#8592; Back</button>
       <div class="hamburger-menu">
         <button id="btn-hamburger" aria-label="Menu">&#9776;</button>
@@ -29,6 +30,15 @@
       </div>
     </div>
   </header>
+
+  <!-- ── Pause overlay ── -->
+  <div id="pause-overlay" class="hidden">
+    <div id="pause-box">
+      <p class="pause-icon">⏸</p>
+      <p class="pause-title">PAUSED</p>
+      <p class="pause-hint">Press ⏸ to continue</p>
+    </div>
+  </div>
 
   <!-- ── About modal ── -->
   <div id="modal-about" class="modal-backdrop hidden">

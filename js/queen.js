@@ -1,6 +1,7 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
 import { scoreQueenDifficulty, diffLabel } from './difficulty.js';
+import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -237,6 +238,7 @@ export function initQueenAttack(navigateFn) {
 }
 
 export function startQueenAttack() {
+  registerPause(stopTimer, startTimer);
   resetDrill();
   fillQueue();
   loadNextPuzzle();

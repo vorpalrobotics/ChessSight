@@ -30,6 +30,8 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 1000;
 }
 
 header h1 {
@@ -58,6 +60,41 @@ header h1 {
   background: var(--surface2);
   color: var(--text);
 }
+
+#btn-pause {
+  background: transparent;
+  border: 1px solid var(--surface2);
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+#btn-pause:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* ── Pause overlay ── */
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(10, 10, 20, 0.88);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#pause-box {
+  text-align: center;
+  padding: 2rem 3rem;
+  border: 1px solid var(--surface2);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+.pause-icon  { font-size: 3rem; line-height: 1; margin-bottom: 0.75rem; }
+.pause-title { font-size: 1.5rem; font-weight: bold; letter-spacing: 0.1em; color: var(--text); margin-bottom: 0.5rem; }
+.pause-hint  { font-size: 0.85rem; color: var(--text-muted); }
 
 /* ── Hamburger menu ── */
 #btn-hamburger {

@@ -2,6 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
+import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -42,6 +43,7 @@ export function initLoose(navigateFn) {
 }
 
 export async function startLoose() {
+  registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
   await fillQueue();

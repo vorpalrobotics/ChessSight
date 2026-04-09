@@ -3,6 +3,7 @@ import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extens
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { addDisciplineGame } from './storage.js';
+import { registerPause } from './pause.js';
 
 const PIECES_URL  = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const MARKERS_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.svg';
@@ -97,6 +98,7 @@ let looseTotal  = 0;
 let phaseStartTime = 0;
 let checksMs = 0, capturesMs = 0, looseMs = 0;
 let waitingLooseContinue = false;
+let discPauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -208,6 +210,7 @@ async function startGame() {
   looseTotal  = 0;
   checksMs = capturesMs = looseMs = phaseStartTime = 0;
   gameStartTime = Date.now();
+  registerPause(pauseGame, resumeGame);
 
   const fen = chess.fen();
   if (!board) {
@@ -552,6 +555,16 @@ function endGame(result) {
 
   document.getElementById('disc-game-area').classList.add('hidden');
   document.getElementById('disc-game-over').classList.remove('hidden');
+}
+
+function pauseGame() {
+  discPauseStart = Date.now();
+}
+
+function resumeGame() {
+  const d = Date.now() - discPauseStart;
+  gameStartTime += d;
+  if (phaseStartTime > 0) phaseStartTime += d;
 }
 
 function cleanupDrill() {
