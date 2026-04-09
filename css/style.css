@@ -575,7 +575,8 @@ header h1 {
   animation: flash-red 0.6s ease-out forwards;
 }
 .loose-continue-msg,
-.under-continue-msg {
+.under-continue-msg,
+.disc-continue-msg {
   font-weight: 700;
   fill: #111;
   stroke: white;
@@ -1568,6 +1569,7 @@ button:disabled {
 
 .disc-digit-btn:hover  { background: #1a5ca8; border-color: #3a80d0; color: #fff; }
 .disc-digit-btn.selected { background: #3a9fd0; border-color: #3a9fd0; color: #fff; }
+.disc-digit-btn.correct  { background: #27ae60; border-color: #27ae60; color: #fff; }
 
 /* Flash wrong answer row */
 @keyframes disc-row-flash {

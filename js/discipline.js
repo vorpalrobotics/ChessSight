@@ -92,6 +92,7 @@ let playerTurns = 0;
 let checksTotal = 0, checksFirstTry = 0, checksMisses = 0;
 let capsTotal   = 0, capsFirstTry   = 0, capsMisses   = 0;
 let looseMisses = 0, bookMoves = 0, forcedMoves = 0;
+let waitingLooseContinue = false;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -218,6 +219,8 @@ async function startGame() {
 
 function startPlayerTurn() {
   if (!isGameActive) return;
+  waitingLooseContinue = false;
+  clearContinueMsg();
   playerTurnCount++;
   playerTurns++;
   clearSqMarks();
@@ -308,8 +311,11 @@ function submitChecks() {
   const bOk = selectedChecksB === turnChecksB;
   if (wOk && bOk) {
     if (checksFirstAttempt) checksFirstTry++;
+    markCorrectRow('disc-checks-w-digits');
+    markCorrectRow('disc-checks-b-digits');
+    document.getElementById('btn-disc-checks-submit').disabled = true;
     setFeedback('');
-    enterPhase(PHASE.CAPTURES);
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 500);
   } else {
     checksMisses++;
     checksFirstAttempt = false;
@@ -331,8 +337,11 @@ function submitCaptures() {
   const bOk = selectedCapturesB === turnCapturesB;
   if (wOk && bOk) {
     if (capsFirstAttempt) capsFirstTry++;
+    markCorrectRow('disc-captures-w-digits');
+    markCorrectRow('disc-captures-b-digits');
+    document.getElementById('btn-disc-captures-submit').disabled = true;
     setFeedback('');
-    enterPhase(PHASE.LOOSE);
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 500);
   } else {
     capsMisses++;
     capsFirstAttempt = false;
@@ -349,6 +358,14 @@ function submitCaptures() {
 // ─── Phase: Loose pieces ──────────────────────────────────────────────────────
 
 function handleBoardClick(e) {
+  if (waitingLooseContinue) {
+    waitingLooseContinue = false;
+    clearContinueMsg();
+    clearSqMarks();
+    setFeedback('');
+    if (isGameActive) enterPhase(PHASE.CANDIDATES);
+    return;
+  }
   if (currentPhase !== PHASE.LOOSE) return;
   const sq = sqFromClick(e);
   if (!sq) return;
@@ -373,13 +390,10 @@ function looseDone() {
   for (const sq of turnLooseSqs) {
     if (!foundLooseSqs.has(sq)) { looseMisses++; missed++; drawSqMark(sq, 'loose-sq-missed'); }
   }
-  setFeedback(missed > 0 ? `${missed} loose piece${missed !== 1 ? 's' : ''} missed.` : '', missed > 0 ? 'error' : '');
-  setTimeout(() => {
-    if (!isGameActive) return;
-    clearSqMarks();
-    setFeedback('');
-    enterPhase(PHASE.CANDIDATES);
-  }, 1500);
+  const msg = missed > 0 ? `${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.` : 'Click the board to continue.';
+  setFeedback(msg, missed > 0 ? 'error' : '');
+  showContinueMsg();
+  waitingLooseContinue = true;
 }
 
 // ─── Phase: Candidates ────────────────────────────────────────────────────────
@@ -528,8 +542,10 @@ function endGame(result) {
 
 function cleanupDrill() {
   isGameActive = false;
+  waitingLooseContinue = false;
   if (board) board.disableMoveInput();
   clearSqMarks();
+  clearContinueMsg();
   clearMoveMarkers();
   currentPhase = PHASE.CHECKS;
   playerTurnCount = 0;
@@ -586,7 +602,15 @@ function onDigitClick(key, digit, btn) {
 
 function resetDigitRow(containerId) {
   document.getElementById(containerId)
-    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected'));
+    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected', 'correct'));
+}
+
+function markCorrectRow(containerId) {
+  document.getElementById(containerId)
+    .querySelectorAll('.disc-digit-btn.selected').forEach(b => {
+      b.classList.remove('selected');
+      b.classList.add('correct');
+    });
 }
 
 function flashDigitRow(containerId) {
@@ -667,6 +691,27 @@ function flashSqMark(sq) {
 function clearSqMarks() {
   const boardEl = document.getElementById('disc-board');
   if (boardEl) boardEl.querySelectorAll('[data-disc-sq]').forEach(el => el.remove());
+}
+
+function showContinueMsg() {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', sqSize * 4);
+  text.setAttribute('y', sqSize * 4);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'middle');
+  text.setAttribute('font-size', sqSize * 0.35);
+  text.setAttribute('class', 'disc-continue-msg');
+  text.setAttribute('data-disc-msg', 'continue');
+  text.textContent = 'Click to continue';
+  svg.appendChild(text);
+}
+
+function clearContinueMsg() {
+  const boardEl = document.getElementById('disc-board');
+  if (boardEl) boardEl.querySelectorAll('[data-disc-msg]').forEach(el => el.remove());
 }
 
 function formatTime(s) {
