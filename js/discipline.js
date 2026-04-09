@@ -585,17 +585,27 @@ function maybeAutoAdvance(key) {
   if (key[0] === 'c') {
     if (selectedChecksW === null || selectedChecksB === null) return;
     if (checksFirstAttempt) checksFirstTry++;
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 500);
+    pulseCorrectButtons('disc-checks-w-digits');
+    pulseCorrectButtons('disc-checks-b-digits');
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 2000);
   } else {
     if (selectedCapturesW === null || selectedCapturesB === null) return;
     if (capsFirstAttempt) capsFirstTry++;
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 500);
+    pulseCorrectButtons('disc-captures-w-digits');
+    pulseCorrectButtons('disc-captures-b-digits');
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 2000);
   }
+}
+
+function pulseCorrectButtons(containerId) {
+  document.getElementById(containerId)
+    .querySelectorAll('.disc-digit-btn.correct')
+    .forEach(b => b.classList.add('pulsing'));
 }
 
 function resetDigitRow(containerId) {
   document.getElementById(containerId)
-    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected', 'correct', 'wrong'));
+    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected', 'correct', 'wrong', 'pulsing'));
 }
 
 function markCorrectRow(containerId) {

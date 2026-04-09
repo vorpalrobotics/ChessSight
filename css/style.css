@@ -561,11 +561,16 @@ header h1 {
   stroke-width: 2.5px;
   pointer-events: none;
 }
+@keyframes disc-missed-flash {
+  0%, 100% { fill: rgba(220, 50, 50, 0.55); stroke: #dc3232; }
+  50%       { fill: rgba(230, 130, 0, 0.55); stroke: #e68200; }
+}
 .loose-sq-missed {
-  fill: rgba(230, 130, 0, 0.35);
-  stroke: #e68200;
+  fill: rgba(220, 50, 50, 0.55);
+  stroke: #dc3232;
   stroke-width: 2.5px;
   pointer-events: none;
+  animation: disc-missed-flash 0.5s ease-in-out infinite;
 }
 .loose-sq-invalid {
   fill: rgba(220, 50, 50, 0.5);
@@ -1500,7 +1505,7 @@ button:disabled {
 /* Phase indicator */
 .disc-phase-indicator {
   text-align: center;
-  font-size: 0.72rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--text-muted);
@@ -1577,6 +1582,14 @@ button:disabled {
 .disc-digit-btn.selected { background: #3a9fd0; border-color: #3a9fd0; color: #fff; }
 .disc-digit-btn.correct  { background: #27ae60; border-color: #27ae60; color: #fff; }
 .disc-digit-btn.wrong    { background: #8b1a2a; border-color: #dc3232; color: #fff; }
+
+@keyframes disc-correct-pulse {
+  0%, 100% { background: #27ae60; border-color: #27ae60; box-shadow: none; }
+  50%       { background: #52d68a; border-color: #52d68a; box-shadow: 0 0 8px #52d68a; }
+}
+.disc-digit-btn.correct.pulsing {
+  animation: disc-correct-pulse 0.5s ease-in-out infinite;
+}
 
 /* Flash wrong answer row */
 @keyframes disc-row-flash {
