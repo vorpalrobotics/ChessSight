@@ -111,6 +111,37 @@ export async function getDisciplineGames() {
 }
 
 /**
+ * Return all data from both stores for export.
+ */
+export async function exportAllData() {
+  const [drillDays, disciplineGames] = await Promise.all([getAllRecords(), getDisciplineGames()]);
+  return { drillDays, disciplineGames };
+}
+
+/**
+ * Import data previously exported by exportAllData.
+ * drillDays: upsert by [date, drill] key (imported wins on conflict).
+ * disciplineGames: strip id and add as new records.
+ */
+export async function importAllData({ drillDays = [], disciplineGames = [] }) {
+  const db = await getDB();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    drillDays.forEach(rec => store.put(rec));
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(GAME_STORE, 'readwrite');
+    const store = tx.objectStore(GAME_STORE);
+    disciplineGames.forEach(({ id, ...rest }) => store.add(rest));
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
  * Return every record in the store, sorted newest-date first.
  */
 export async function getAllRecords() {

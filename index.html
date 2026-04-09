@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.0.94</title>
+  <title>ChessSight v0.0.95</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.0.94</span>
+      <h1>ChessSight</h1><span class="version-label">v0.0.95</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-pause" class="hidden" aria-label="Pause">⏸</button>
@@ -25,11 +25,16 @@
         <div id="hamburger-dropdown" class="hamburger-dropdown hidden">
           <button id="btn-about">About</button>
           <button id="btn-history">History</button>
+          <button id="btn-export">Export data</button>
+          <button id="btn-import">Import data</button>
           <button id="btn-debug">Debug</button>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- ── Hidden file input for import ── -->
+  <input type="file" id="import-file-input" accept=".json" class="hidden">
 
   <!-- ── Pause overlay ── -->
   <div id="pause-overlay" class="hidden">

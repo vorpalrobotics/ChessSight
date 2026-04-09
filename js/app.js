@@ -11,7 +11,7 @@ import { initQueenAttack, startQueenAttack } from './queen.js';
 import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
-import { getAllRecords } from './storage.js';
+import { getAllRecords, getDisciplineGames, exportAllData, importAllData } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 
 // --- Screen management ---
@@ -258,6 +258,63 @@ async function renderCharts() {
     options: commonOpts('accuracy', 100, v => `${v}%`),
   });
 }
+
+// --- Export / Import ---
+
+document.getElementById('btn-export').addEventListener('click', async () => {
+  hamburgerDropdown.classList.add('hidden');
+  const payload = {
+    app: 'ChessSight',
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    ...(await exportAllData()),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `chesssight-backup-${new Date().toLocaleDateString('sv')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-import').addEventListener('click', () => {
+  hamburgerDropdown.classList.add('hidden');
+  const input = document.getElementById('import-file-input');
+  input.value = '';
+  input.click();
+});
+
+document.getElementById('import-file-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    alert('Invalid file: could not parse JSON.');
+    return;
+  }
+  if (!Array.isArray(data.drillDays) || !Array.isArray(data.disciplineGames)) {
+    alert('Invalid file: missing drillDays or disciplineGames.');
+    return;
+  }
+  const dd = data.drillDays.length;
+  const dg = data.disciplineGames.length;
+  const ok = confirm(
+    `Import ${dd} drill-day record${dd !== 1 ? 's' : ''} and ${dg} game record${dg !== 1 ? 's' : ''}?\n\n` +
+    `Drill stats: existing records for the same date/drill will be overwritten.\n` +
+    `Game history: imported games will be added (re-importing the same file creates duplicates).\n\n` +
+    `This cannot be undone.`
+  );
+  if (!ok) return;
+  try {
+    await importAllData(data);
+    alert('Imported successfully.');
+  } catch (err) {
+    alert(`Import failed: ${err.message}`);
+  }
+});
 
 // --- Debug modal (raw data table) ---
 const modalDebug = document.getElementById('modal-debug');
