@@ -285,7 +285,7 @@ function enterPhase(phase) {
   } else if (phase === PHASE.LOOSE) {
     showPanel('loose');
     setPhaseIndicator('STEP 3 / 4 — LOOSE PIECES');
-    setFeedback('Click every loose piece — both colors, kings excluded.');
+    setFeedback('');
 
   } else if (phase === PHASE.CANDIDATES) {
     showPanel('candidates');
@@ -310,52 +310,16 @@ function enterMovePhase() {
 
 function submitChecks() {
   if (selectedChecksW === null || selectedChecksB === null) return;
-  const wOk = selectedChecksW === turnChecksW;
-  const bOk = selectedChecksB === turnChecksB;
-  if (wOk && bOk) {
-    if (checksFirstAttempt) checksFirstTry++;
-    markCorrectRow('disc-checks-w-digits');
-    markCorrectRow('disc-checks-b-digits');
-    document.getElementById('btn-disc-checks-submit').disabled = true;
-    setFeedback('');
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 500);
-  } else {
-    checksMisses++;
-    checksFirstAttempt = false;
-    const msg = (!wOk && !bOk) ? 'Both counts wrong — try again.'
-              : !wOk           ? 'White count incorrect — try again.'
-              :                  'Black count incorrect — try again.';
-    setFeedback(msg, 'error');
-    if (!wOk) { flashDigitRow('disc-checks-w-digits'); resetDigitRow('disc-checks-w-digits'); selectedChecksW = null; }
-    if (!bOk) { flashDigitRow('disc-checks-b-digits'); resetDigitRow('disc-checks-b-digits'); selectedChecksB = null; }
-    document.getElementById('btn-disc-checks-submit').disabled = selectedChecksW === null || selectedChecksB === null;
-  }
+  if (checksFirstAttempt) checksFirstTry++;
+  enterPhase(PHASE.CAPTURES);
 }
 
 // ─── Phase: Captures ─────────────────────────────────────────────────────────
 
 function submitCaptures() {
   if (selectedCapturesW === null || selectedCapturesB === null) return;
-  const wOk = selectedCapturesW === turnCapturesW;
-  const bOk = selectedCapturesB === turnCapturesB;
-  if (wOk && bOk) {
-    if (capsFirstAttempt) capsFirstTry++;
-    markCorrectRow('disc-captures-w-digits');
-    markCorrectRow('disc-captures-b-digits');
-    document.getElementById('btn-disc-captures-submit').disabled = true;
-    setFeedback('');
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 500);
-  } else {
-    capsMisses++;
-    capsFirstAttempt = false;
-    const msg = (!wOk && !bOk) ? 'Both counts wrong — try again.'
-              : !wOk           ? 'White count incorrect — try again.'
-              :                  'Black count incorrect — try again.';
-    setFeedback(msg, 'error');
-    if (!wOk) { flashDigitRow('disc-captures-w-digits'); resetDigitRow('disc-captures-w-digits'); selectedCapturesW = null; }
-    if (!bOk) { flashDigitRow('disc-captures-b-digits'); resetDigitRow('disc-captures-b-digits'); selectedCapturesB = null; }
-    document.getElementById('btn-disc-captures-submit').disabled = selectedCapturesW === null || selectedCapturesB === null;
-  }
+  if (capsFirstAttempt) capsFirstTry++;
+  enterPhase(PHASE.LOOSE);
 }
 
 // ─── Phase: Loose pieces ──────────────────────────────────────────────────────
@@ -393,10 +357,13 @@ function looseDone() {
   for (const sq of turnLooseSqs) {
     if (!foundLooseSqs.has(sq)) { looseMisses++; missed++; drawSqMark(sq, 'loose-sq-missed'); }
   }
-  const msg = missed > 0 ? `${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.` : 'Click the board to continue.';
-  setFeedback(msg, missed > 0 ? 'error' : '');
-  showContinueMsg();
-  waitingLooseContinue = true;
+  if (missed === 0) {
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CANDIDATES); }, 500);
+  } else {
+    setFeedback(`${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.`, 'error');
+    showContinueMsg();
+    waitingLooseContinue = true;
+  }
 }
 
 // ─── Phase: Candidates ────────────────────────────────────────────────────────
@@ -592,20 +559,43 @@ function buildDigitRow(containerId, key) {
 }
 
 function onDigitClick(key, digit, btn) {
-  const container = btn.parentElement;
-  container.querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  if      (key === 'cw') { selectedChecksW   = digit; }
-  else if (key === 'cb') { selectedChecksB   = digit; }
-  else if (key === 'pw') { selectedCapturesW = digit; }
-  else if (key === 'pb') { selectedCapturesB = digit; }
-  if (key[0] === 'c') document.getElementById('btn-disc-checks-submit').disabled   = selectedChecksW   === null || selectedChecksB   === null;
-  if (key[0] === 'p') document.getElementById('btn-disc-captures-submit').disabled = selectedCapturesW === null || selectedCapturesB === null;
+  // Ignore clicks on already-answered or wrong buttons
+  if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  // Ignore if this row already has a correct answer
+  if (btn.parentElement.querySelector('.disc-digit-btn.correct')) return;
+
+  const correctAnswer = key === 'cw' ? turnChecksW   : key === 'cb' ? turnChecksB
+                      : key === 'pw' ? turnCapturesW : turnCapturesB;
+
+  if (digit === correctAnswer) {
+    btn.classList.add('correct');
+    if      (key === 'cw') selectedChecksW   = digit;
+    else if (key === 'cb') selectedChecksB   = digit;
+    else if (key === 'pw') selectedCapturesW = digit;
+    else if (key === 'pb') selectedCapturesB = digit;
+    maybeAutoAdvance(key);
+  } else {
+    btn.classList.add('wrong');
+    if (key[0] === 'c') { checksMisses++; checksFirstAttempt = false; }
+    else                { capsMisses++;   capsFirstAttempt   = false; }
+  }
+}
+
+function maybeAutoAdvance(key) {
+  if (key[0] === 'c') {
+    if (selectedChecksW === null || selectedChecksB === null) return;
+    if (checksFirstAttempt) checksFirstTry++;
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 500);
+  } else {
+    if (selectedCapturesW === null || selectedCapturesB === null) return;
+    if (capsFirstAttempt) capsFirstTry++;
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 500);
+  }
 }
 
 function resetDigitRow(containerId) {
   document.getElementById(containerId)
-    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected', 'correct'));
+    .querySelectorAll('.disc-digit-btn').forEach(b => b.classList.remove('selected', 'correct', 'wrong'));
 }
 
 function markCorrectRow(containerId) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v78</title>
+  <title>ChessSight v79</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v78</span>
+      <h1>ChessSight</h1><span class="version-label">v79</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -465,7 +465,7 @@
           <span class="disc-side-label disc-black-lbl">Black</span>
           <div class="disc-digits" id="disc-checks-b-digits"></div>
         </div>
-        <button id="btn-disc-checks-submit" class="disc-submit-btn" disabled>SUBMIT</button>
+        <button id="btn-disc-checks-submit" class="disc-submit-btn hidden" disabled>SUBMIT</button>
       </div>
 
       <!-- Captures panel -->
@@ -479,12 +479,12 @@
           <span class="disc-side-label disc-black-lbl">Black</span>
           <div class="disc-digits" id="disc-captures-b-digits"></div>
         </div>
-        <button id="btn-disc-captures-submit" class="disc-submit-btn" disabled>SUBMIT</button>
+        <button id="btn-disc-captures-submit" class="disc-submit-btn hidden" disabled>SUBMIT</button>
       </div>
 
       <!-- Loose pieces panel -->
       <div id="disc-panel-loose" class="disc-panel hidden">
-        <p class="disc-panel-q">Click every loose piece on the board — both colors, kings excluded.</p>
+        <p class="disc-panel-q">CLICK LOOSE PIECES</p>
         <button id="btn-disc-loose-done" class="disc-submit-btn">DONE</button>
       </div>
 

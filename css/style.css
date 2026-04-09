@@ -381,7 +381,7 @@ header h1 {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight {
+#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-discipline {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1576,6 +1576,7 @@ button:disabled {
 .disc-digit-btn:hover  { background: #1a5ca8; border-color: #3a80d0; color: #fff; }
 .disc-digit-btn.selected { background: #3a9fd0; border-color: #3a9fd0; color: #fff; }
 .disc-digit-btn.correct  { background: #27ae60; border-color: #27ae60; color: #fff; }
+.disc-digit-btn.wrong    { background: #8b1a2a; border-color: #dc3232; color: #fff; }
 
 /* Flash wrong answer row */
 @keyframes disc-row-flash {
