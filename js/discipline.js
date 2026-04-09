@@ -121,7 +121,6 @@ export function initDiscipline(navigateFn) {
   document.getElementById('btn-disc-checks-submit').addEventListener('click', submitChecks);
   document.getElementById('btn-disc-captures-submit').addEventListener('click', submitCaptures);
   document.getElementById('btn-disc-loose-done').addEventListener('click', looseDone);
-  document.getElementById('btn-disc-candidates').addEventListener('click', candidatesDone);
 
   // Board interaction
   const boardEl = document.getElementById('disc-board');
