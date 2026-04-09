@@ -100,10 +100,13 @@ export function initDiscipline(navigateFn) {
   navigate = navigateFn;
 
   // Setup panel
+  const SKILL_ELO = [800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2600,2800,3000,'3200+'];
   const slider = document.getElementById('disc-skill-slider');
-  slider.addEventListener('input', () => {
+  const updateSkillDisplay = () => {
     document.getElementById('disc-skill-display').textContent = slider.value;
-  });
+    document.getElementById('disc-elo-display').textContent = `~${SKILL_ELO[+slider.value]} ELO`;
+  };
+  slider.addEventListener('input', updateSkillDisplay);
   document.getElementById('btn-disc-white').addEventListener('click',  () => setChosenSide('w'));
   document.getElementById('btn-disc-black').addEventListener('click',  () => setChosenSide('b'));
   document.getElementById('btn-disc-random').addEventListener('click', () => setChosenSide('r'));

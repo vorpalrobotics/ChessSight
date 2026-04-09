@@ -1415,6 +1415,12 @@ button:disabled {
   text-align: center;
 }
 
+.disc-elo-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 6em;
+}
+
 .disc-slider {
   width: 160px;
   accent-color: #c080ff;
