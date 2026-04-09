@@ -9,7 +9,7 @@
   --text-muted: #888;
   --white-side: #f0d9b5;
   --black-side: #2c2c2c;
-  --board-size: min(480px, 90vw);
+  --board-size: min(600px, 90vw, calc(100vh - 280px));
 }
 
 body {
