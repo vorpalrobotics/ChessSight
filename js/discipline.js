@@ -106,11 +106,20 @@ export function initDiscipline(navigateFn) {
     document.getElementById('disc-skill-display').textContent = slider.value;
     document.getElementById('disc-elo-display').textContent = `~${SKILL_ELO[+slider.value]} ELO`;
   };
-  slider.addEventListener('input', updateSkillDisplay);
+  slider.addEventListener('input', () => {
+    updateSkillDisplay();
+    localStorage.setItem('disc-skill', slider.value);
+  });
   document.getElementById('btn-disc-white').addEventListener('click',  () => setChosenSide('w'));
   document.getElementById('btn-disc-black').addEventListener('click',  () => setChosenSide('b'));
   document.getElementById('btn-disc-random').addEventListener('click', () => setChosenSide('r'));
   document.getElementById('btn-disc-start').addEventListener('click', startGame);
+
+  // Restore saved preferences
+  const savedSkill = localStorage.getItem('disc-skill');
+  if (savedSkill !== null) slider.value = savedSkill;
+  updateSkillDisplay();
+  setChosenSide(localStorage.getItem('disc-side') ?? 'w');
 
   // In-game controls
   document.getElementById('btn-disc-resign').addEventListener('click', resignGame);
@@ -156,6 +165,7 @@ export function startDiscipline() {
 
 function setChosenSide(side) {
   chosenSide = side;
+  localStorage.setItem('disc-side', side);
   ['w', 'b', 'r'].forEach(s =>
     document.getElementById({ w: 'btn-disc-white', b: 'btn-disc-black', r: 'btn-disc-random' }[s])
       .classList.toggle('active', s === side)
