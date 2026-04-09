@@ -107,7 +107,7 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', 'dlm-rook': 'Vision: Rook', 'dlm-bishop': 'Vision: Bishop', 'dlm-knight': 'Vision: Knight' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
 
 const DRILL_COLORS = {
   checks:       '#e94560',

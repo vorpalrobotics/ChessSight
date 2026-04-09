@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v81</title>
+  <title>ChessSight v82</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v81</span>
+      <h1>ChessSight</h1><span class="version-label">v82</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -77,23 +77,23 @@
         <span class="mode-desc">Count threat moves for each side</span>
       </button>
       -->
-      <button class="mode-card" id="mode-queen">
-        <span class="mode-icon">♛</span>
-        <span class="mode-name">Queen Attack</span>
-        <span class="mode-desc">Fork, skewer, or pin a rook, bishop, or knight</span>
-      </button>
       <button class="mode-card" id="mode-knight">
         <span class="mode-icon">♞</span>
         <span class="mode-name">Knight Route</span>
         <span class="mode-desc">Find the shortest knight path to the target</span>
       </button>
+      <button class="mode-card" id="mode-queen">
+        <span class="mode-icon">♛</span>
+        <span class="mode-name">Queen Attack</span>
+        <span class="mode-desc">Fork, skewer, or pin a rook, bishop, or knight</span>
+      </button>
       <button class="mode-card" id="mode-dlm">
         <span class="mode-icon">👁</span>
-        <span class="mode-name">Vision Drill</span>
+        <span class="mode-name">Spiral Vision</span>
         <span class="mode-desc">de La Maza: spot every queen fork, pin &amp; skewer</span>
       </button>
       <button class="mode-card" id="mode-discipline">
-        <span class="mode-icon">🧠</span>
+        <span class="mode-icon">♔</span>
         <span class="mode-name">Move Discipline</span>
         <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
       </button>
@@ -348,11 +348,11 @@
     <p class="drill-rule">Route the white knight to the target square (◎) in as few moves as possible. White pawns block the knight's path. Black pawns are also impassable, and the knight cannot move into any square a black pawn attacks (the two diagonals in front of it). Click any reachable square — valid moves turn green with the step number, yellow once you exceed the optimal count. Re-tap your current square to undo the last move. Click SHOW to reveal an optimal solution. You score 1 miss per invalid click plus 1 miss per move beyond the shortest possible route. A ⭐ marks a perfect run.</p>
   </div>
 
-  <!-- ── Screen 9: de La Maza Vision Drill ── -->
+  <!-- ── Screen 9: de La Maza Spiral Vision ── -->
   <div id="screen-dlm" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Vision Drill</h2>
+        <h2>Spiral Vision</h2>
         <span id="dlm-progress">— / 63</span>
       </div>
     </div>
