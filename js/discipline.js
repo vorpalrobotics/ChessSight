@@ -353,6 +353,14 @@ function handleBoardClick(e) {
 }
 
 function looseDone() {
+  if (waitingLooseContinue) {
+    waitingLooseContinue = false;
+    clearContinueMsg();
+    clearSqMarks();
+    setFeedback('');
+    if (isGameActive) enterPhase(PHASE.CANDIDATES);
+    return;
+  }
   if (currentPhase !== PHASE.LOOSE) return;
   let missed = 0;
   for (const sq of turnLooseSqs) {
