@@ -242,13 +242,13 @@ function startPlayerTurn() {
   turnLooseSqs  = getLoosePieces(fen);
   foundLooseSqs = new Set();
 
-  // Single legal move → skip discipline, make it automatically
+  // Single legal move → skip discipline, let user make the move
   if (chess.moves().length === 1) {
     forcedMoves++;
     showPanel('forced');
     setPhaseIndicator('ONLY ONE LEGAL MOVE');
     updateBookBtn(false);
-    setTimeout(() => { if (isGameActive) enterMovePhase(); }, 1500);
+    board.enableMoveInput(handleMoveInput, playerSide === 'w' ? COLOR.white : COLOR.black);
     return;
   }
 
