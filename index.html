@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v83</title>
+  <title>ChessSight v84</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v83</span>
+      <h1>ChessSight</h1><span class="version-label">v84</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -42,6 +42,7 @@
         <p><strong>Chessboard UI:</strong> <a href="https://github.com/shaack/cm-chessboard" target="_blank" rel="noopener">cm-chessboard</a> by Stefan Haack &mdash; a responsive SVG chessboard library (MIT licensed).</p>
         <p><strong>Chess logic:</strong> <a href="https://github.com/jhlywa/chess.js" target="_blank" rel="noopener">chess.js</a> by Jeff Hlywa &mdash; a TypeScript chess library for move generation and validation (BSD licensed).</p>
         <p><strong>Puzzles:</strong> Positions sourced from the <a href="https://lichess.org/" target="_blank" rel="noopener">Lichess</a> open puzzle database, available under Creative Commons CC0.</p>
+        <p><strong>Spiral Vision drill:</strong> Inspired by <em>Rapid Chess Improvement</em> by Michael de la Maza.</p>
       </div>
     </div>
   </div>
@@ -90,7 +91,7 @@
       <button class="mode-card" id="mode-dlm">
         <span class="mode-icon">👁</span>
         <span class="mode-name">Spiral Vision</span>
-        <span class="mode-desc">de La Maza: spot every queen fork, pin &amp; skewer</span>
+        <span class="mode-desc">Spot every queen fork, pin &amp; skewer across 63 positions</span>
       </button>
       <button class="mode-card" id="mode-discipline">
         <span class="mode-icon">♔</span>
@@ -406,6 +407,7 @@
         </div>
       </div>
     </div>
+    <p class="dlm-attribution">Inspired by <em>Rapid Chess Improvement</em> by Michael de la Maza.</p>
   </div>
 
   <!-- ── Screen 10: Move Discipline ── -->
