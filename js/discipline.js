@@ -92,6 +92,10 @@ let playerTurns = 0;
 let checksTotal = 0, checksFirstTry = 0, checksMisses = 0;
 let capsTotal   = 0, capsFirstTry   = 0, capsMisses   = 0;
 let looseMisses = 0, bookMoves = 0, forcedMoves = 0;
+let looseTotal  = 0;
+// Per-phase timing (ms accumulated across all turns, stopped at user-completion moment)
+let phaseStartTime = 0;
+let checksMs = 0, capturesMs = 0, looseMs = 0;
 let waitingLooseContinue = false;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -201,6 +205,8 @@ async function startGame() {
   checksTotal = checksFirstTry = checksMisses = 0;
   capsTotal   = capsFirstTry   = capsMisses   = 0;
   looseMisses = bookMoves = forcedMoves = 0;
+  looseTotal  = 0;
+  checksMs = capturesMs = looseMs = phaseStartTime = 0;
   gameStartTime = Date.now();
 
   const fen = chess.fen();
@@ -280,6 +286,7 @@ function enterPhase(phase) {
     document.getElementById('btn-disc-checks-submit').disabled = true;
     showPanel('checks');
     setPhaseIndicator('STEP 1 / 4 — COUNT CHECKS');
+    phaseStartTime = Date.now();
 
   } else if (phase === PHASE.CAPTURES) {
     capsTotal++;
@@ -290,11 +297,13 @@ function enterPhase(phase) {
     document.getElementById('btn-disc-captures-submit').disabled = true;
     showPanel('captures');
     setPhaseIndicator('STEP 2 / 4 — COUNT CAPTURES');
+    phaseStartTime = Date.now();
 
   } else if (phase === PHASE.LOOSE) {
     showPanel('loose');
     setPhaseIndicator('STEP 3 / 4 — LOOSE PIECES');
     setFeedback('');
+    phaseStartTime = Date.now();
 
   } else if (phase === PHASE.CANDIDATES) {
     showPanel('candidates');
@@ -372,6 +381,8 @@ function looseDone() {
     return;
   }
   if (currentPhase !== PHASE.LOOSE) return;
+  looseMs += Date.now() - phaseStartTime;
+  looseTotal++;
   let missed = 0;
   for (const sq of turnLooseSqs) {
     if (!foundLooseSqs.has(sq)) { looseMisses++; missed++; drawSqMark(sq, 'loose-sq-missed'); }
@@ -508,6 +519,10 @@ function endGame(result) {
   updateBookBtn(false);
 
   const elapsed = Math.round((Date.now() - gameStartTime) / 1000);
+  const avgChecksS   = checksTotal > 0 ? (checksMs   / checksTotal   / 1000).toFixed(1) : null;
+  const avgCapturesS = capsTotal   > 0 ? (capturesMs / capsTotal     / 1000).toFixed(1) : null;
+  const avgLooseS    = looseTotal  > 0 ? (looseMs    / looseTotal    / 1000).toFixed(1) : null;
+
   addDisciplineGame({
     date: new Date().toLocaleDateString('sv'),
     side: playerSide === 'w' ? 'white' : 'black',
@@ -515,7 +530,8 @@ function endGame(result) {
     turns: playerTurns,
     checksTotal, checksFirstTry, checksMisses,
     capsTotal, capsFirstTry, capsMisses,
-    looseMisses, bookMoves, forcedMoves,
+    looseMisses, looseTotal, bookMoves, forcedMoves,
+    checksMs, capturesMs, looseMs,
     seconds: elapsed,
   });
 
@@ -529,6 +545,9 @@ function endGame(result) {
   document.getElementById('disc-stat-loose').textContent    = `${looseMisses} miss${looseMisses !== 1 ? 'es' : ''}`;
   document.getElementById('disc-stat-book').textContent     = bookMoves;
   document.getElementById('disc-stat-forced').textContent   = forcedMoves;
+  document.getElementById('disc-stat-checks-time').textContent   = avgChecksS   ? `${avgChecksS}s avg`   : '—';
+  document.getElementById('disc-stat-captures-time').textContent = avgCapturesS ? `${avgCapturesS}s avg` : '—';
+  document.getElementById('disc-stat-loose-time').textContent    = avgLooseS    ? `${avgLooseS}s avg`    : '—';
   document.getElementById('disc-stat-time').textContent     = formatTime(elapsed);
 
   document.getElementById('disc-game-area').classList.add('hidden');
@@ -609,12 +628,14 @@ function onDigitClick(key, digit, btn) {
 function maybeAutoAdvance(key) {
   if (key[0] === 'c') {
     if (selectedChecksW === null || selectedChecksB === null) return;
+    checksMs += Date.now() - phaseStartTime;
     if (checksFirstAttempt) checksFirstTry++;
     pulseCorrectButtons('disc-checks-w-digits');
     pulseCorrectButtons('disc-checks-b-digits');
     setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 2000);
   } else {
     if (selectedCapturesW === null || selectedCapturesB === null) return;
+    capturesMs += Date.now() - phaseStartTime;
     if (capsFirstAttempt) capsFirstTry++;
     pulseCorrectButtons('disc-captures-w-digits');
     pulseCorrectButtons('disc-captures-b-digits');

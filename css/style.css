@@ -1707,6 +1707,20 @@ button:disabled {
 .disc-over-row span:first-child { color: var(--text-muted); }
 .disc-over-row span:last-child  { font-family: monospace; color: var(--text); font-weight: 600; }
 
+.disc-over-subrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  padding-left: 1rem;
+  margin-top: -0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.disc-over-subrow span:first-child { color: var(--text-muted); opacity: 0.7; }
+.disc-over-subrow span:last-child  { font-family: monospace; color: var(--text-muted); }
+
 .disc-over-actions {
   display: flex;
   gap: 0.7rem;
