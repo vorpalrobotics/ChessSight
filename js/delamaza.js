@@ -163,6 +163,10 @@ export function initDeLaMaza(navigateFn) {
   navigate = navigateFn;
 
   document.getElementById('btn-dlm-show').addEventListener('click', handleShow);
+  document.getElementById('btn-dlm-done').addEventListener('click', () => {
+    stopSession();
+    navigate('screen-select');
+  });
   document.getElementById('btn-menu').addEventListener('click', stopSession);
   document.getElementById('btn-dlm-again').addEventListener('click', () => beginSession());
   document.getElementById('btn-dlm-choose').addEventListener('click', () => {

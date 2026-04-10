@@ -61,7 +61,8 @@ header h1 {
   color: var(--text);
 }
 
-#btn-pause {
+#btn-pause,
+.drill-pause-btn {
   background: transparent;
   border: 1px solid var(--surface2);
   color: var(--text-muted);
@@ -69,7 +70,8 @@ header h1 {
   padding: 0.35rem 0.7rem;
   cursor: pointer;
 }
-#btn-pause:hover {
+#btn-pause:hover,
+.drill-pause-btn:hover {
   background: var(--surface2);
   color: var(--text);
 }

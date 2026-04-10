@@ -17,8 +17,13 @@ import { togglePause, clearPause } from './pause.js';
 // --- Screen management ---
 const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
 
-const btnPause = document.getElementById('btn-pause');
 const pauseOverlay = document.getElementById('pause-overlay');
+
+function doPauseToggle() {
+  const paused = togglePause();
+  document.querySelectorAll('.drill-pause-btn').forEach(b => b.textContent = paused ? '▶' : '⏸');
+  pauseOverlay.classList.toggle('hidden', !paused);
+}
 
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
@@ -26,22 +31,20 @@ function showScreen(id) {
   );
   const isSelect = id === 'screen-select';
   document.getElementById('btn-menu').classList.toggle('hidden', isSelect);
-  btnPause.classList.toggle('hidden', isSelect);
   if (isSelect) {
     clearPause();
     pauseOverlay.classList.add('hidden');
-    btnPause.textContent = '⏸';
+    document.querySelectorAll('.drill-pause-btn').forEach(b => b.textContent = '⏸');
   }
 }
 
-btnPause.addEventListener('click', () => {
-  const paused = togglePause();
-  btnPause.textContent = paused ? '▶' : '⏸';
-  pauseOverlay.classList.toggle('hidden', !paused);
+// Event delegation: any .drill-pause-btn click triggers pause toggle
+document.addEventListener('click', e => {
+  if (e.target.matches('.drill-pause-btn')) doPauseToggle();
 });
 
 // Tapping the overlay itself also resumes
-pauseOverlay.addEventListener('click', () => btnPause.click());
+pauseOverlay.addEventListener('click', doPauseToggle);
 
 document.getElementById('mode-checks').addEventListener('click', async () => {
   showScreen('screen-checks');
