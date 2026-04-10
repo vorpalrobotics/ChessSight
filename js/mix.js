@@ -18,7 +18,7 @@ const DRILL_DEFS = {
   checks:   { label: 'COUNT CHECKS',   type: 'count', fetch: fetchChecksPuzzle   },
   captures: { label: 'COUNT CAPTURES', type: 'count', fetch: fetchCapturesPuzzle },
   loose:    { label: 'LOOSE PIECES',   type: 'click', fetch: fetchLoosePuzzle    },
-  under:    { label: 'UNDER ATTACK',   type: 'click', fetch: fetchUnderPuzzle    },
+  under:    { label: 'UNDERGUARDED',    type: 'click', fetch: fetchUnderPuzzle    },
   queen:    { label: 'QUEEN ATTACK',   type: 'click', fetch: generateQueenPuzzle },
   hanggrab: { label: 'HANG GRAB',      type: 'click', fetch: generateHangGrabPuzzle },
 };
