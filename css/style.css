@@ -1585,8 +1585,9 @@ button:disabled {
 }
 
 .disc-panel-q {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
   text-align: center;
   margin: 0;
 }
@@ -1633,26 +1634,23 @@ button:disabled {
   text-align: center;
 }
 
-.disc-white-lbl { color: #e8e8e8; }
-.disc-black-lbl { color: #888; }
+.disc-white-lbl { color: var(--text-muted); }
+.disc-black-lbl { color: var(--text-muted); }
 
-/* Digit buttons */
+/* Digit buttons — match standalone drill sizing */
 .disc-digits {
   display: flex;
-  gap: 6px;
-  border-radius: 6px;
-  padding: 2px;
-  transition: background 0.3s;
+  gap: calc(var(--board-size) / 60);
 }
 
 .disc-digit-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  border: 1px solid var(--text-muted);
+  width: calc(var(--board-size) / 11);
+  height: calc(var(--board-size) / 11);
+  border-radius: 6px;
+  border: 2px solid transparent;
   background: var(--surface2);
-  color: var(--text-muted);
-  font-size: 0.8rem;
+  color: var(--text);
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
