@@ -629,10 +629,10 @@ function updateBookBtn(show) {
 
 function buildDigitRow(containerId, key) {
   const container = document.getElementById(containerId);
-  for (let d = 0; d <= 9; d++) {
+  for (let d = 0; d <= 7; d++) {
     const btn = document.createElement('button');
     btn.className = 'disc-digit-btn';
-    btn.textContent = d < 9 ? String(d) : '9+';
+    btn.textContent = d < 7 ? String(d) : '7+';
     btn.addEventListener('click', () => onDigitClick(key, d, btn));
     container.appendChild(btn);
   }
@@ -648,7 +648,7 @@ function onDigitClick(key, digit, btn) {
                       : key === 'pw' ? turnCapturesW : turnCapturesB;
 
   // '9+' button matches any answer >= 9
-  const isCorrect = digit === 9 ? correctAnswer >= 9 : digit === correctAnswer;
+  const isCorrect = digit === 7 ? correctAnswer >= 7 : digit === correctAnswer;
   if (isCorrect) {
     btn.classList.add('correct');
     if      (key === 'cw') selectedChecksW   = digit;

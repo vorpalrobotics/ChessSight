@@ -285,7 +285,7 @@ function handleDigitClick(color, value) {
   if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
 
   const correct = isWhite ? answerW : answerB;
-  if (value === correct) {
+  if (value === 7 ? correct >= 7 : value === correct) {
     btn.classList.add('correct');
     correctAnswers++;
     if (isWhite) correctW = true; else correctB = true;
@@ -353,12 +353,12 @@ async function restartDrill() {
 function createDigitButtons() {
   [['cap-digits-white', 'w'], ['cap-digits-black', 'b']].forEach(([containerId, color]) => {
     const container = document.getElementById(containerId);
-    for (let i = 0; i <= 9; i++) {
+    for (let i = 0; i <= 7; i++) {
       const btn = document.createElement('button');
       btn.className = 'digit-btn';
       btn.dataset.color = color;
       btn.dataset.value = i;
-      btn.textContent = i === 9 ? '9+' : i;
+      btn.textContent = i === 7 ? '7+' : i;
       btn.addEventListener('click', () => handleDigitClick(color, i));
       container.appendChild(btn);
     }

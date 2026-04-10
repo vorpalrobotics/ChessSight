@@ -694,7 +694,8 @@ header h1 {
 }
 
 .answer-label {
-  width: calc(var(--board-size) / 12);
+  width: 2ch;
+  min-width: 2ch;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -710,8 +711,8 @@ header h1 {
 }
 
 .digit-btn {
-  width: calc(var(--board-size) / 12);
-  height: calc(var(--board-size) / 12);
+  width: calc(var(--board-size) / 10);
+  height: calc(var(--board-size) / 10);
   padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
@@ -1594,15 +1595,15 @@ button:disabled {
 .disc-candidates-list {
   list-style: disc;
   padding-left: 1.4rem;
-  font-size: 1rem;
-  line-height: 1.9;
+  font-size: clamp(0.78rem, 3.8vw, 1rem);
+  line-height: 1.8;
   color: var(--text);
   text-align: left;
   max-width: calc(var(--board-size) + 4px);
 }
 
 .disc-candidates-cta {
-  font-size: 1.1rem;
+  font-size: clamp(0.88rem, 4vw, 1.1rem);
   font-weight: 700;
   color: var(--accent);
   margin-top: 0.6rem;
@@ -1628,8 +1629,9 @@ button:disabled {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  min-width: 2.8em;
-  text-align: right;
+  width: 2ch;
+  min-width: 2ch;
+  text-align: center;
 }
 
 .disc-white-lbl { color: #e8e8e8; }
@@ -1645,8 +1647,8 @@ button:disabled {
 }
 
 .disc-digit-btn {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 4px;
   border: 1px solid var(--text-muted);
   background: var(--surface2);

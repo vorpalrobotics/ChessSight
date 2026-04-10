@@ -40,6 +40,9 @@ btnPause.addEventListener('click', () => {
   pauseOverlay.classList.toggle('hidden', !paused);
 });
 
+// Tapping the overlay itself also resumes
+pauseOverlay.addEventListener('click', () => btnPause.click());
+
 document.getElementById('mode-checks').addEventListener('click', async () => {
   showScreen('screen-checks');
   await startChecks();
