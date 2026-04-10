@@ -57,7 +57,6 @@ function blackPieceCovers(type, fromSq, targetSq, occupied) {
 }
 
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5 };
-const PIECE_NAME  = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook' };
 
 function isDefended(targetSq, pos) {
   const { queenSq, wPawns, bPieces, bPawns } = pos;
@@ -110,22 +109,32 @@ function generatePosition() {
     const queenSq = pick(ALL_SQS);
     occupied.add(queenSq);
 
-    // 0–4 white pawns on ranks 1–4 (index 0–3)
+    // 0–4 white pawns on ranks 2–4 (index 1–3)
     const wPawns = [];
     for (let i = 0, n = randInt(0, 4); i < n; i++) {
-      const avail = ALL_SQS.filter(sq => rankOf(sq) <= 3 && !occupied.has(sq));
+      const avail = ALL_SQS.filter(sq => rankOf(sq) >= 1 && rankOf(sq) <= 3 && !occupied.has(sq));
       if (!avail.length) break;
       const sq = pick(avail); wPawns.push(sq); occupied.add(sq);
     }
 
-    // 1–3 black pieces anywhere
+    // 1–3 black pieces anywhere (no two bishops on same color square)
+    const usedBishopColors = new Set();
     const bPieces = [];
     for (let i = 0, n = randInt(1, 3); i < n; i++) {
-      const avail = ALL_SQS.filter(sq => !occupied.has(sq));
+      const type = pick(TYPES);
+      let avail = ALL_SQS.filter(sq => !occupied.has(sq));
+      if (type === 'b') {
+        if (usedBishopColors.size >= 2) continue; // both colors used, skip this bishop
+        if (usedBishopColors.size === 1) {
+          const usedParity = [...usedBishopColors][0];
+          avail = avail.filter(sq => (fileOf(sq) + rankOf(sq)) % 2 !== usedParity);
+        }
+      }
       if (!avail.length) break;
       const sq = pick(avail);
-      bPieces.push({ sq, type: pick(TYPES) });
+      bPieces.push({ sq, type });
       occupied.add(sq);
+      if (type === 'b') usedBishopColors.add((fileOf(sq) + rankOf(sq)) % 2);
     }
 
     // 2–4 black pawns on ranks 5–7 (index 4–6)
@@ -174,7 +183,9 @@ let board = null;
 let navigate = null;
 let currentPos = null;
 let validTargets = [];
-let bestValue = 0;
+let foundTargetSqs = new Set();
+let puzzleMisses = 0;
+let firstTryThisPuzzle = true;
 let puzzleActive = false;
 let puzzleStartTime = 0;
 let timerInterval = null;
@@ -229,7 +240,9 @@ function loadPuzzle() {
 
   currentPos = generatePosition();
   validTargets = computeValidTargets(currentPos);
-  bestValue = validTargets.length > 0 ? Math.max(...validTargets.map(t => t.value)) : 0;
+  foundTargetSqs = new Set();
+  puzzleMisses = 0;
+  firstTryThisPuzzle = true;
 
   board.setPosition(buildFen(currentPos), false);
   startTimer();
@@ -246,54 +259,47 @@ function handleBoardClick(e) {
   // Ignore white pieces (queen / pawns)
   if (sq === queenSq || wPawns.includes(sq)) return;
 
-  // Only act on black pieces / pawns
+  // Only respond to clicks on actual black pieces
   const isBlack = bPieces.some(p => p.sq === sq) || bPawns.includes(sq);
   if (!isBlack) return;
 
+  // Ignore already-found squares
+  if (foundTargetSqs.has(sq)) return;
+
   const target = validTargets.find(t => t.sq === sq);
 
-  if (!target) {
-    // Clicked a defended piece or one the queen doesn't reach
-    finishPuzzle(false);
-    drawSqOverlay(sq, 'hg-sq-wrong');
-    if (validTargets.length > 0) {
-      validTargets.filter(t => t.value === bestValue).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
-      setStatus('That piece is not a free capture. Better option highlighted.');
-    } else {
-      setStatus('That piece is not free — nothing was available here. PASS was correct.');
+  if (target) {
+    // Correct free capture — mark green, track progress
+    drawSqOverlay(sq, 'hg-sq-correct');
+    foundTargetSqs.add(sq);
+
+    if (foundTargetSqs.size === validTargets.length) {
+      // All free captures found — complete puzzle
+      const elapsed = finishPuzzle(true);
+      setStatus(firstTryThisPuzzle ? `✓  ${elapsed}s` : `Found all  ${elapsed}s`);
+      setTimeout(loadPuzzle, 1500);
     }
-    setTimeout(loadPuzzle, 2000);
-    return;
+  } else {
+    // Wrong click — defended or unreachable piece; flash red transiently
+    flashSqRed(sq);
+    puzzleMisses++;
+    firstTryThisPuzzle = false;
   }
-
-  if (target.value < bestValue) {
-    // Valid free capture but a better one exists
-    finishPuzzle(false);
-    drawSqOverlay(sq, 'hg-sq-wrong');
-    validTargets.filter(t => t.value === bestValue).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
-    setStatus(`A ${PIECE_NAME[validTargets.find(t=>t.value===bestValue).type]} was worth more — see highlight.`);
-    setTimeout(loadPuzzle, 2000);
-    return;
-  }
-
-  // Correct — clicked the best (or a tied-best) free capture
-  const elapsed = finishPuzzle(true);
-  drawSqOverlay(sq, 'hg-sq-correct');
-  setStatus(`✓  ${elapsed}s`);
-  setTimeout(loadPuzzle, 1500);
 }
 
 function handlePass() {
   if (!puzzleActive) return;
 
   if (validTargets.length === 0) {
+    // Correct — nothing was free to grab
     const elapsed = finishPuzzle(true);
     setStatus(`✓ Nothing to grab!  ${elapsed}s`);
     setTimeout(loadPuzzle, 1500);
   } else {
+    // Wrong — free captures were available
     finishPuzzle(false);
-    validTargets.filter(t => t.value === bestValue).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
-    setStatus('There was a free capture — see highlight.');
+    validTargets.filter(t => !foundTargetSqs.has(t.sq)).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
+    setStatus('There were free captures — see highlights.');
     setTimeout(loadPuzzle, 2000);
   }
 }
@@ -304,8 +310,9 @@ function handleShow() {
   if (validTargets.length === 0) {
     setStatus('Nothing to grab here — PASS was correct.');
   } else {
-    validTargets.filter(t => t.value === bestValue).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
-    setStatus('Best free capture(s) shown.');
+    const unfound = validTargets.filter(t => !foundTargetSqs.has(t.sq));
+    unfound.forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
+    setStatus(unfound.length > 0 ? 'Free capture(s) shown.' : 'All found already!');
   }
   setTimeout(loadPuzzle, 2000);
 }
@@ -314,13 +321,13 @@ function handleShow() {
 function finishPuzzle(correct) {
   puzzleActive = false;
   const elapsed = stopTimer();
-  if (!correct) sessionMisses++;
+  sessionMisses += puzzleMisses;
   document.getElementById('hg-misses').textContent = `Misses: ${sessionMisses}`;
-  drillResults.push({ seconds: parseFloat(elapsed), correct: correct ? 1 : 0, misses: correct ? 0 : 1 });
+  drillResults.push({ seconds: parseFloat(elapsed), correct: correct ? 1 : 0, misses: puzzleMisses });
   upsertDrillDay('hanggrab', {
     seconds: Math.round(parseFloat(elapsed)),
     correct: correct ? 1 : 0,
-    misses: correct ? 0 : 1,
+    misses: puzzleMisses,
     puzzleId: `hg-${puzzleCount}`,
   });
   updateSessionStats();
@@ -372,8 +379,7 @@ function updateSessionStats() {
   const n = drillResults.length;
   if (!n) return;
   const totalC = drillResults.reduce((s, r) => s + r.correct, 0);
-  const totalM = drillResults.reduce((s, r) => s + r.misses,  0);
-  const acc    = totalC + totalM > 0 ? Math.round(totalC / (totalC + totalM) * 100) : 100;
+  const acc = Math.round(totalC / n * 100);
   const correctTimes = drillResults.filter(r => r.correct).map(r => r.seconds);
   const avg = correctTimes.length
     ? (correctTimes.reduce((a, b) => a + b, 0) / correctTimes.length).toFixed(1)
@@ -416,6 +422,23 @@ function drawSqOverlay(sq, cssClass) {
   rect.setAttribute('class', cssClass);
   rect.setAttribute('data-hg-sq', sq);
   svg.appendChild(rect);
+}
+
+// Transient red flash for wrong clicks — removes itself after animation
+function flashSqRed(sq) {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const { x, y } = sqToXY(sq, sqSize);
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x + 2);
+  rect.setAttribute('y', y + 2);
+  rect.setAttribute('width',  sqSize - 4);
+  rect.setAttribute('height', sqSize - 4);
+  rect.setAttribute('rx', 4);
+  rect.setAttribute('class', 'hg-sq-flash');
+  svg.appendChild(rect);
+  setTimeout(() => rect.remove(), 600);
 }
 
 function clearOverlays() {

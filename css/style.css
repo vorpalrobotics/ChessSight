@@ -627,7 +627,18 @@ header h1 {
   animation: flash-red 0.6s ease-out forwards;
 }
 
+@keyframes flash-red {
+  0%   { fill: rgba(220, 50, 50, 0.75); }
+  100% { fill: rgba(220, 50, 50, 0); }
+}
+
 /* ── Hang Grab drill ── */
+.hg-sq-flash {
+  stroke: #dc3232;
+  stroke-width: 2px;
+  pointer-events: none;
+  animation: flash-red 0.6s ease-out forwards;
+}
 .hg-sq-correct {
   fill: rgba(39, 174, 96, 0.7);
   stroke: #27ae60;
@@ -1070,7 +1081,7 @@ button {
   transition: background 0.15s;
 }
 
-button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.disc-exit-btn):not(.mode-card) {
+button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.disc-exit-btn):not(.hg-pass-btn):not(.mode-card) {
   background: var(--accent);
 }
 
