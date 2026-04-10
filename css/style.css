@@ -694,8 +694,8 @@ header h1 {
 }
 
 .answer-label {
-  width: 2ch;
-  min-width: 2ch;
+  width: 3ch;
+  min-width: 3ch;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -706,13 +706,13 @@ header h1 {
 
 .digit-buttons {
   display: flex;
-  gap: 0;
+  gap: calc(var(--board-size) / 60);
   flex-wrap: nowrap;
 }
 
 .digit-btn {
-  width: calc(var(--board-size) / 10);
-  height: calc(var(--board-size) / 10);
+  width: calc(var(--board-size) / 11);
+  height: calc(var(--board-size) / 11);
   padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
@@ -721,7 +721,6 @@ header h1 {
   color: var(--text);
   border: 2px solid transparent;
   transition: background 0.1s, border-color 0.12s;
-  margin-right: calc(var(--board-size) / 120);
 }
 /* Hover/active: lighter blue — NOT red — so correct answers don't flash red */
 .digit-btn:hover:not(.correct):not(.incorrect),
@@ -1629,8 +1628,8 @@ button:disabled {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  width: 2ch;
-  min-width: 2ch;
+  width: 3ch;
+  min-width: 3ch;
   text-align: center;
 }
 
@@ -1640,15 +1639,15 @@ button:disabled {
 /* Digit buttons */
 .disc-digits {
   display: flex;
-  gap: 3px;
+  gap: 6px;
   border-radius: 6px;
   padding: 2px;
   transition: background 0.3s;
 }
 
 .disc-digit-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
   border: 1px solid var(--text-muted);
   background: var(--surface2);
