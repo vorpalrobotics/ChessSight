@@ -130,6 +130,7 @@ export function initDiscipline(navigateFn) {
 
   // In-game controls
   document.getElementById('btn-disc-resign').addEventListener('click', resignGame);
+  document.getElementById('btn-disc-exit').addEventListener('click', exitGame);
   document.getElementById('btn-disc-book').addEventListener('click', useBook);
   document.getElementById('btn-menu').addEventListener('click', cleanupDrill);
 
@@ -324,7 +325,7 @@ function enterPhase(phase) {
 
   } else if (phase === PHASE.CANDIDATES) {
     showPanel('candidates');
-    setPhaseIndicator('STEP 4 / 4 — MAKE YOUR MOVE');
+    setPhaseIndicator('STEP 4 / 4 — OTHER THREATS');
     setFeedback('');
     updateBookBtn(false);
     board.enableMoveInput(handleMoveInput, playerSide === 'w' ? COLOR.white : COLOR.black);
@@ -440,6 +441,28 @@ function useBook() {
 
 function resignGame() {
   if (isGameActive) endGame('resigned');
+}
+
+async function exitGame() {
+  if (!isGameActive) return;
+  isGameActive = false;
+  if (board) board.disableMoveInput();
+  showPanel('engine');
+  setPhaseIndicator('EVALUATING POSITION…');
+  updateBookBtn(false);
+
+  const fen = chess.fen();
+  let result = 'exit-loss';
+  try {
+    const { score } = await discEngine.evaluate(fen, 18);
+    if (score !== null) {
+      const playerScore = playerSide === 'w' ? score : -score;
+      if (playerScore > 200)       result = 'exit-win';
+      else if (playerScore >= -200) result = 'exit-draw';
+      // else keep 'exit-loss'
+    }
+  } catch { /* keep fallback */ }
+  endGame(result);
 }
 
 // ─── Move input ───────────────────────────────────────────────────────────────
@@ -559,7 +582,10 @@ function endGame(result) {
     seconds: elapsed,
   });
 
-  const labels = { win: '♔ You Win!', loss: '♚ You Lose', draw: '½-½ Draw', resigned: 'Resigned' };
+  const labels = {
+    win: '♔ You Win!', loss: '♚ You Lose', draw: '½-½ Draw', resigned: 'Resigned',
+    'exit-win': 'EXIT — Win', 'exit-draw': 'EXIT — Draw', 'exit-loss': 'EXIT — Loss',
+  };
   document.getElementById('disc-over-result').textContent = labels[result] ?? result;
   document.getElementById('disc-stat-turns').textContent    = playerTurns;
   document.getElementById('disc-stat-checks').textContent   =

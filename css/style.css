@@ -1021,7 +1021,7 @@ button {
   transition: background 0.15s;
 }
 
-button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.mode-card) {
+button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.disc-exit-btn):not(.mode-card) {
   background: var(--accent);
 }
 
@@ -1565,6 +1565,20 @@ button:disabled {
 
 .disc-resign-btn:hover { background: #8b1a2a; color: #fff; border-color: #8b1a2a; }
 
+.disc-exit-btn {
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.disc-exit-btn:hover { background: #1a5ca8; color: #fff; border-color: #1a5ca8; }
+
 /* Phase indicator */
 .disc-phase-indicator {
   text-align: center;
@@ -1573,6 +1587,9 @@ button:disabled {
   letter-spacing: 0.12em;
   color: var(--text-muted);
   padding: 0.3rem 0;
+}
+@media (max-width: 500px) {
+  .disc-phase-indicator { font-size: 0.85rem; }
 }
 
 /* Answer panels */
@@ -1625,6 +1642,12 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+#disc-checks-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
 .disc-side-label {
