@@ -686,6 +686,67 @@ header h1 {
   padding: 0.3rem 1rem;
   margin-top: 0.1rem;
 }
+/* ── Mix drill ── */
+.mix-select-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2.5rem 1.5rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.mix-select-title {
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.mix-select-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.mix-checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 2.5rem;
+}
+
+.mix-checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  user-select: none;
+}
+
+.mix-checkbox-grid input[type=checkbox] {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#btn-mix-start {
+  padding: 0.55rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.mix-drill-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
 .loose-continue-msg,
 .under-continue-msg,
 .disc-continue-msg {

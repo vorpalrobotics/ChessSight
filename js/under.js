@@ -42,6 +42,27 @@ export function initUnder(navigateFn) {
   document.getElementById('under-board').addEventListener('click', handleBoardClick);
 }
 
+// Returns a single puzzle object for use by the Mix drill.
+export async function fetchUnderPuzzle() {
+  const { fen, puzzleId } = await fetchValidFen();
+  const targets = getUnderguardedPieces(fen);
+  return {
+    fen, puzzleId, type: 'under',
+    targets,
+    pieceSquares: getPieceSquares(fen),
+    difficulty: scoreCountDifficulty(fen, targets.size),
+  };
+}
+
+function getPieceSquares(fen) {
+  const tmp = new Chess();
+  try { tmp.load(fen); } catch { return new Set(); }
+  const sqs = new Set();
+  for (const file of 'abcdefgh')
+    for (let rank = 1; rank <= 8; rank++) { const sq = file + rank; if (tmp.get(sq)) sqs.add(sq); }
+  return sqs;
+}
+
 export async function startUnder() {
   registerPause(stopTimer, startTimer);
   resetDrill();

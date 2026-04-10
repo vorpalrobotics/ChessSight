@@ -196,6 +196,18 @@ let pauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+// Returns a single puzzle object for use by the Mix drill.
+export function generateHangGrabPuzzle() {
+  const pos = generatePosition();
+  const validTargets = computeValidTargets(pos);
+  return {
+    fen: buildFen(pos),
+    targets: new Set(validTargets.map(t => t.sq)),
+    pieceSquares: new Set([pos.queenSq, ...pos.wPawns, ...pos.bPieces.map(p => p.sq), ...pos.bPawns]),
+    type: 'hanggrab',
+  };
+}
+
 export function initHangGrab(navigateFn) {
   navigate = navigateFn;
   document.getElementById('btn-hg-done').addEventListener('click', () => {

@@ -53,6 +53,20 @@ export function initCaptures(navigateFn) {
   });
 }
 
+// Returns a single puzzle object for use by the Mix drill.
+export async function fetchCapturesPuzzle() {
+  const { fen, puzzleId } = await fetchValidFen();
+  const movesW = getCapturesForColor(fen, 'w');
+  const movesB = getCapturesForColor(fen, 'b');
+  return {
+    fen, puzzleId, type: 'captures',
+    answerW: Math.min(movesW.length, 9),
+    answerB: Math.min(movesB.length, 9),
+    movesW, movesB,
+    difficulty: scoreCountDifficulty(fen, movesW.length + movesB.length),
+  };
+}
+
 export async function startCaptures() {
   registerPause(stopTimer, startTimer);
   resetDrill();

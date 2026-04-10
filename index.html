@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.11</title>
+  <title>ChessSight v0.1.12</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.11</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.12</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -106,6 +106,11 @@
         <span class="mode-icon">🎯</span>
         <span class="mode-name">Hang Grab</span>
         <span class="mode-desc">Spot the queen's best free capture — or PASS if there's nothing</span>
+      </button>
+      <button class="mode-card" id="mode-mix">
+        <span class="mode-icon">🔀</span>
+        <span class="mode-name">Mix</span>
+        <span class="mode-desc">Combine any drills into one randomised session</span>
       </button>
       <button class="mode-card" id="mode-dlm">
         <span class="mode-icon">👁</span>
@@ -407,7 +412,70 @@
     <p class="drill-rule">The white queen can freely capture a loose black piece — one it attacks that has no defenders. Click the highest-value loose piece the queen can take (rook=5, bishop=knight=3, pawn=1). If two equal pieces qualify, either is correct. Click PASS if no free capture exists. No kings — this is a pattern drill.</p>
   </div>
 
-  <!-- ── Screen 10: de La Maza Spiral Vision ── -->
+  <!-- ── Screen 10: Mix drill ── -->
+  <div id="screen-mix" class="screen hidden">
+
+    <!-- Selection panel: shown on entry, hidden once session starts -->
+    <div id="mix-select-panel">
+      <h2 class="mix-select-title">Mix Drill</h2>
+      <p class="mix-select-desc">Select 2 or more drills to combine:</p>
+      <div id="mix-checkboxes" class="mix-checkbox-grid">
+        <label><input type="checkbox" value="checks"> Count Checks</label>
+        <label><input type="checkbox" value="captures"> Count Captures</label>
+        <label><input type="checkbox" value="loose"> Loose Pieces</label>
+        <label><input type="checkbox" value="under"> Under Attack</label>
+        <label><input type="checkbox" value="queen"> Queen Attack</label>
+        <label><input type="checkbox" value="hanggrab"> Hang Grab</label>
+      </div>
+      <button id="btn-mix-start" disabled>START MIX ▶</button>
+    </div>
+
+    <!-- Puzzle panel: hidden until session starts -->
+    <div id="mix-puzzle-panel" class="hidden">
+      <div class="drill-top">
+        <div class="drill-top-left">
+          <span id="mix-drill-label" class="mix-drill-label">MIX</span>
+          <span id="mix-puzzle-num">#1</span>
+          <span id="mix-diff" class="drill-difficulty"></span>
+        </div>
+        <div class="drill-top-right">
+          <span id="mix-session-time" class="session-stat"></span>
+          <span id="mix-session-acc"  class="session-stat"></span>
+          <button class="drill-pause-btn">⏸</button>
+          <button id="btn-mix-done">END DRILL</button>
+        </div>
+      </div>
+
+      <div class="drill-board-wrap">
+        <div id="mix-board"></div>
+      </div>
+
+      <!-- Digit rows — shown for count drills (checks / captures) -->
+      <div id="mix-count-panel" class="hidden">
+        <div class="answer-rows">
+          <div class="answer-row">
+            <span class="answer-label">W</span>
+            <div class="digit-buttons" id="mix-digits-w"></div>
+          </div>
+          <div class="answer-row">
+            <span class="answer-label">B</span>
+            <div class="digit-buttons" id="mix-digits-b"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drill-current-stats">
+        <span id="mix-timer">0:00</span>
+        <span id="mix-misses">Misses: 0</span>
+        <button id="btn-mix-done-click">DONE</button><!-- shown for click drills -->
+        <button id="btn-mix-show">SHOW</button>
+      </div>
+
+      <div id="mix-status" class="hg-status"></div>
+    </div>
+  </div>
+
+  <!-- ── Screen 11: de La Maza Spiral Vision ── -->
   <div id="screen-dlm" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">

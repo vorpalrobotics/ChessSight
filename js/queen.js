@@ -237,6 +237,19 @@ export function initQueenAttack(navigateFn) {
   document.getElementById('queen-board').addEventListener('click', handleBoardClick);
 }
 
+// Returns a single puzzle object for use by the Mix drill.
+export function generateQueenPuzzle() {
+  const pos = generatePosition();
+  return {
+    ...pos,
+    fen: buildFen(pos.queenSq, pos.kingSq, pos.pieceSq, pos.pieceType),
+    targets: new Set(pos.valid),
+    pieceSquares: new Set([pos.queenSq, pos.kingSq, pos.pieceSq]),
+    type: 'queen',
+    difficulty: scoreQueenDifficulty(pos),
+  };
+}
+
 export function startQueenAttack() {
   registerPause(stopTimer, startTimer);
   resetDrill();

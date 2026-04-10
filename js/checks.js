@@ -53,6 +53,20 @@ export function initChecks(navigateFn) {
   });
 }
 
+// Returns a single puzzle object for use by the Mix drill.
+export async function fetchChecksPuzzle() {
+  const { fen, puzzleId } = await fetchValidFen();
+  const movesW = getChecksForColor(fen, 'w');
+  const movesB = getChecksForColor(fen, 'b');
+  return {
+    fen, puzzleId, type: 'checks',
+    answerW: Math.min(movesW.length, 9),
+    answerB: Math.min(movesB.length, 9),
+    movesW, movesB,
+    difficulty: scoreChecksDifficulty(fen, movesW.length + movesB.length),
+  };
+}
+
 export async function startChecks() {
   registerPause(stopTimer, startTimer);
   resetDrill();
