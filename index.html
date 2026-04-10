@@ -231,7 +231,7 @@
 
     <div id="loose-status"></div>
     <div id="loose-result" class="hidden"></div>
-    <p class="drill-rule">A piece is loose when it has zero friendly defenders on its square. Kings are excluded. Click every loose piece you can find on the board — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
+    <p class="drill-rule">A piece is loose when it has zero friendly defenders. Kings are excluded. Click every loose piece — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
   </div>
 
   <!-- ── Screen 5: Underguarded drill ── -->
@@ -263,7 +263,7 @@
 
     <div id="under-status"></div>
     <div id="under-result" class="hidden"></div>
-    <p class="drill-rule">A piece is underguarded when enemy attackers ≥ friendly defenders (kings excluded). Click every underguarded piece — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
+    <p class="drill-rule">A piece is underguarded when attackers ≥ defenders (kings excluded). Click every underguarded piece — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
   </div>
 
   <!-- ── Screen 6: Threats drill — disabled, needs rethink ── -->
@@ -366,7 +366,7 @@
 
     <div id="knight-status"></div>
     <div id="knight-result" class="hidden"></div>
-    <p class="drill-rule">Route the white knight to the target square (◎) in as few moves as possible. White pawns block the knight's path. Black pawns are also impassable, and the knight cannot move into any square a black pawn attacks (the two diagonals in front of it). Click any reachable square — valid moves turn green with the step number, yellow once you exceed the optimal count. Re-tap your current square to undo the last move. Click SHOW to reveal an optimal solution. You score 1 miss per invalid click plus 1 miss per move beyond the shortest possible route. A ⭐ marks a perfect run.</p>
+    <p class="drill-rule">Route the white knight to the target square (◎) in as few moves as possible. White pawns block the knight's path. Black pawns may not be captured, and the knight cannot move into any square a black pawn attacks (the two diagonals in front of it). Click any reachable square — valid moves turn green with the step number, yellow once you exceed the optimal count. Re-tap your current square to undo the last move. Click SHOW to reveal an optimal solution. You score 1 miss per invalid click plus 1 miss per move beyond the shortest possible route. A ⭐ marks a perfect run.</p>
   </div>
 
   <!-- ── Screen 9: de La Maza Spiral Vision ── -->
@@ -432,7 +432,7 @@
         </div>
       </div>
     </div>
-    <p class="dlm-attribution">Inspired by <em>Rapid Chess Improvement</em> by Michael de la Maza.</p>
+    <p class="dlm-attribution">Inspired by the book <em>Rapid Chess Improvement</em> by Michael de la Maza.</p>
   </div>
 
   <!-- ── Screen 10: Move Discipline ── -->
@@ -459,7 +459,7 @@
         </div>
         <button id="btn-disc-start" class="disc-start-btn">START GAME</button>
       </div>
-      <p class="drill-rule">Before each move you must: (1) count checking moves for both sides, (2) count capturing moves for both sides, (3) click every loose piece, and (4) confirm you have considered candidates. BOOK skips the pre-move steps for your first 5 turns. When only one legal move exists it is made for you. Enter 0 where there are none — the habit matters.</p>
+      <p class="drill-rule">Before each move you must: (1) count checks for both sides, (2) count captures for both sides, (3) click every loose piece, and (4) confirm you have considered other threats and candidate moves. BOOK skips the pre-move steps for your first 5 turns, you can skip later if you feel the position has become trivial.</p>
     </div>
 
     <!-- Game area -->
@@ -521,9 +521,9 @@
       <!-- Candidates panel -->
       <div id="disc-panel-candidates" class="disc-panel hidden">
         <ul class="disc-candidates-list">
-          <li>Consider other kinds of threats for both sides.</li>
+          <li>Consider other kinds of threats for both sides: pawn kicks, discovered attacks, pins, skewers, mate threats, etc.</li>
           <li>Consider whether pieces on either side are trappable.</li>
-          <li>Choose your candidate moves and consider replies.</li>
+          <li>Choose your candidate moves and consider opponent replies.</li>
         </ul>
         <p class="disc-candidates-cta">WHEN DONE, MAKE YOUR MOVE</p>
       </div>
