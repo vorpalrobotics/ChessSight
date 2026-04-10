@@ -11,11 +11,12 @@ import { initQueenAttack, startQueenAttack } from './queen.js';
 import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
+import { initHangGrab, startHangGrab } from './hanggrab.js';
 import { getAllRecords, getDisciplineGames, exportAllData, importAllData } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -76,6 +77,11 @@ document.getElementById('mode-queen').addEventListener('click', () => {
 document.getElementById('mode-knight').addEventListener('click', () => {
   showScreen('screen-knight');
   startKnightRoute();
+});
+
+document.getElementById('mode-hanggrab').addEventListener('click', () => {
+  showScreen('screen-hanggrab');
+  startHangGrab();
 });
 
 document.getElementById('mode-dlm').addEventListener('click', () => {
@@ -744,5 +750,6 @@ initUnder(showScreen);
 // initThreats(showScreen);  // disabled
 initQueenAttack(showScreen);
 initKnightRoute(showScreen);
+initHangGrab(showScreen);
 initDeLaMaza(showScreen);
 initDiscipline(showScreen);

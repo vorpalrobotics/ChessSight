@@ -626,6 +626,55 @@ header h1 {
   pointer-events: none;
   animation: flash-red 0.6s ease-out forwards;
 }
+
+/* ── Hang Grab drill ── */
+.hg-sq-correct {
+  fill: rgba(39, 174, 96, 0.7);
+  stroke: #27ae60;
+  stroke-width: 2px;
+  pointer-events: none;
+}
+.hg-sq-wrong {
+  fill: rgba(220, 50, 50, 0.7);
+  stroke: #dc3232;
+  stroke-width: 2px;
+  pointer-events: none;
+}
+.hg-sq-reveal {
+  fill: rgba(39, 174, 96, 0.45);
+  stroke: #27ae60;
+  stroke-width: 2px;
+  pointer-events: none;
+}
+
+.hg-pass-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.hg-pass-btn {
+  padding: 0.45rem 1.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.hg-pass-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--text); }
+
+.hg-status {
+  text-align: center;
+  min-height: 1.4em;
+  font-size: 0.9rem;
+  color: var(--text);
+  padding: 0.3rem 1rem;
+  margin-top: 0.1rem;
+}
 .loose-continue-msg,
 .under-continue-msg,
 .disc-continue-msg {

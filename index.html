@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.9</title>
+  <title>ChessSight v0.1.10</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.9</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.10</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -101,6 +101,11 @@
         <span class="mode-icon">♛</span>
         <span class="mode-name">Queen Attack</span>
         <span class="mode-desc">Fork, skewer, or pin a rook, bishop, or knight</span>
+      </button>
+      <button class="mode-card" id="mode-hanggrab">
+        <span class="mode-icon">🎯</span>
+        <span class="mode-name">Hang Grab</span>
+        <span class="mode-desc">Spot the queen's best free capture — or PASS if there's nothing</span>
       </button>
       <button class="mode-card" id="mode-dlm">
         <span class="mode-icon">👁</span>
@@ -369,7 +374,40 @@
     <p class="drill-rule">Route the white knight to the target square (◎) in as few moves as possible. White pawns block the knight's path. Black pawns may not be captured, and the knight cannot move into any square a black pawn attacks (the two diagonals in front of it). Click any reachable square — valid moves turn green with the step number, yellow once you exceed the optimal count. Re-tap your current square to undo the last move. Click SHOW to reveal an optimal solution. You score 1 miss per invalid click plus 1 miss per move beyond the shortest possible route. A ⭐ marks a perfect run.</p>
   </div>
 
-  <!-- ── Screen 9: de La Maza Spiral Vision ── -->
+  <!-- ── Screen 9: Hang Grab drill ── -->
+  <div id="screen-hanggrab" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Hang Grab</h2>
+        <span id="hg-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <span id="hg-session-time" class="session-stat"></span>
+        <span id="hg-session-acc"  class="session-stat"></span>
+        <button class="drill-pause-btn">⏸</button>
+        <button id="btn-hg-done">END DRILL</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="hg-board"></div>
+    </div>
+
+    <div class="drill-current-stats">
+      <span id="hg-timer">0.0s</span>
+      <span id="hg-misses">Misses: 0</span>
+      <button id="btn-hg-show">SHOW</button>
+    </div>
+
+    <div class="hg-pass-row">
+      <button id="btn-hg-pass" class="hg-pass-btn">PASS — nothing to grab</button>
+    </div>
+
+    <div id="hg-status" class="hg-status"></div>
+    <p class="drill-rule">The white queen can freely capture a loose black piece — one it attacks that has no defenders. Click the highest-value loose piece the queen can take (rook=5, bishop=knight=3, pawn=1). If two equal pieces qualify, either is correct. Click PASS if no free capture exists. No kings — this is a pattern drill.</p>
+  </div>
+
+  <!-- ── Screen 10: de La Maza Spiral Vision ── -->
   <div id="screen-dlm" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
