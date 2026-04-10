@@ -388,7 +388,7 @@ function handleBoardClick(e) {
       looseMs += Date.now() - phaseStartTime;
       looseTotal++;
       flashFoundSquares();
-      setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 2000);
+      setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 1500);
     }
   } else {
     looseMisses++;
@@ -414,7 +414,7 @@ function looseDone() {
   }
   if (missed === 0) {
     flashFoundSquares();
-    setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 2000);
+    setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 1500);
   } else {
     setFeedback(`${missed} loose piece${missed !== 1 ? 's' : ''} missed — click board to continue.`, 'error');
     showContinueMsg();
@@ -696,14 +696,14 @@ function maybeAutoAdvance(key) {
     if (checksFirstAttempt) checksFirstTry++;
     pulseCorrectButtons('disc-checks-w-digits');
     pulseCorrectButtons('disc-checks-b-digits');
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 2000);
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, checksFirstAttempt ? 1500 : 2000);
   } else {
     if (selectedCapturesW === null || selectedCapturesB === null) return;
     capturesMs += Date.now() - phaseStartTime;
     if (capsFirstAttempt) capsFirstTry++;
     pulseCorrectButtons('disc-captures-w-digits');
     pulseCorrectButtons('disc-captures-b-digits');
-    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, 2000);
+    setTimeout(() => { if (isGameActive) enterPhase(PHASE.LOOSE); }, capsFirstAttempt ? 1500 : 2000);
   }
 }
 
