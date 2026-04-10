@@ -1655,6 +1655,9 @@ button:disabled {
 .disc-digit-btn.selected { background: #3a9fd0; border-color: #3a9fd0; color: #fff; }
 .disc-digit-btn.correct  { background: #27ae60; border-color: #27ae60; color: #fff; }
 .disc-digit-btn.wrong    { background: #8b1a2a; border-color: #dc3232; color: #fff; }
+/* prevent hover from overriding feedback colors */
+.disc-digit-btn.correct:hover { background: #27ae60; border-color: #27ae60; }
+.disc-digit-btn.wrong:hover   { background: #8b1a2a; border-color: #dc3232; }
 
 @keyframes disc-correct-pulse {
   0%, 100% { background: #27ae60; border-color: #27ae60; box-shadow: none; }

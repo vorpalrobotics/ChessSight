@@ -98,6 +98,7 @@ let looseTotal  = 0;
 let phaseStartTime = 0;
 let checksMs = 0, capturesMs = 0, looseMs = 0;
 let waitingLooseContinue = false;
+let looseComplete = false;   // true once auto-advance fires from handleBoardClick
 let discPauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -270,7 +271,7 @@ function startPlayerTurn() {
     return;
   }
 
-  updateBookBtn(playerTurnCount <= 5);
+  updateBookBtn(true);
   enterPhase(PHASE.CHECKS);
 }
 
@@ -303,6 +304,8 @@ function enterPhase(phase) {
     phaseStartTime = Date.now();
 
   } else if (phase === PHASE.LOOSE) {
+    looseComplete = false;
+    if (turnLooseSqs.size === 0) { enterPhase(PHASE.CANDIDATES); return; }
     showPanel('loose');
     setPhaseIndicator('STEP 3 / 4 — LOOSE PIECES');
     setFeedback('');
@@ -368,6 +371,13 @@ function handleBoardClick(e) {
   if (turnLooseSqs.has(sq)) {
     foundLooseSqs.add(sq);
     drawSqMark(sq, 'loose-sq-found');
+    if (foundLooseSqs.size === turnLooseSqs.size) {
+      looseComplete = true;
+      looseMs += Date.now() - phaseStartTime;
+      looseTotal++;
+      flashFoundSquares();
+      setTimeout(() => { if (isGameActive) { clearSqMarks(); enterPhase(PHASE.CANDIDATES); } }, 2000);
+    }
   } else {
     looseMisses++;
     flashSqMark(sq);
@@ -383,7 +393,7 @@ function looseDone() {
     if (isGameActive) enterPhase(PHASE.CANDIDATES);
     return;
   }
-  if (currentPhase !== PHASE.LOOSE) return;
+  if (looseComplete || currentPhase !== PHASE.LOOSE) return;
   looseMs += Date.now() - phaseStartTime;
   looseTotal++;
   let missed = 0;
@@ -412,7 +422,7 @@ function candidatesDone() { enterPhase(PHASE.MOVE); }
 // ─── BOOK & Resign ────────────────────────────────────────────────────────────
 
 function useBook() {
-  if (playerTurnCount > 5 || !isGameActive) return;
+  if (!isGameActive) return;
   bookMoves++;
   enterMovePhase();
 }
@@ -599,7 +609,9 @@ function setFeedback(text, type = '') {
 }
 
 function updateBookBtn(show) {
-  document.getElementById('btn-disc-book').classList.toggle('hidden', !show);
+  const btn = document.getElementById('btn-disc-book');
+  btn.classList.toggle('hidden', !show);
+  if (show) btn.textContent = playerTurnCount <= 5 ? 'BOOK' : 'SKIP';
 }
 
 // ─── Digit button rows ────────────────────────────────────────────────────────
