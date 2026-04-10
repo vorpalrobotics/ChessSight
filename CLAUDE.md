@@ -5,16 +5,21 @@ Chess training web app deployed at vorpalrobotics.github.io/ChessSight.
 Static site (HTML/CSS/ES modules), no build step. GitHub Pages serves from `main`.
 
 ## Version number
-`index.html` has `<title>ChessSight vN</title>`.
-**Increment N by 1 before every commit.** This lets the user verify GitHub Pages
+`index.html` has `<title>ChessSight vX.Y.Z</title>`.
+**Update the version before every commit.** This lets the user verify GitHub Pages
 has deployed the latest version by checking the browser tab title.
 Current version after the most recent commit is tracked in this file:
 
-**Current version: v0.0.97**
+**Current version: v0.1.0**
 
 ## Version format
-Version is `v0.0.N` where N increments by 1 each commit. Update both
-`<title>ChessSight vX.X.N</title>` and `<span class="version-label">vX.X.N</span>` in index.html.
+Version is `v0.MAJOR.MINOR` derived from the git commit count N:
+- MAJOR = floor(N / 100)
+- MINOR = N mod 100
+
+So commit 100 → v0.1.0, commit 150 → v0.1.50, commit 200 → v0.2.0.
+Get the commit count with: `git rev-list --count HEAD`
+Update both `<title>ChessSight vX.Y.Z</title>` and `<span class="version-label">vX.Y.Z</span>` in index.html.
 
 ## Commit & push discipline
 - Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
