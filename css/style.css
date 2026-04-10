@@ -1474,6 +1474,13 @@ button:disabled {
   text-align: center;
 }
 
+.disc-incheck-msg {
+  font-size: 0.95rem;
+  color: var(--accent);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
 .disc-elo-label {
   font-size: 0.8rem;
   color: var(--text-muted);

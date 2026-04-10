@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.0.96</title>
+  <title>ChessSight v0.0.97</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.0.96</span>
+      <h1>ChessSight</h1><span class="version-label">v0.0.97</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-pause" class="hidden" aria-label="Pause">⏸</button>
@@ -475,14 +475,17 @@
       <!-- Checks panel -->
       <div id="disc-panel-checks" class="disc-panel hidden">
         <p class="disc-panel-q">COUNT CHECKS</p>
-        <div class="disc-answer-row">
-          <span class="disc-side-label disc-white-lbl">White</span>
-          <div class="disc-digits" id="disc-checks-w-digits"></div>
+        <div id="disc-checks-rows">
+          <div class="disc-answer-row">
+            <span class="disc-side-label disc-white-lbl">White</span>
+            <div class="disc-digits" id="disc-checks-w-digits"></div>
+          </div>
+          <div class="disc-answer-row">
+            <span class="disc-side-label disc-black-lbl">Black</span>
+            <div class="disc-digits" id="disc-checks-b-digits"></div>
+          </div>
         </div>
-        <div class="disc-answer-row">
-          <span class="disc-side-label disc-black-lbl">Black</span>
-          <div class="disc-digits" id="disc-checks-b-digits"></div>
-        </div>
+        <p id="disc-checks-incheck-msg" class="disc-incheck-msg hidden"></p>
         <button id="btn-disc-checks-submit" class="disc-submit-btn hidden" disabled>SUBMIT</button>
       </div>
 

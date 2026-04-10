@@ -282,7 +282,6 @@ function enterPhase(phase) {
   clearSqMarks();
 
   if (phase === PHASE.CHECKS) {
-    checksTotal++;
     checksFirstAttempt = true;
     selectedChecksW = selectedChecksB = null;
     resetDigitRow('disc-checks-w-digits');
@@ -290,7 +289,19 @@ function enterPhase(phase) {
     document.getElementById('btn-disc-checks-submit').disabled = true;
     showPanel('checks');
     setPhaseIndicator('STEP 1 / 4 — COUNT CHECKS');
-    phaseStartTime = Date.now();
+
+    const inCheck = chess.inCheck();
+    document.getElementById('disc-checks-rows').classList.toggle('hidden', inCheck);
+    const inCheckMsg = document.getElementById('disc-checks-incheck-msg');
+    if (inCheck) {
+      inCheckMsg.textContent = `${playerSide === 'w' ? 'White' : 'Black'} is already in check`;
+      inCheckMsg.classList.remove('hidden');
+      setTimeout(() => { if (isGameActive) enterPhase(PHASE.CAPTURES); }, 1500);
+    } else {
+      checksTotal++;
+      inCheckMsg.classList.add('hidden');
+      phaseStartTime = Date.now();
+    }
 
   } else if (phase === PHASE.CAPTURES) {
     capsTotal++;
@@ -621,7 +632,7 @@ function buildDigitRow(containerId, key) {
   for (let d = 0; d <= 9; d++) {
     const btn = document.createElement('button');
     btn.className = 'disc-digit-btn';
-    btn.textContent = d;
+    btn.textContent = d < 9 ? String(d) : '9+';
     btn.addEventListener('click', () => onDigitClick(key, d, btn));
     container.appendChild(btn);
   }
@@ -636,7 +647,9 @@ function onDigitClick(key, digit, btn) {
   const correctAnswer = key === 'cw' ? turnChecksW   : key === 'cb' ? turnChecksB
                       : key === 'pw' ? turnCapturesW : turnCapturesB;
 
-  if (digit === correctAnswer) {
+  // '9+' button matches any answer >= 9
+  const isCorrect = digit === 9 ? correctAnswer >= 9 : digit === correctAnswer;
+  if (isCorrect) {
     btn.classList.add('correct');
     if      (key === 'cw') selectedChecksW   = digit;
     else if (key === 'cb') selectedChecksB   = digit;
