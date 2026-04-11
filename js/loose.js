@@ -117,6 +117,7 @@ async function loadNextPuzzle() {
     board.setPosition(currentFen, false);
   }
 
+  updateSessionStats();
   setStatus('');
   puzzleActive = true;
   startTimer();
@@ -245,14 +246,6 @@ function finishPuzzle() {
   upsertDrillDay('loose', { seconds, correct, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
 
-  const el = document.getElementById('loose-result');
-  if (total === 0) {
-    el.textContent = `✓ ${formatTime(seconds)} · No loose pieces · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  } else {
-    el.textContent = `✓ ${formatTime(seconds)} · ${correct}/${total} found · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  }
-  el.classList.remove('hidden');
-
   drawContinueMsg();
   document.getElementById('btn-loose-complete').textContent = 'CONTINUE';
   waitingToAdvance = true;
@@ -358,6 +351,7 @@ function updateSessionStats() {
   const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('loose-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
   document.getElementById('loose-session-acc').textContent  = `Acc ${accuracy}%`;
+  document.getElementById('loose-session-stats').classList.remove('hidden');
 }
 
 // --- Summary ---
@@ -403,6 +397,7 @@ function resetDrill() {
   puzzleQueue = [];
   document.getElementById('loose-session-time').textContent = '';
   document.getElementById('loose-session-acc').textContent  = '';
+  document.getElementById('loose-session-stats').classList.add('hidden');
 }
 
 function resetUI() {
@@ -411,10 +406,7 @@ function resetUI() {
   clearAllMarks();
   document.getElementById('loose-timer').textContent   = '0:00';
   document.getElementById('loose-misses').textContent  = 'Misses: 0';
-  document.getElementById('btn-loose-complete').textContent = 'COMPLETE';
-  const result = document.getElementById('loose-result');
-  result.classList.add('hidden');
-  result.textContent = '';
+  document.getElementById('btn-loose-complete').textContent = 'DONE';
 }
 
 function setStatus(msg) {
