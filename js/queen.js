@@ -227,6 +227,7 @@ let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
+let autoSummaryTimer = null;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -266,6 +267,11 @@ function fillQueue() {
 // ─── Puzzle loading ───────────────────────────────────────────────────────────
 
 function loadNextPuzzle() {
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) {
+    showSummary();
+    return;
+  }
   stopTimer();
   resetUI();
   puzzleCount++;
@@ -353,6 +359,10 @@ function finishPuzzle() {
 
   if (missed.length > 0) {
     missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
+    const limit = getPositionsPerDrill();
+    if (limit !== null && drillResults.length >= limit) {
+      autoSummaryTimer = setTimeout(showSummary, 1000);
+    }
     drawContinueMsg();
     waitingToAdvance = true;
   } else {
@@ -426,7 +436,14 @@ function updateSessionStats() {
 
 // ─── Summary ──────────────────────────────────────────────────────────────────
 
+function getPositionsPerDrill() {
+  const el = document.getElementById('select-positions-per-drill');
+  if (!el || el.value === 'unlimited') return null;
+  return parseInt(el.value, 10);
+}
+
 function showSummary() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   stopTimer();
   document.getElementById('btn-summary-again').onclick = restartDrill;
   const count = drillResults.length;
@@ -462,6 +479,7 @@ function showDifficulty(id, score) {
 }
 
 function resetDrill() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
