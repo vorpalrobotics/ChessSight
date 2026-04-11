@@ -234,6 +234,7 @@ function loadNextPuzzle() {
   // Draw target after board has rendered
   requestAnimationFrame(() => drawTargetSquare(pos.targetSq));
 
+  updateSessionStats();
   puzzleActive = true;
   startTimer();
 }
@@ -307,14 +308,6 @@ function finishPuzzle() {
     puzzleId: `${currentStartSq}-${currentTargetSq}` });
   updateSessionStats();
 
-  const el = document.getElementById('knight-result');
-  let msg = `✓ ${formatTime(seconds)} · ${pathLen} moves`;
-  if (pathLen !== currentOptimalDist) msg += ` (optimal: ${currentOptimalDist})`;
-  msg += ` · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  if (isOptimal) msg += ' ⭐';
-  el.textContent = msg;
-  el.classList.remove('hidden');
-
   drawContinueMsg();
   waitingToAdvance = true;
 }
@@ -354,12 +347,7 @@ function handleShow() {
     puzzleId: `${currentStartSq}-${currentTargetSq}` });
   updateSessionStats();
 
-  const el = document.getElementById('knight-result');
-  el.textContent = `${formatTime(seconds)} · ${correct}/${currentOptimalDist} moves found · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  el.classList.remove('hidden');
-
   drawContinueMsg();
-  document.getElementById('btn-knight-show').textContent = 'CONTINUE';
   waitingToAdvance = true;
 }
 
@@ -522,6 +510,7 @@ function updateSessionStats() {
   const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('knight-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
   document.getElementById('knight-session-acc').textContent  = `Acc ${accuracy}%`;
+  document.getElementById('knight-session-stats').classList.remove('hidden');
 }
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
@@ -567,6 +556,7 @@ function resetDrill() {
   puzzleQueue = [];
   document.getElementById('knight-session-time').textContent = '';
   document.getElementById('knight-session-acc').textContent  = '';
+  document.getElementById('knight-session-stats').classList.add('hidden');
 }
 
 function resetUI() {
@@ -576,9 +566,6 @@ function resetUI() {
   document.getElementById('knight-timer').textContent  = '0:00';
   document.getElementById('knight-misses').textContent = 'Misses: 0';
   document.getElementById('btn-knight-show').textContent = 'SHOW';
-  const result = document.getElementById('knight-result');
-  result.classList.add('hidden');
-  result.textContent = '';
 }
 
 function startTimer() {

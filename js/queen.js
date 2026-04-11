@@ -294,6 +294,7 @@ function loadNextPuzzle() {
 
   if (currentValid.length === 0) setStatus('No valid squares for this position.');
 
+  updateSessionStats();
   puzzleActive = true;
   startTimer();
 }
@@ -350,14 +351,9 @@ function finishPuzzle() {
   upsertDrillDay('queen', { seconds, correct: found, misses, puzzleId: `${currentQueenSq}-${currentKingSq}-${currentPieceSq}-${currentPieceType}` });
   updateSessionStats();
 
-  const el = document.getElementById('queen-result');
-  el.textContent = `✓ ${formatTime(seconds)} · ${found}/${total} squares · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  el.classList.remove('hidden');
-
   if (missed.length > 0) {
     missed.forEach(sq => drawMark(sq, 'queen-sq-missed'));
     drawContinueMsg();
-    document.getElementById('btn-queen-complete').textContent = 'CONTINUE';
     waitingToAdvance = true;
   } else {
     loadNextPuzzle();
@@ -425,6 +421,7 @@ function updateSessionStats() {
   const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('queen-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
   document.getElementById('queen-session-acc').textContent  = `Acc ${accuracy}%`;
+  document.getElementById('queen-session-stats').classList.remove('hidden');
 }
 
 // ─── Summary ──────────────────────────────────────────────────────────────────
@@ -470,6 +467,7 @@ function resetDrill() {
   puzzleQueue = [];
   document.getElementById('queen-session-time').textContent = '';
   document.getElementById('queen-session-acc').textContent  = '';
+  document.getElementById('queen-session-stats').classList.add('hidden');
 }
 
 function resetUI() {
@@ -480,11 +478,8 @@ function resetUI() {
   clearMarks();
   document.getElementById('queen-timer').textContent    = '0:00';
   document.getElementById('queen-misses').textContent   = 'Misses: 0';
-  document.getElementById('btn-queen-complete').textContent = 'COMPLETE';
+  document.getElementById('btn-queen-complete').textContent = 'DONE';
   setStatus('');
-  const result = document.getElementById('queen-result');
-  result.classList.add('hidden');
-  result.textContent = '';
 }
 
 function setStatus(msg) {

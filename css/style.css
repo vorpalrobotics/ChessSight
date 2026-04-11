@@ -879,7 +879,7 @@ header h1 {
   min-height: 1em;
 }
 
-#forks-result, #queen-result, #knight-result {
+#forks-result {
   font-size: 1rem;
   font-weight: 700;
   color: #27ae60;
