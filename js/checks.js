@@ -318,6 +318,7 @@ function updateSessionStats() {
   const avgSecs = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('checks-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
   document.getElementById('checks-session-acc').textContent = `Acc ${accuracy}%`;
+  document.getElementById('checks-session-stats').classList.remove('hidden');
 }
 
 // --- Summary ---
@@ -379,6 +380,7 @@ function resetDrill() {
   puzzleQueue = [];
   document.getElementById('checks-session-time').textContent = '';
   document.getElementById('checks-session-acc').textContent = '';
+  document.getElementById('checks-session-stats').classList.add('hidden');
 }
 
 function resetUI() {

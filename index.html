@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.14</title>
+  <title>ChessSight v0.1.15</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.14</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.15</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -163,7 +163,8 @@
 
     <div id="checks-status"></div>
     <button id="btn-checks-next">NEXT ›</button>
-    <div class="drill-session-stats">
+    <div id="checks-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
       <span id="checks-session-time" class="session-stat"></span>
       <span id="checks-session-acc" class="session-stat"></span>
     </div>
@@ -207,7 +208,8 @@
 
     <div id="captures-status"></div>
     <button id="btn-captures-next">NEXT ›</button>
-    <div class="drill-session-stats">
+    <div id="captures-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
       <span id="captures-session-time" class="session-stat"></span>
       <span id="captures-session-acc" class="session-stat"></span>
     </div>

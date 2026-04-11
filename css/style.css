@@ -888,8 +888,23 @@ header h1 {
 
 .drill-session-stats {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   justify-content: center;
+  align-items: baseline;
+  font-size: 1rem;
+  font-family: monospace;
+  color: var(--text-muted);
+}
+
+.drill-session-stats .session-stat {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.session-label {
+  font-size: 1rem;
+  font-family: monospace;
+  color: var(--text-muted);
 }
 
 #btn-checks-next, #btn-captures-next, #btn-threats-next {
