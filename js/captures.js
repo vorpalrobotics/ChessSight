@@ -39,6 +39,7 @@ let showingCaptures = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;       // injected by app.js for screen transitions
 let puzzleQueue = [];
+let autoSummaryTimer = null;
 
 // --- Public API ---
 
@@ -318,6 +319,17 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('captures', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) {
+    document.getElementById('btn-captures-next').disabled = true;
+    autoSummaryTimer = setTimeout(showSummary, 800);
+  }
+}
+
+function getPositionsPerDrill() {
+  const el = document.getElementById('select-positions-per-drill');
+  if (!el || el.value === 'unlimited') return null;
+  return parseInt(el.value, 10);
 }
 
 function updateSessionStats() {
@@ -335,6 +347,7 @@ function updateSessionStats() {
 // --- Summary ---
 
 function showSummary() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   stopTimer();
   // Wire "Play Again" to this drill's restart so the shared summary screen works for both drills
   document.getElementById('btn-summary-again').onclick = restartDrill;
@@ -387,9 +400,11 @@ function showDifficulty(id, score) {
 }
 
 function resetDrill() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
+  document.getElementById('btn-captures-next').disabled = false;
   document.getElementById('captures-session-time').textContent = '';
   document.getElementById('captures-session-acc').textContent = '';
   document.getElementById('captures-session-stats').classList.add('hidden');
