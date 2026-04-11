@@ -866,18 +866,30 @@ header h1 {
   transition: none;
 }
 
-#checks-status, #captures-status, #loose-status, #under-status, #forks-status, #queen-status, #knight-status {
+#checks-status, #captures-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+#loose-status, #under-status, #forks-status, #queen-status, #knight-status {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
   min-height: 1em;
 }
 
-#checks-result, #captures-result, #loose-result, #under-result, #forks-result, #queen-result, #knight-result {
+#loose-result, #under-result, #forks-result, #queen-result, #knight-result {
   font-size: 1rem;
   font-weight: 700;
   color: #27ae60;
   text-align: center;
+}
+
+.drill-session-stats {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
 }
 
 #btn-checks-next, #btn-captures-next, #btn-threats-next {

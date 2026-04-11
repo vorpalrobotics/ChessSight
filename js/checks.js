@@ -305,9 +305,6 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
-  const el = document.getElementById('checks-result');
-  el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  el.classList.remove('hidden');
 }
 
 // --- Session stats (shown above the board during subsequent puzzles) ---
@@ -390,9 +387,6 @@ function resetUI() {
   hideChecks();
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
-  const result = document.getElementById('checks-result');
-  result.classList.add('hidden');
-  result.textContent = '';
   document.querySelectorAll('#screen-checks .digit-btn').forEach(b =>
     b.classList.remove('correct', 'incorrect')
   );

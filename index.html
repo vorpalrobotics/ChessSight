@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.13</title>
+  <title>ChessSight v0.1.14</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.13</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.14</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -135,8 +135,6 @@
         <span id="checks-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
-        <span id="checks-session-time" class="session-stat"></span>
-        <span id="checks-session-acc" class="session-stat"></span>
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-checks-done">END DRILL</button>
       </div>
@@ -164,8 +162,11 @@
     </div>
 
     <div id="checks-status"></div>
-    <div id="checks-result" class="hidden"></div>
     <button id="btn-checks-next">NEXT ›</button>
+    <div class="drill-session-stats">
+      <span id="checks-session-time" class="session-stat"></span>
+      <span id="checks-session-acc" class="session-stat"></span>
+    </div>
     <p class="drill-rule">Count all moves that put the opponent's king in check, including discovered checks. Pawn promotions to the same square count as one move — if any promotion piece gives check, that square counts once.</p>
   </div>
 
@@ -178,8 +179,6 @@
         <span id="captures-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
-        <span id="captures-session-time" class="session-stat"></span>
-        <span id="captures-session-acc" class="session-stat"></span>
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-captures-done">END DRILL</button>
       </div>
@@ -207,8 +206,11 @@
     </div>
 
     <div id="captures-status"></div>
-    <div id="captures-result" class="hidden"></div>
     <button id="btn-captures-next">NEXT ›</button>
+    <div class="drill-session-stats">
+      <span id="captures-session-time" class="session-stat"></span>
+      <span id="captures-session-acc" class="session-stat"></span>
+    </div>
     <p class="drill-rule">Count all moves that take an enemy piece, including en passant. Pawn promotions by capture to the same square count as one capture — the promotion piece choice does not matter.</p>
   </div>
 

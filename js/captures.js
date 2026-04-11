@@ -317,9 +317,6 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('captures', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
-  const el = document.getElementById('captures-result');
-  el.textContent = `✓ ${formatTime(seconds)} · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  el.classList.remove('hidden');
 }
 
 function updateSessionStats() {
@@ -401,9 +398,6 @@ function resetUI() {
   hideCaptures();
   document.getElementById('captures-timer').textContent = '0:00';
   document.getElementById('captures-misses').textContent = 'Misses: 0';
-  const result = document.getElementById('captures-result');
-  result.classList.add('hidden');
-  result.textContent = '';
   document.querySelectorAll('#screen-captures .digit-btn').forEach(b =>
     b.classList.remove('correct', 'incorrect')
   );
