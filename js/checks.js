@@ -124,6 +124,7 @@ async function loadNextPuzzle() {
     board.setPosition(currentFen, false);
   }
 
+  updateSessionStats();
   setStatus('');
   puzzleActive = true;
   startTimer();
