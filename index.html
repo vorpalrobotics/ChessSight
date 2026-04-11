@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.19</title>
+  <title>ChessSight v0.1.20</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.19</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.20</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -259,8 +259,6 @@
         <span id="under-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
-        <span id="under-session-time" class="session-stat"></span>
-        <span id="under-session-acc" class="session-stat"></span>
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-under-done">END DRILL</button>
       </div>
@@ -273,13 +271,17 @@
     <div class="drill-current-stats">
       <span id="under-timer">0:00</span>
       <span id="under-misses">Misses: 0</span>
-      <button id="btn-under-complete">COMPLETE</button>
+      <button id="btn-under-complete">DONE</button>
       <button id="btn-under-show">SHOW</button>
     </div>
 
     <div id="under-status"></div>
-    <div id="under-result" class="hidden"></div>
-    <p class="drill-rule">A piece is underguarded when attackers ≥ defenders (kings excluded). Click every underguarded piece — both colors. Click a marked piece again to un-mark it. Click COMPLETE when done or SHOW to reveal the answer.</p>
+    <div id="under-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
+      <span id="under-session-time" class="session-stat"></span>
+      <span id="under-session-acc" class="session-stat"></span>
+    </div>
+    <p class="drill-rule">A piece is underguarded when attackers ≥ defenders (kings excluded). Click every underguarded piece — both colors. Click a marked piece again to un-mark it. Click DONE when done or SHOW to reveal the answer.</p>
   </div>
 
   <!-- ── Screen 6: Threats drill — disabled, needs rethink ── -->

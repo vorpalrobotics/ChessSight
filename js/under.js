@@ -117,6 +117,7 @@ async function loadNextPuzzle() {
     board.setPosition(currentFen, false);
   }
 
+  updateSessionStats();
   setStatus('');
   puzzleActive = true;
   startTimer();
@@ -248,16 +249,7 @@ function finishPuzzle() {
   upsertDrillDay('under', { seconds, correct, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
 
-  const el = document.getElementById('under-result');
-  if (total === 0) {
-    el.textContent = `✓ ${formatTime(seconds)} · None underguarded · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  } else {
-    el.textContent = `✓ ${formatTime(seconds)} · ${correct}/${total} found · ${misses} miss${misses !== 1 ? 'es' : ''}`;
-  }
-  el.classList.remove('hidden');
-
   drawContinueMsg();
-  document.getElementById('btn-under-complete').textContent = 'CONTINUE';
   waitingToAdvance = true;
 }
 
@@ -361,6 +353,7 @@ function updateSessionStats() {
   const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / count);
   document.getElementById('under-session-time').textContent = `Avg ${formatTime(avgSecs)}`;
   document.getElementById('under-session-acc').textContent  = `Acc ${accuracy}%`;
+  document.getElementById('under-session-stats').classList.remove('hidden');
 }
 
 // --- Summary ---
@@ -406,6 +399,7 @@ function resetDrill() {
   puzzleQueue = [];
   document.getElementById('under-session-time').textContent = '';
   document.getElementById('under-session-acc').textContent  = '';
+  document.getElementById('under-session-stats').classList.add('hidden');
 }
 
 function resetUI() {
@@ -414,10 +408,7 @@ function resetUI() {
   clearAllMarks();
   document.getElementById('under-timer').textContent   = '0:00';
   document.getElementById('under-misses').textContent  = 'Misses: 0';
-  document.getElementById('btn-under-complete').textContent = 'COMPLETE';
-  const result = document.getElementById('under-result');
-  result.classList.add('hidden');
-  result.textContent = '';
+  document.getElementById('btn-under-complete').textContent = 'DONE';
 }
 
 function setStatus(msg) {
