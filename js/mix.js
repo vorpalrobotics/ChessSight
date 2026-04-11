@@ -52,6 +52,12 @@ const drillResults = [];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+function getPositionsPerDrill() {
+  const el = document.getElementById('select-positions-per-drill');
+  if (!el || el.value === 'unlimited') return null;
+  return parseInt(el.value, 10);
+}
+
 export function initMix(navigateFn) {
   navigate = navigateFn;
 
@@ -105,6 +111,11 @@ function startSession() {
 // ─── Puzzle lifecycle ─────────────────────────────────────────────────────────
 
 async function loadNextPuzzle() {
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) {
+    endSession();
+    return;
+  }
   puzzleActive = false;
   waitingToAdvance = false;
   showingAnswers = false;

@@ -193,6 +193,7 @@ let puzzleCount = 0;
 let sessionMisses = 0;
 const drillResults = [];
 let pauseStart = 0;
+let autoAdvanceTimer = null;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -208,12 +209,15 @@ export function generateHangGrabPuzzle() {
   };
 }
 
+function getPositionsPerDrill() {
+  const el = document.getElementById('select-positions-per-drill');
+  if (!el || el.value === 'unlimited') return null;
+  return parseInt(el.value, 10);
+}
+
 export function initHangGrab(navigateFn) {
   navigate = navigateFn;
-  document.getElementById('btn-hg-done').addEventListener('click', () => {
-    endDrill();
-    navigate('screen-select');
-  });
+  document.getElementById('btn-hg-done').addEventListener('click', showSummary);
   document.getElementById('btn-hg-pass').addEventListener('click', handlePass);
   document.getElementById('btn-hg-show').addEventListener('click', handleShow);
   document.getElementById('hg-board').addEventListener('click', handleBoardClick);
@@ -221,6 +225,7 @@ export function initHangGrab(navigateFn) {
 
 export function startHangGrab() {
   registerPause(pauseDrill, resumeDrill);
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount = 0;
   sessionMisses = 0;
   drillResults.length = 0;
@@ -243,6 +248,11 @@ export function startHangGrab() {
 // ─── Puzzle lifecycle ─────────────────────────────────────────────────────────
 
 function loadPuzzle() {
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) {
+    showSummary();
+    return;
+  }
   puzzleActive = false;
   stopTimer();
   clearOverlays();
@@ -290,7 +300,7 @@ function handleBoardClick(e) {
       // All free captures found — complete puzzle
       const elapsed = finishPuzzle(true);
       setStatus(firstTryThisPuzzle ? `✓  ${elapsed}s` : `Found all  ${elapsed}s`);
-      setTimeout(loadPuzzle, 1500);
+      autoAdvanceTimer = setTimeout(loadPuzzle, 1500);
     }
   } else {
     // Wrong click — defended or unreachable piece; flash red transiently
@@ -307,13 +317,13 @@ function handlePass() {
     // Correct — nothing was free to grab
     const elapsed = finishPuzzle(true);
     setStatus(`✓ Nothing to grab!  ${elapsed}s`);
-    setTimeout(loadPuzzle, 1500);
+    autoAdvanceTimer = setTimeout(loadPuzzle, 1500);
   } else {
     // Wrong — free captures were available
     finishPuzzle(false);
     validTargets.filter(t => !foundTargetSqs.has(t.sq)).forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
     setStatus('There were free captures — see highlights.');
-    setTimeout(loadPuzzle, 2000);
+    autoAdvanceTimer = setTimeout(loadPuzzle, 2000);
   }
 }
 
@@ -327,7 +337,7 @@ function handleShow() {
     unfound.forEach(t => drawSqOverlay(t.sq, 'hg-sq-reveal'));
     setStatus(unfound.length > 0 ? 'Free capture(s) shown.' : 'All found already!');
   }
-  setTimeout(loadPuzzle, 2000);
+  autoAdvanceTimer = setTimeout(loadPuzzle, 2000);
 }
 
 // Stops timer, records result, updates stats. Returns elapsed string.
@@ -359,6 +369,29 @@ function resumeDrill() {
   if (!puzzleActive) return;
   puzzleStartTime += Date.now() - pauseStart;
   startTimer();
+}
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+
+function showSummary() {
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  endDrill();
+
+  document.getElementById('btn-summary-again').onclick = () => navigate('screen-hanggrab');
+
+  const n = drillResults.length;
+  document.getElementById('stat-count').textContent = n;
+  if (n > 0) {
+    const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
+    const avgSecs = drillResults.reduce((s, r) => s + r.seconds, 0) / n;
+    const accuracy = Math.round(totalCorrect / n * 100);
+    document.getElementById('stat-avg-time').textContent = `${avgSecs.toFixed(1)}s`;
+    document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+  } else {
+    document.getElementById('stat-avg-time').textContent = '—';
+    document.getElementById('stat-accuracy').textContent = '—';
+  }
+  navigate('screen-summary');
 }
 
 // ─── End drill ────────────────────────────────────────────────────────────────
