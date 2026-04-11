@@ -120,9 +120,11 @@ document.getElementById('btn-hamburger').addEventListener('click', (e) => {
   hamburgerDropdown.classList.toggle('hidden');
 });
 
-// Close dropdown when clicking anywhere else
-document.addEventListener('click', () => {
-  hamburgerDropdown.classList.add('hidden');
+// Close dropdown when clicking outside the hamburger menu
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.hamburger-menu')) {
+    hamburgerDropdown.classList.add('hidden');
+  }
 });
 
 // --- Settings modal ---
