@@ -125,6 +125,22 @@ document.addEventListener('click', () => {
   hamburgerDropdown.classList.add('hidden');
 });
 
+// --- Settings modal ---
+const modalSettings = document.getElementById('modal-settings');
+
+document.getElementById('btn-settings').addEventListener('click', () => {
+  hamburgerDropdown.classList.add('hidden');
+  modalSettings.classList.remove('hidden');
+});
+
+document.getElementById('btn-settings-close').addEventListener('click', () => {
+  modalSettings.classList.add('hidden');
+});
+
+modalSettings.addEventListener('click', (e) => {
+  if (e.target === modalSettings) modalSettings.classList.add('hidden');
+});
+
 // --- About modal ---
 const modalAbout = document.getElementById('modal-about');
 
