@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.21</title>
+  <title>ChessSight v0.1.22</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.21</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.22</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -399,8 +399,6 @@
         <span id="hg-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <span id="hg-session-time" class="session-stat"></span>
-        <span id="hg-session-acc"  class="session-stat"></span>
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-hg-done">END DRILL</button>
       </div>
@@ -421,6 +419,11 @@
     </div>
 
     <div id="hg-status" class="hg-status"></div>
+    <div id="hg-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
+      <span id="hg-session-time" class="session-stat"></span>
+      <span id="hg-session-acc"  class="session-stat"></span>
+    </div>
     <p class="drill-rule">The white queen can freely capture a loose black piece — one it attacks that has no defenders. Click the highest-value loose piece the queen can take (rook=5, bishop=knight=3, pawn=1). If two equal pieces qualify, either is correct. Click PASS if no free capture exists. No kings — this is a pattern drill.</p>
   </div>
 

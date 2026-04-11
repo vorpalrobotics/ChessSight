@@ -226,6 +226,7 @@ export function startHangGrab() {
   drillResults.length = 0;
   document.getElementById('hg-session-time').textContent = '';
   document.getElementById('hg-session-acc').textContent  = '';
+  document.getElementById('hg-session-stats').classList.add('hidden');
   document.getElementById('hg-misses').textContent = 'Misses: 0';
 
   if (!board) {
@@ -398,6 +399,7 @@ function updateSessionStats() {
     : null;
   document.getElementById('hg-session-time').textContent = avg ? `Avg ${avg}s` : '';
   document.getElementById('hg-session-acc').textContent  = `Acc ${acc}%`;
+  document.getElementById('hg-session-stats').classList.remove('hidden');
 }
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
