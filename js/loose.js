@@ -247,7 +247,6 @@ function finishPuzzle() {
   updateSessionStats();
 
   drawContinueMsg();
-  document.getElementById('btn-loose-complete').textContent = 'CONTINUE';
   waitingToAdvance = true;
 }
 
