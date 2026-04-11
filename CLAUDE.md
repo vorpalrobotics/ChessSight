@@ -44,6 +44,40 @@ Board is created once (lazy) with `new Chessboard(...)` and reused via `setPosit
 SHOW button toggles solution overlay (arrows for moves, SVG rects for piece-based drills).
 Arrow labels are placed at 75% along the line (near the arrowhead).
 
+## Drill screen layout (standard for all drills)
+Every drill screen follows this top-to-bottom order:
+
+```
+drill-top
+  drill-top-left:  h2 title · puzzle-num · drill-difficulty
+  drill-top-right: ⏸ pause · END DRILL (small)
+drill-board-wrap > #*-board
+drill-answer-panel  (count drills only: digit button rows W / B)
+drill-current-stats: timer · misses · action buttons (DONE / SHOW)
+#*-status           (italic muted status text, no min-height on count drills)
+#*-session-stats    (hidden until first puzzle completes)
+  .session-label "Session:"
+  #*-session-time  "Avg X:XX"
+  #*-session-acc   "Acc XX%"
+p.drill-rule
+```
+
+### Key rules
+- **Session stats** live in `#*-session-stats.drill-session-stats` below all controls,
+  NOT in `drill-top-right`. Start hidden (`class="drill-session-stats hidden"`).
+  Call `updateSessionStats()` both on puzzle completion AND at the start of each new
+  puzzle load so stats appear as soon as the user advances (even via NEXT/board click).
+  `resetDrill()` re-adds the `hidden` class and clears the span text.
+- **Action buttons** for click drills are DONE and SHOW (never COMPLETE or CONTINUE).
+  After puzzle completion the button label stays DONE — do not rename it.
+- **END DRILL button**: `font-size: 0.65rem; padding: 0.25rem 0.6rem` (smaller than normal).
+- **drill-top-right gap**: `0.4rem` (tight — only pause + END DRILL buttons live there now).
+- **Per-puzzle result lines** (`#*-result`) have been removed from all drills — they
+  were redundant with the stats bar. Do not add them to new drills.
+- **`min-height: 1em`** on `#*-status` is kept for click drills (loose, under, queen,
+  knight, hanggrab) but removed from count drills (checks, captures) where it caused
+  dead space after the SHOW button.
+
 ## IDB storage key
 Compound key `[date, drill]` in store `drillDays`.
 `upsertDrillDay(drill, { seconds, correct, misses, puzzleId })` accumulates daily totals.
