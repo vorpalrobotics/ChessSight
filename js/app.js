@@ -143,6 +143,15 @@ modalSettings.addEventListener('click', (e) => {
   if (e.target === modalSettings) modalSettings.classList.add('hidden');
 });
 
+// Persist "positions per drill" to localStorage
+const selectPositions = document.getElementById('select-positions-per-drill');
+const POSITIONS_KEY = 'chesssight-positions-per-drill';
+const savedPositions = localStorage.getItem(POSITIONS_KEY);
+if (savedPositions) selectPositions.value = savedPositions;
+selectPositions.addEventListener('change', () => {
+  localStorage.setItem(POSITIONS_KEY, selectPositions.value);
+});
+
 // --- About modal ---
 const modalAbout = document.getElementById('modal-about');
 

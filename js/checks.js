@@ -39,6 +39,7 @@ let showingChecks = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 let puzzleQueue = [];
+let autoSummaryTimer = null;
 
 // --- Public API ---
 
@@ -306,6 +307,17 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) {
+    document.getElementById('btn-checks-next').disabled = true;
+    autoSummaryTimer = setTimeout(showSummary, 800);
+  }
+}
+
+function getPositionsPerDrill() {
+  const el = document.getElementById('select-positions-per-drill');
+  if (!el || el.value === 'unlimited') return null;
+  return parseInt(el.value, 10);
 }
 
 // --- Session stats (shown above the board during subsequent puzzles) ---
@@ -325,6 +337,7 @@ function updateSessionStats() {
 // --- Summary ---
 
 function showSummary() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   stopTimer();
   document.getElementById('btn-summary-again').onclick = restartDrill;
 
@@ -376,9 +389,11 @@ function showDifficulty(id, score) {
 }
 
 function resetDrill() {
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
+  document.getElementById('btn-checks-next').disabled = false;
   document.getElementById('checks-session-time').textContent = '';
   document.getElementById('checks-session-acc').textContent = '';
   document.getElementById('checks-session-stats').classList.add('hidden');
