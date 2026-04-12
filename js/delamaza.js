@@ -146,6 +146,7 @@ function buildFen(kingSq, pieceSq, pieceType) {
 
 let board = null;
 let navigate = null;
+let onPerfect = null;
 let chosenPiece = 'r';
 let spiralIndex = 0;
 let sessionStart = 0;
@@ -159,8 +160,9 @@ let pauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export function initDeLaMaza(navigateFn) {
+export function initDeLaMaza(navigateFn, onPerfectFn) {
   navigate = navigateFn;
+  onPerfect = onPerfectFn;
 
   document.getElementById('btn-dlm-show').addEventListener('click', handleShow);
   document.getElementById('btn-dlm-done').addEventListener('click', () => {
@@ -290,6 +292,7 @@ function endSession() {
   const pieceName = { r: 'Rook', b: 'Bishop', n: 'Knight' }[chosenPiece];
   document.getElementById('dlm-end-piece').textContent = pieceName;
   document.getElementById('dlm-end-screen').classList.remove('hidden');
+  if (sessionMisses === 0 && onPerfect) onPerfect();
 }
 
 // ─── Board interaction ────────────────────────────────────────────────────────

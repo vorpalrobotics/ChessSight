@@ -2050,11 +2050,12 @@ button:disabled {
   left: 50%;
   font-size: 1.5rem;
   line-height: 1;
-  animation: confetti-fly ease-out both;
+  animation: confetti-fly linear both;
 }
 
 @keyframes confetti-fly {
   0%   { transform: translate(-50%, -50%) scale(2) rotate(0deg); opacity: 1; }
-  70%  { opacity: 1; }
-  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4) rotate(var(--rot)); opacity: 0; }
+  50%  { transform: translate(calc(-50% + var(--dx) * 0.5), calc(-50% + var(--dy) * 0.5 - 25px)) scale(1.1) rotate(calc(var(--rot) * 0.5)); opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 90px)) scale(0.35) rotate(var(--rot)); opacity: 0; }
 }

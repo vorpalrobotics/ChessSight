@@ -813,5 +813,5 @@ initQueenAttack(showScreen);
 initKnightRoute(showScreen);
 initHangGrab(showScreen);
 initMix(showScreen);
-initDeLaMaza(showScreen);
+initDeLaMaza(showScreen, launchChessConfetti);
 initDiscipline(showScreen);
