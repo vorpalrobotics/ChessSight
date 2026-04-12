@@ -432,6 +432,18 @@ header h1 {
   font-size: 2.8rem;
   line-height: 1;
 }
+
+/* Per-card icon colours — gives each text/symbol glyph its own hue.
+   CSS colour has no effect on true emoji (🎯 🔀) so those stay native. */
+#mode-checks     .mode-icon { color: #60a5fa; }  /* sky blue    ♟ */
+#mode-captures   .mode-icon { color: #f87171; }  /* coral red   ⚔ */
+#mode-loose      .mode-icon { color: #fb923c; }  /* orange      ◎ */
+#mode-under      .mode-icon { color: #facc15; }  /* yellow      ⚠ */
+#mode-knight     .mode-icon { color: #c084fc; }  /* violet      ♞ */
+#mode-queen      .mode-icon { color: #fbbf24; }  /* gold        ♛ */
+#mode-dlm        .mode-icon { color: #34d399; }  /* emerald     👁 */
+#mode-discipline .mode-icon { color: #22d3ee; }  /* cyan        ♔ */
+
 .mode-name {
   font-size: 1.1rem;
   font-weight: bold;
