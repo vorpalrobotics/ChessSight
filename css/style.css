@@ -533,27 +533,11 @@ header h1 {
 }
 
 /* Tighter stats row for drills with 4 controls (timer · misses · DONE · SHOW) */
-#screen-loose .drill-current-stats,
 #screen-under .drill-current-stats {
   gap: 0.65rem;
 }
-#screen-loose .drill-current-stats span:first-child,
 #screen-under .drill-current-stats span:first-child {
   min-width: 2.5em;
-}
-
-/* Loose pieces mobile: tighter spacing + smaller fonts to fit 4 controls */
-@media (max-width: 500px) {
-  #screen-loose .drill-current-stats {
-    gap: 0.4rem;
-  }
-  #screen-loose .drill-current-stats span:first-child {
-    font-size: 1.1rem;
-    min-width: 2em;
-  }
-  #screen-loose .drill-current-stats span:last-of-type {
-    font-size: 0.9rem;
-  }
 }
 
 #btn-threats-show,
@@ -808,7 +792,6 @@ header h1 {
   100% { transform: scale(1); }
 }
 
-.loose-continue-msg,
 .under-continue-msg,
 .disc-continue-msg {
   font-weight: 700;

@@ -27,18 +27,17 @@ let currentPuzzleId = '';
 let currentFen = '';
 let currentLooseSqs = new Set();  // all loose piece squares for this position
 let foundSqs = new Set();         // correctly identified by user
-let waitingToAdvance = false;
 const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
 let autoSummaryTimer = null;
+let autoAdvanceTimer = null;
 
 // --- Public API ---
 
 export function initLoose(navigateFn) {
   navigate = navigateFn;
   document.getElementById('btn-loose-done').addEventListener('click', showSummary);
-  document.getElementById('btn-loose-complete').addEventListener('click', handleComplete);
   document.getElementById('btn-loose-show').addEventListener('click', handleShow);
   document.getElementById('loose-board').addEventListener('click', handleBoardClick);
 }
@@ -96,6 +95,7 @@ async function loadNextPuzzle() {
     showSummary();
     return;
   }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   stopTimer();
   resetUI();
   puzzleCount++;
@@ -125,6 +125,15 @@ async function loadNextPuzzle() {
 
   updateSessionStats();
   setStatus('');
+
+  // Skip positions with no loose pieces (can't be solved by clicking)
+  if (currentLooseSqs.size === 0) {
+    puzzleCount--;
+    document.getElementById('loose-puzzle-num').textContent = `#${puzzleCount}`;
+    autoAdvanceTimer = setTimeout(loadNextPuzzle, 300);
+    return;
+  }
+
   puzzleActive = true;
   startTimer();
 }
@@ -198,22 +207,18 @@ function getLoosePieces(fen) {
 // --- Board click handler ---
 
 function handleBoardClick(e) {
-  if (waitingToAdvance) { loadNextPuzzle(); return; }
   if (!puzzleActive) return;
 
   const sq = sqFromEvent(e);
   if (!sq) return;
 
-  // Toggle: un-mark an already-found square
-  if (foundSqs.has(sq)) {
-    foundSqs.delete(sq);
-    removeSqMark(sq);
-    return;
-  }
-
   if (currentLooseSqs.has(sq)) {
+    if (foundSqs.has(sq)) return;  // already marked, ignore
     foundSqs.add(sq);
     drawSqMark(sq, 'loose-sq-found');
+    if (foundSqs.size === currentLooseSqs.size) {
+      finishPuzzle(true);
+    }
   } else {
     misses++;
     document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
@@ -221,44 +226,39 @@ function handleBoardClick(e) {
   }
 }
 
-function handleComplete() {
-  if (waitingToAdvance) { loadNextPuzzle(); return; }
-  if (!puzzleActive) return;
-  finishPuzzle();
-}
-
 function handleShow() {
-  if (waitingToAdvance) { loadNextPuzzle(); return; }
   if (!puzzleActive) return;
-  finishPuzzle();
+  finishPuzzle(false);
 }
 
-function finishPuzzle() {
+function finishPuzzle(allFound) {
   puzzleActive = false;
   stopTimer();
 
-  // Reveal missed loose squares in amber
-  for (const sq of currentLooseSqs) {
-    if (!foundSqs.has(sq)) {
-      misses++;
-      drawSqMark(sq, 'loose-sq-missed');
+  if (!allFound) {
+    // Reveal any missed loose squares
+    for (const sq of currentLooseSqs) {
+      if (!foundSqs.has(sq)) {
+        misses++;
+        drawSqMark(sq, 'loose-sq-missed');
+      }
     }
+    document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
   }
-  document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
 
-  const correct = foundSqs.size;
-  const total   = currentLooseSqs.size;
-  drillResults.push({ seconds, correct, misses });
-  upsertDrillDay('loose', { seconds, correct, misses, puzzleId: currentPuzzleId });
+  drillResults.push({ seconds, correct: foundSqs.size, misses });
+  upsertDrillDay('loose', { seconds, correct: foundSqs.size, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
 
   const limit = getPositionsPerDrill();
-  if (limit !== null && drillResults.length >= limit) {
-    autoSummaryTimer = setTimeout(showSummary, 1000);
-  }
+  const limitReached = limit !== null && drillResults.length >= limit;
+  const delay = allFound ? 500 : 1500;
 
-  drawContinueMsg();
-  waitingToAdvance = true;
+  if (limitReached) {
+    autoSummaryTimer = setTimeout(showSummary, delay);
+  } else {
+    autoAdvanceTimer = setTimeout(loadNextPuzzle, delay);
+  }
 }
 
 // --- SVG helpers ---
@@ -301,11 +301,6 @@ function drawSqMark(sq, cssClass) {
   svg.appendChild(rect);
 }
 
-function removeSqMark(sq) {
-  const boardEl = document.getElementById('loose-board');
-  if (boardEl) boardEl.querySelectorAll(`[data-loose-sq="${sq}"]`).forEach(el => el.remove());
-}
-
 function flashSq(sq) {
   const svg = getSvg();
   if (!svg) return;
@@ -331,23 +326,7 @@ function flashSq(sq) {
 
 function clearAllMarks() {
   const boardEl = document.getElementById('loose-board');
-  if (boardEl) boardEl.querySelectorAll('[data-loose-sq], .loose-continue-msg').forEach(el => el.remove());
-}
-
-function drawContinueMsg() {
-  const svg = getSvg();
-  if (!svg) return;
-  const vb = svg.viewBox.baseVal;
-  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
-  const sqSize = boardW / 8;
-  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', boardW / 2);
-  text.setAttribute('y', boardW - sqSize * 0.15);
-  text.setAttribute('text-anchor', 'middle');
-  text.setAttribute('font-size', sqSize * 0.48);
-  text.setAttribute('class', 'loose-continue-msg');
-  text.textContent = 'Click anywhere to continue';
-  svg.appendChild(text);
+  if (boardEl) boardEl.querySelectorAll('[data-loose-sq]').forEach(el => el.remove());
 }
 
 // --- Session stats ---
@@ -410,6 +389,7 @@ function showDifficulty(id, score) {
 
 function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
@@ -420,11 +400,9 @@ function resetDrill() {
 
 function resetUI() {
   misses = seconds = 0;
-  waitingToAdvance = false;
   clearAllMarks();
   document.getElementById('loose-timer').textContent   = '0:00';
   document.getElementById('loose-misses').textContent  = 'Misses: 0';
-  document.getElementById('btn-loose-complete').textContent = 'DONE';
 }
 
 function setStatus(msg) {
