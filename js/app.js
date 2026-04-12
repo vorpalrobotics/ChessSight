@@ -27,6 +27,29 @@ function doPauseToggle() {
   pauseOverlay.classList.toggle('hidden', !paused);
 }
 
+function launchChessConfetti() {
+  const pieces  = ['♟','♞','♝','♜','♛','♔','♙','♘','♗','♖','♕','♚'];
+  const colors  = ['#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa','#a78bfa','#f472b6','#22d3ee'];
+  const container = document.createElement('div');
+  container.id = 'confetti-container';
+  document.body.appendChild(container);
+  for (let i = 0; i < 48; i++) {
+    const el = document.createElement('span');
+    el.className = 'confetti-piece';
+    el.textContent = pieces[Math.floor(Math.random() * pieces.length)];
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    const angle    = Math.random() * Math.PI * 2;
+    const distance = 100 + Math.random() * 320;
+    el.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+    el.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+    el.style.setProperty('--rot', `${(Math.random() - 0.5) * 720}deg`);
+    el.style.animationDuration  = `${0.8 + Math.random() * 0.7}s`;
+    el.style.animationDelay     = `${Math.random() * 0.3}s`;
+    container.appendChild(el);
+  }
+  setTimeout(() => container.remove(), 2500);
+}
+
 function showScreen(id) {
   SCREEN_IDS.forEach(s =>
     document.getElementById(s).classList.toggle('hidden', s !== id)
@@ -37,6 +60,11 @@ function showScreen(id) {
     clearPause();
     pauseOverlay.classList.add('hidden');
     document.querySelectorAll('.drill-pause-btn').forEach(b => b.textContent = '⏸');
+  }
+  if (id === 'screen-summary') {
+    if (document.getElementById('stat-accuracy').textContent === '100%') {
+      launchChessConfetti();
+    }
   }
 }
 
