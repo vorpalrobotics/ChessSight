@@ -542,6 +542,20 @@ header h1 {
   min-width: 2.5em;
 }
 
+/* Loose pieces mobile: tighter spacing + smaller fonts to fit 4 controls */
+@media (max-width: 500px) {
+  #screen-loose .drill-current-stats {
+    gap: 0.4rem;
+  }
+  #screen-loose .drill-current-stats span:first-child {
+    font-size: 1.1rem;
+    min-width: 2em;
+  }
+  #screen-loose .drill-current-stats span:last-of-type {
+    font-size: 0.9rem;
+  }
+}
+
 #btn-threats-show,
 #btn-under-show,
 #btn-loose-show,
@@ -781,7 +795,7 @@ header h1 {
   color: var(--accent);
   text-transform: uppercase;
   display: inline-block;
-  transform-origin: center;
+  transform-origin: left center;
 }
 
 .mix-drill-label.pop {
