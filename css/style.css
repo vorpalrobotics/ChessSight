@@ -532,13 +532,6 @@ header h1 {
   font-family: monospace;
 }
 
-/* Tighter stats row for drills with 4 controls (timer · misses · DONE · SHOW) */
-#screen-under .drill-current-stats {
-  gap: 0.65rem;
-}
-#screen-under .drill-current-stats span:first-child {
-  min-width: 2.5em;
-}
 
 #btn-threats-show,
 #btn-under-show,
@@ -792,7 +785,6 @@ header h1 {
   100% { transform: scale(1); }
 }
 
-.under-continue-msg,
 .disc-continue-msg {
   font-weight: 700;
   fill: #111;
