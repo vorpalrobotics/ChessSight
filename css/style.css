@@ -532,6 +532,16 @@ header h1 {
   font-family: monospace;
 }
 
+/* Tighter stats row for drills with 4 controls (timer · misses · DONE · SHOW) */
+#screen-loose .drill-current-stats,
+#screen-under .drill-current-stats {
+  gap: 0.65rem;
+}
+#screen-loose .drill-current-stats span:first-child,
+#screen-under .drill-current-stats span:first-child {
+  min-width: 2.5em;
+}
+
 #btn-threats-show,
 #btn-under-show,
 #btn-loose-show,
@@ -770,6 +780,18 @@ header h1 {
   letter-spacing: 0.08em;
   color: var(--accent);
   text-transform: uppercase;
+  display: inline-block;
+  transform-origin: center;
+}
+
+.mix-drill-label.pop {
+  animation: mix-label-pop 1s ease-in-out;
+}
+
+@keyframes mix-label-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(3); }
+  100% { transform: scale(1); }
 }
 
 .loose-continue-msg,

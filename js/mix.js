@@ -137,7 +137,11 @@ async function loadNextPuzzle() {
   // Randomly pick from selected drills
   currentDrill = selectedDrills[Math.floor(Math.random() * selectedDrills.length)];
   const def = DRILL_DEFS[currentDrill];
-  document.getElementById('mix-drill-label').textContent = def.label;
+  const labelEl = document.getElementById('mix-drill-label');
+  labelEl.textContent = def.label;
+  labelEl.classList.remove('pop');
+  void labelEl.offsetWidth; // force reflow to restart animation
+  labelEl.classList.add('pop');
 
   const isCount = def.type === 'count';
   document.getElementById('mix-count-panel').classList.toggle('hidden', !isCount);
