@@ -176,6 +176,7 @@ const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
 let autoSummaryTimer = null;
+let autoAdvanceTimer = null;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -207,6 +208,7 @@ function loadNextPuzzle() {
     showSummary();
     return;
   }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   stopTimer();
   resetUI();
   puzzleCount++;
@@ -315,12 +317,25 @@ function finishPuzzle() {
   updateSessionStats();
 
   const limit = getPositionsPerDrill();
-  if (limit !== null && drillResults.length >= limit) {
-    autoSummaryTimer = setTimeout(showSummary, 1000);
-  }
+  const limitReached = limit !== null && drillResults.length >= limit;
 
-  drawContinueMsg();
-  waitingToAdvance = true;
+  if (isOptimal) {
+    // Pulse path squares green and auto-advance — no click needed
+    const boardEl = document.getElementById('knight-board');
+    if (boardEl) boardEl.querySelectorAll('.knight-sq-path').forEach(el => el.classList.add('pulsing'));
+    if (limitReached) {
+      autoSummaryTimer = setTimeout(showSummary, 1500);
+    } else {
+      autoAdvanceTimer = setTimeout(loadNextPuzzle, 1500);
+    }
+  } else {
+    // Sub-optimal or had invalid clicks — pause so user can review / hit SHOW
+    if (limitReached) {
+      autoSummaryTimer = setTimeout(showSummary, 1000);
+    }
+    drawContinueMsg();
+    waitingToAdvance = true;
+  }
 }
 
 // ─── SHOW button ──────────────────────────────────────────────────────────────
@@ -575,6 +590,7 @@ function showDifficulty(id, score) {
 
 function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];

@@ -1339,6 +1339,9 @@ button:disabled {
   stroke-width: 2.5px;
   pointer-events: none;
 }
+.knight-sq-path.pulsing {
+  animation: loose-found-pulse 0.5s ease-in-out infinite;
+}
 .knight-sq-path-num {
   fill: white;
   font-weight: 700;
