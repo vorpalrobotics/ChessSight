@@ -244,6 +244,10 @@ function finishPuzzle(allFound) {
       }
     }
     document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
+  } else {
+    // Pulse all found squares green like the discipline drill
+    const boardEl = document.getElementById('loose-board');
+    if (boardEl) boardEl.querySelectorAll('.loose-sq-found').forEach(el => el.classList.add('pulsing'));
   }
 
   drillResults.push({ seconds, correct: foundSqs.size, misses });
@@ -252,12 +256,11 @@ function finishPuzzle(allFound) {
 
   const limit = getPositionsPerDrill();
   const limitReached = limit !== null && drillResults.length >= limit;
-  const delay = allFound ? 500 : 1500;
 
   if (limitReached) {
-    autoSummaryTimer = setTimeout(showSummary, delay);
+    autoSummaryTimer = setTimeout(showSummary, 1500);
   } else {
-    autoAdvanceTimer = setTimeout(loadNextPuzzle, delay);
+    autoAdvanceTimer = setTimeout(loadNextPuzzle, 1500);
   }
 }
 
