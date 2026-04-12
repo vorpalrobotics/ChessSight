@@ -66,6 +66,7 @@ let board = null;
 let discEngine = null;
 let chess = null;
 let navigate = null;
+let onWin = null;
 let boardOrientation = COLOR.white;
 let playerSide = 'w';       // 'w' or 'b' (resolved at game start)
 let chosenSide  = 'w';      // 'w', 'b', 'r'
@@ -103,8 +104,9 @@ let discPauseStart = 0;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export function initDiscipline(navigateFn) {
+export function initDiscipline(navigateFn, onWinFn) {
   navigate = navigateFn;
+  onWin = onWinFn;
 
   // Setup panel
   const SKILL_ELO = [800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2600,2800,3000,'3200+'];
@@ -602,6 +604,7 @@ function endGame(result) {
 
   document.getElementById('disc-game-area').classList.add('hidden');
   document.getElementById('disc-game-over').classList.remove('hidden');
+  if (result === 'win' && onWin) onWin();
 }
 
 function pauseGame() {
