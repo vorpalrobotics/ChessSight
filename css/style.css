@@ -893,14 +893,15 @@ header h1 {
 }
 
 .digit-buttons {
-  display: flex;
-  gap: calc(var(--board-size) / 60);
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  column-gap: calc(100% / 39);
+  flex: 1;
 }
 
 .digit-btn {
-  width: calc(var(--board-size) / 11);
-  height: calc(var(--board-size) / 11);
+  width: 100%;
+  aspect-ratio: 1;
   padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
@@ -939,19 +940,6 @@ header h1 {
   animation: digit-correct-flash 0.3s ease-in-out 5;
 }
 
-/* On large viewports shrink buttons and spread them to fill the row */
-@media (min-width: 680px) {
-  .digit-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-  }
-  .digit-buttons {
-    flex: 1;
-    justify-content: space-between;
-    gap: 0;
-  }
-}
 
 #checks-status, #captures-status {
   font-size: 0.8rem;
