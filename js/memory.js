@@ -7,7 +7,35 @@ const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/s
 
 const PIECE_ORDER = ['K', 'Q', 'R', 'B', 'N', 'P'];
 
-// Build an SVG element using the same cm-chessboard sprite (already cached by the board)
+// Fetch the sprite once and inline it into the DOM so local `<use href="#wq">`
+// references work reliably (external SVG <use> is inconsistent across browsers).
+let spriteLoaded = false;
+let spriteLoadPromise = null;
+
+function loadSprite() {
+  if (spriteLoaded) return Promise.resolve();
+  if (spriteLoadPromise) return spriteLoadPromise;
+  spriteLoadPromise = fetch(PIECES_URL)
+    .then(r => r.text())
+    .then(svgText => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgText, 'image/svg+xml');
+      const spriteSvg = doc.documentElement;
+      // Hide the sprite container so any renderable content inside it isn't shown
+      spriteSvg.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden;');
+      spriteSvg.setAttribute('aria-hidden', 'true');
+      spriteSvg.id = 'memory-piece-sprite';
+      document.body.insertBefore(spriteSvg, document.body.firstChild);
+      spriteLoaded = true;
+    })
+    .catch(err => {
+      console.warn('Memory drill: failed to inline piece sprite', err);
+      spriteLoaded = true; // don't retry forever
+    });
+  return spriteLoadPromise;
+}
+
+// Build an SVG element referencing a piece in the inlined cm-chessboard sprite.
 function makePieceSvg(pk, sizePx) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 45 45');
@@ -15,7 +43,7 @@ function makePieceSvg(pk, sizePx) {
   svg.setAttribute('height', sizePx);
   const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
   // sprite ID: 'wQ' → 'wq', 'bN' → 'bn'
-  use.setAttribute('href', `${PIECES_URL}#${pk[0]}${pk[1].toLowerCase()}`);
+  use.setAttribute('href', `#${pk[0]}${pk[1].toLowerCase()}`);
   svg.appendChild(use);
   return svg;
 }
@@ -95,6 +123,7 @@ export function initMemory(navigateFn) {
 
 export async function startMemory() {
   registerPause(pauseDrill, resumeDrill);
+  await loadSprite();
   resetDrill();
   positionQueue = shuffleArray([...POSITIONS]);
   await loadNextPuzzle();
