@@ -931,6 +931,14 @@ header h1 {
   transition: none;
 }
 
+@keyframes digit-correct-flash {
+  0%, 100% { background: #1b6e42; border-color: #27ae60; box-shadow: none; }
+  50%       { background: #27ae60; border-color: #52d68a; box-shadow: 0 0 8px #4ade80; }
+}
+.digit-btn.correct.flashing {
+  animation: digit-correct-flash 0.3s ease-in-out 5;
+}
+
 #checks-status, #captures-status {
   font-size: 0.8rem;
   color: var(--text-muted);

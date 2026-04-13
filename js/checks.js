@@ -40,6 +40,7 @@ const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 let puzzleQueue = [];
 let autoSummaryTimer = null;
+let autoAdvanceTimer = null;
 
 // --- Public API ---
 
@@ -96,6 +97,9 @@ async function fetchWithDifficulty() {
 // --- Puzzle loading ---
 
 async function loadNextPuzzle() {
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) { showSummary(); return; }
   stopTimer();
   resetUI();
   puzzleCount++;
@@ -307,10 +311,16 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
+
+  // Flash the correct buttons
+  document.querySelectorAll('#screen-checks .digit-btn.correct').forEach(btn => btn.classList.add('flashing'));
+
   const limit = getPositionsPerDrill();
-  if (limit !== null && drillResults.length >= limit) {
-    document.getElementById('btn-checks-next').disabled = true;
-    autoSummaryTimer = setTimeout(showSummary, 800);
+  const limitReached = limit !== null && drillResults.length >= limit;
+  if (limitReached) {
+    autoSummaryTimer = setTimeout(showSummary, 1500);
+  } else {
+    autoAdvanceTimer = setTimeout(loadNextPuzzle, 1500);
   }
 }
 
@@ -390,6 +400,7 @@ function showDifficulty(id, score) {
 
 function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
