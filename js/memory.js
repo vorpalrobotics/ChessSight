@@ -5,12 +5,20 @@ import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
-const PIECE_GLYPH = {
-  wK: '♔', wQ: '♕', wR: '♖', wB: '♗', wN: '♘', wP: '♙',
-  bK: '♚', bQ: '♛', bR: '♜', bB: '♝', bN: '♞', bP: '♟',
-};
-
 const PIECE_ORDER = ['K', 'Q', 'R', 'B', 'N', 'P'];
+
+// Build an SVG element using the same cm-chessboard sprite (already cached by the board)
+function makePieceSvg(pk, sizePx) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 45 45');
+  svg.setAttribute('width', sizePx);
+  svg.setAttribute('height', sizePx);
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  // sprite ID: 'wQ' → 'wq', 'bN' → 'bn'
+  use.setAttribute('href', `${PIECES_URL}#${pk[0]}${pk[1].toLowerCase()}`);
+  svg.appendChild(use);
+  return svg;
+}
 
 // Varied positions: 4–12 pieces each
 const POSITIONS = [
@@ -334,10 +342,9 @@ function buildPaletteRow(pieceKeys, label) {
     slot.className = 'memory-piece-slot';
     slot.dataset.pieceKey = pk;
 
-    const glyph = document.createElement('span');
-    glyph.className = 'memory-piece-glyph ' + (pk[0] === 'w' ? 'piece-white' : 'piece-black');
-    glyph.textContent = PIECE_GLYPH[pk];
-    slot.appendChild(glyph);
+    const svgEl = makePieceSvg(pk, 36);
+    svgEl.classList.add('memory-piece-svg');
+    slot.appendChild(svgEl);
 
     if (count > 1) {
       const badge = document.createElement('span');
@@ -363,9 +370,9 @@ function attachDragHandlers(slot, pk) {
     e.preventDefault();
     dragPieceKey = pk;
 
-    dragClone = document.createElement('span');
+    dragClone = document.createElement('div');
     dragClone.className = 'memory-drag-clone';
-    dragClone.textContent = PIECE_GLYPH[pk];
+    dragClone.appendChild(makePieceSvg(pk, 52));
     dragClone.style.left = e.clientX + 'px';
     dragClone.style.top = e.clientY + 'px';
     document.body.appendChild(dragClone);

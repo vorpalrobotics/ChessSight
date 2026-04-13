@@ -2172,18 +2172,8 @@ button:disabled {
   border-color: #3a9fd0;
 }
 
-.memory-piece-glyph {
-  font-size: 1.8rem;
-  line-height: 1;
+.memory-piece-svg {
   display: block;
-}
-.memory-piece-glyph.piece-white {
-  color: #fff;
-  -webkit-text-stroke: 1px #555;
-}
-.memory-piece-glyph.piece-black {
-  color: #c8a96e;
-  -webkit-text-stroke: 1px #333;
 }
 
 .memory-piece-badge {
@@ -2197,16 +2187,13 @@ button:disabled {
   font-family: monospace;
 }
 
-/* Floating drag clone */
+/* Floating drag clone — contains a 52×52 SVG piece that follows the pointer */
 .memory-drag-clone {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
-  font-size: 2.6rem;
-  line-height: 1;
   transform: translate(-50%, -50%);
-  cursor: grabbing;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.7));
 }
 
 /* SVG square overlays */
