@@ -939,6 +939,20 @@ header h1 {
   animation: digit-correct-flash 0.3s ease-in-out 5;
 }
 
+/* On large viewports shrink buttons and spread them to fill the row */
+@media (min-width: 680px) {
+  .digit-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  .digit-buttons {
+    flex: 1;
+    justify-content: space-between;
+    gap: 0;
+  }
+}
+
 #checks-status, #captures-status {
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -980,7 +994,7 @@ header h1 {
   color: var(--text-muted);
 }
 
-#btn-captures-next, #btn-threats-next {
+#btn-threats-next {
   margin-top: 0.25rem;
   padding: 0.5rem 2.5rem;
   font-size: 0.95rem;
@@ -991,7 +1005,6 @@ header h1 {
   border-radius: 8px;
   letter-spacing: 0.05em;
 }
-#btn-captures-next:hover:not(:disabled),
 #btn-threats-next:hover:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);

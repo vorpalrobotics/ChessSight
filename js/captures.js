@@ -36,10 +36,12 @@ let puzzleCount = 0;
 let currentPuzzleId = '';
 let currentFen = '';
 let showingCaptures = false;
+let waitingForContinue = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;       // injected by app.js for screen transitions
 let puzzleQueue = [];
 let autoSummaryTimer = null;
+let autoAdvanceTimer = null;
 
 // --- Public API ---
 
@@ -47,11 +49,8 @@ export function initCaptures(navigateFn) {
   navigate = navigateFn;
   createDigitButtons();
   document.getElementById('btn-captures-done').addEventListener('click', showSummary);
-  document.getElementById('btn-captures-next').addEventListener('click', loadNextPuzzle);
-  document.getElementById('btn-captures-show').addEventListener('click', () => {
-    if (showingCaptures) hideCaptures();
-    else showCaptures();
-  });
+  document.getElementById('btn-captures-show').addEventListener('click', handleShow);
+  document.getElementById('captures-board').addEventListener('click', handleBoardClick);
 }
 
 // Returns a single puzzle object for use by the Mix drill.
@@ -96,6 +95,9 @@ async function fetchWithDifficulty() {
 // --- Puzzle loading ---
 
 async function loadNextPuzzle() {
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) { showSummary(); return; }
   stopTimer();
   resetUI();
   puzzleCount++;
@@ -209,6 +211,38 @@ function countCapturesForColor(fen, colorChar) {
   return Math.min(getCapturesForColor(fen, colorChar).length, 9);
 }
 
+function handleShow() {
+  if (waitingForContinue) {
+    if (showingCaptures) hideCaptures(); else showCaptures();
+    return;
+  }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  if (puzzleActive) {
+    puzzleActive = false;
+    stopTimer();
+    if (!correctW) misses++;
+    if (!correctB) misses++;
+    document.getElementById('captures-misses').textContent = `Misses: ${misses}`;
+    drillResults.push({ seconds, correct: correctAnswers, misses });
+    upsertDrillDay('captures', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
+    updateSessionStats();
+  }
+  showCaptures();
+  setStatus('Click board to continue');
+  waitingForContinue = true;
+}
+
+function handleBoardClick() {
+  if (!waitingForContinue) return;
+  waitingForContinue = false;
+  hideCaptures();
+  setStatus('');
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) showSummary();
+  else loadNextPuzzle();
+}
+
 function showCaptures() {
   if (!board || !currentFen) return;
   board.removeArrows();
@@ -319,10 +353,16 @@ function puzzleComplete() {
   drillResults.push({ seconds, correct: correctAnswers, misses });
   upsertDrillDay('captures', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
+
+  // Flash the correct buttons
+  document.querySelectorAll('#screen-captures .digit-btn.correct').forEach(btn => btn.classList.add('flashing'));
+
   const limit = getPositionsPerDrill();
-  if (limit !== null && drillResults.length >= limit) {
-    document.getElementById('btn-captures-next').disabled = true;
-    autoSummaryTimer = setTimeout(showSummary, 800);
+  const limitReached = limit !== null && drillResults.length >= limit;
+  if (limitReached) {
+    autoSummaryTimer = setTimeout(showSummary, 1500);
+  } else {
+    autoAdvanceTimer = setTimeout(loadNextPuzzle, 1500);
   }
 }
 
@@ -401,10 +441,11 @@ function showDifficulty(id, score) {
 
 function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  waitingForContinue = false;
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
-  document.getElementById('btn-captures-next').disabled = false;
   document.getElementById('captures-session-time').textContent = '';
   document.getElementById('captures-session-acc').textContent = '';
   document.getElementById('captures-session-stats').classList.add('hidden');
@@ -413,6 +454,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  waitingForContinue = false;
   hideCaptures();
   document.getElementById('captures-timer').textContent = '0:00';
   document.getElementById('captures-misses').textContent = 'Misses: 0';
