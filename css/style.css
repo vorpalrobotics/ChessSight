@@ -980,7 +980,7 @@ header h1 {
   color: var(--text-muted);
 }
 
-#btn-checks-next, #btn-captures-next, #btn-threats-next {
+#btn-captures-next, #btn-threats-next {
   margin-top: 0.25rem;
   padding: 0.5rem 2.5rem;
   font-size: 0.95rem;
@@ -991,7 +991,6 @@ header h1 {
   border-radius: 8px;
   letter-spacing: 0.05em;
 }
-#btn-checks-next:hover:not(:disabled),
 #btn-captures-next:hover:not(:disabled),
 #btn-threats-next:hover:not(:disabled) {
   background: var(--accent);

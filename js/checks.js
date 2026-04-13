@@ -36,6 +36,7 @@ let puzzleCount = 0;
 let currentPuzzleId = '';
 let currentFen = '';
 let showingChecks = false;
+let waitingForContinue = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 let puzzleQueue = [];
@@ -48,11 +49,8 @@ export function initChecks(navigateFn) {
   navigate = navigateFn;
   createDigitButtons();
   document.getElementById('btn-checks-done').addEventListener('click', showSummary);
-  document.getElementById('btn-checks-next').addEventListener('click', loadNextPuzzle);
-  document.getElementById('btn-checks-show').addEventListener('click', () => {
-    if (showingChecks) hideChecks();
-    else showChecks();
-  });
+  document.getElementById('btn-checks-show').addEventListener('click', handleShow);
+  document.getElementById('checks-board').addEventListener('click', handleBoardClick);
 }
 
 // Returns a single puzzle object for use by the Mix drill.
@@ -199,6 +197,41 @@ function getChecksForColor(fen, colorChar) {
 
 function countChecksForColor(fen, colorChar) {
   return Math.min(getChecksForColor(fen, colorChar).length, 9);
+}
+
+function handleShow() {
+  if (waitingForContinue) {
+    // While waiting, allow toggling arrows off/on to study the position
+    if (showingChecks) hideChecks(); else showChecks();
+    return;
+  }
+  // Cancel any pending auto-advance
+  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
+  // End the puzzle if still active (user revealed before getting both right)
+  if (puzzleActive) {
+    puzzleActive = false;
+    stopTimer();
+    if (!correctW) misses++;
+    if (!correctB) misses++;
+    document.getElementById('checks-misses').textContent = `Misses: ${misses}`;
+    drillResults.push({ seconds, correct: correctAnswers, misses });
+    upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
+    updateSessionStats();
+  }
+  showChecks();
+  setStatus('Click board to continue');
+  waitingForContinue = true;
+}
+
+function handleBoardClick() {
+  if (!waitingForContinue) return;
+  waitingForContinue = false;
+  hideChecks();
+  setStatus('');
+  const limit = getPositionsPerDrill();
+  if (limit !== null && drillResults.length >= limit) showSummary();
+  else loadNextPuzzle();
 }
 
 function showChecks() {
@@ -401,10 +434,10 @@ function showDifficulty(id, score) {
 function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  waitingForContinue = false;
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
-  document.getElementById('btn-checks-next').disabled = false;
   document.getElementById('checks-session-time').textContent = '';
   document.getElementById('checks-session-acc').textContent = '';
   document.getElementById('checks-session-stats').classList.add('hidden');
@@ -413,6 +446,7 @@ function resetDrill() {
 function resetUI() {
   correctW = correctB = false;
   misses = seconds = correctAnswers = 0;
+  waitingForContinue = false;
   hideChecks();
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
