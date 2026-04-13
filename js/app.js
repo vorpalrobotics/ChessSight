@@ -13,11 +13,12 @@ import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
 import { initMix, startMix } from './mix.js';
+import { initMemory, startMemory } from './memory.js';
 import { getAllRecords, getDisciplineGames, exportAllData, importAllData } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -126,6 +127,11 @@ document.getElementById('mode-dlm').addEventListener('click', () => {
 document.getElementById('mode-discipline').addEventListener('click', () => {
   showScreen('screen-discipline');
   startDiscipline();
+});
+
+document.getElementById('mode-memory').addEventListener('click', () => {
+  showScreen('screen-memory');
+  startMemory();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -815,3 +821,4 @@ initHangGrab(showScreen);
 initMix(showScreen);
 initDeLaMaza(showScreen, launchChessConfetti);
 initDiscipline(showScreen, launchChessConfetti);
+initMemory(showScreen);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.47</title>
+  <title>ChessSight v0.1.48</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.47</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.48</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -144,6 +144,11 @@
         <span class="mode-icon">♔</span>
         <span class="mode-name">Move Discipline</span>
         <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
+      </button>
+      <button class="mode-card" id="mode-memory">
+        <span class="mode-icon">🧠</span>
+        <span class="mode-name">Memory</span>
+        <span class="mode-desc">Study a position, then reconstruct it from memory</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -710,6 +715,50 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ── Screen 12: Memory drill ── -->
+  <div id="screen-memory" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Memory</h2>
+        <span id="memory-puzzle-num">#1</span>
+      </div>
+      <div class="drill-top-right">
+        <button class="drill-pause-btn">⏸</button>
+        <button id="btn-memory-done">END DRILL</button>
+      </div>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="memory-board"></div>
+    </div>
+
+    <!-- Study phase overlay: timer bar + READY button -->
+    <div id="memory-study-overlay">
+      <div id="memory-study-bar-wrap">
+        <div id="memory-study-bar"></div>
+      </div>
+      <button id="btn-memory-ready">READY</button>
+    </div>
+
+    <!-- Piece palette (shown during recall only) -->
+    <div id="memory-palette" class="hidden"></div>
+
+    <!-- Recall stats (timer + misses + SHOW) -->
+    <div id="memory-recall-stats" class="drill-current-stats hidden">
+      <span id="memory-timer">0:00</span>
+      <span id="memory-misses">Misses: 0</span>
+      <button id="btn-memory-show">SHOW</button>
+    </div>
+
+    <div id="memory-status"></div>
+    <div id="memory-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
+      <span id="memory-session-time" class="session-stat"></span>
+      <span id="memory-session-acc" class="session-stat"></span>
+    </div>
+    <p class="drill-rule">Study the position, then place each piece back from memory. Drag pieces from the palette onto the correct squares.</p>
   </div>
 
   <!-- ── Screen 11: Drill summary ── -->
