@@ -315,9 +315,9 @@ async function loadNextPuzzle() {
 
   const pieceCount = answerKey.size;
   const timeLimitMode = getTimeLimitMode();
-  if (timeLimitMode === 'slow')        studyDuration = Math.max(15000, pieceCount * 3500);
+  if (timeLimitMode === 'slow')        studyDuration = Math.max(25000, pieceCount * 6000);
   else if (timeLimitMode === 'fast')   studyDuration = Math.max(4000,  pieceCount * 1000);
-  else                                 studyDuration = Math.max(8000,  pieceCount * 2000);
+  else                                 studyDuration = Math.max(15000, pieceCount * 3000);
   studyElapsedMs = 0;
   fadingStarted = false;
 
@@ -442,7 +442,7 @@ function finishRecall(allCorrect) {
     });
   }
 
-  setStatus('Click board to continue');
+  drawContinueMsg();
   waitingForContinue = true;
 }
 
@@ -464,7 +464,7 @@ function onBoardClick() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   waitingForContinue = false;
-  setStatus('');
+  clearContinueMsg();
 
   const limit = getPositionsPerDrill();
   if (limit !== null && drillResults.length >= limit) {
@@ -616,6 +616,27 @@ function renderRecallBoard() {
 function getSvg() {
   const boardEl = document.getElementById('memory-board');
   return boardEl ? boardEl.querySelector('svg') : null;
+}
+
+function drawContinueMsg() {
+  const svg = getSvg();
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const boardW = (vb && vb.width) ? vb.width : svg.getBoundingClientRect().width;
+  const sqSize = boardW / 8;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', boardW / 2);
+  text.setAttribute('y', boardW - sqSize * 0.15);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('font-size', sqSize * 0.48);
+  text.setAttribute('class', 'memory-continue-msg');
+  text.textContent = 'Click anywhere to continue';
+  svg.appendChild(text);
+}
+
+function clearContinueMsg() {
+  const svg = getSvg();
+  if (svg) svg.querySelectorAll('.memory-continue-msg').forEach(el => el.remove());
 }
 
 function drawSqMark(sq, cssClass) {
@@ -809,6 +830,7 @@ function resetUI() {
   misses = 0;
   recallSeconds = 0;
   clearAllMarks();
+  clearContinueMsg();
   document.getElementById('memory-timer').textContent  = '0:00';
   document.getElementById('memory-misses').textContent = 'Misses: 0';
   document.getElementById('memory-palette').innerHTML  = '';

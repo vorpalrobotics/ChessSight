@@ -2245,6 +2245,16 @@ button:disabled {
   pointer-events: none;
 }
 
+.memory-continue-msg {
+  font-weight: 700;
+  fill: #111;
+  stroke: white;
+  stroke-width: 5px;
+  paint-order: stroke fill;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+}
+
 .memory-sq-wrong {
   fill: rgba(220, 50, 50, 0.6);
   stroke: #dc3232;
