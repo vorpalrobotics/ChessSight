@@ -40,6 +40,9 @@ function makePieceSvg(pk, sizePx) {
   svg.setAttribute('viewBox', '0 0 40 40');
   svg.setAttribute('width', String(sizePx));
   svg.setAttribute('height', String(sizePx));
+  // Inline style beats any CSS rule that might resize the element.
+  svg.style.width = sizePx + 'px';
+  svg.style.height = sizePx + 'px';
   const id = pk[0] + pk[1].toLowerCase(); // 'wK' → 'wk', 'bN' → 'bn'
   if (pieceCache && pieceCache.has(id)) {
     // importNode adopts the element from the DOMParser document into ours
@@ -258,7 +261,6 @@ function beginRecall() {
   document.getElementById('memory-timer').textContent = '0:00';
   recallInterval = setInterval(tickRecall, 1000);
 
-  palettePx = Math.round(document.getElementById('memory-board').offsetWidth / 8);
   renderPalette();
 }
 
@@ -343,6 +345,11 @@ function onBoardClick() {
 // --- Palette rendering ---
 
 function renderPalette() {
+  // Re-measure each call so stale module state can't cause wrong sizing.
+  const boardEl = document.getElementById('memory-board');
+  const measuredPx = Math.round(boardEl.getBoundingClientRect().width / 8);
+  if (measuredPx > 0) palettePx = measuredPx;
+
   const container = document.getElementById('memory-palette');
   container.classList.remove('hidden');
   container.innerHTML = '';
