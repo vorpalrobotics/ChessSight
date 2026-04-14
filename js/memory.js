@@ -7,44 +7,46 @@ const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/s
 
 const PIECE_ORDER = ['K', 'Q', 'R', 'B', 'N', 'P'];
 
-// Fetch the sprite once and inline it into the DOM so local `<use href="#wq">`
-// references work reliably (external SVG <use> is inconsistent across browsers).
-let spriteLoaded = false;
+// Cache of parsed <g> elements from the sprite, keyed by piece id (e.g. 'wk', 'bn').
+// We clone these directly into each palette/drag SVG — no <use> cross-document refs needed.
+let pieceCache = null;
 let spriteLoadPromise = null;
 
 function loadSprite() {
-  if (spriteLoaded) return Promise.resolve();
+  if (pieceCache) return Promise.resolve();
   if (spriteLoadPromise) return spriteLoadPromise;
   spriteLoadPromise = fetch(PIECES_URL)
     .then(r => r.text())
     .then(svgText => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(svgText, 'image/svg+xml');
-      const spriteSvg = doc.documentElement;
-      // Hide the sprite container so any renderable content inside it isn't shown
-      spriteSvg.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden;');
-      spriteSvg.setAttribute('aria-hidden', 'true');
-      spriteSvg.id = 'memory-piece-sprite';
-      document.body.insertBefore(spriteSvg, document.body.firstChild);
-      spriteLoaded = true;
+      pieceCache = new Map();
+      for (const id of ['wk','wq','wr','wb','wn','wp','bk','bq','br','bb','bn','bp']) {
+        const el = doc.getElementById(id);
+        if (el) pieceCache.set(id, el);
+      }
     })
     .catch(err => {
-      console.warn('Memory drill: failed to inline piece sprite', err);
-      spriteLoaded = true; // don't retry forever
+      console.warn('Memory drill: failed to load piece sprite', err);
+      pieceCache = new Map(); // don't retry forever
     });
   return spriteLoadPromise;
 }
 
-// Build an SVG element referencing a piece in the inlined cm-chessboard sprite.
+// Build a standalone SVG with the piece cloned directly from the sprite cache.
+// sprite viewBox is 0 0 40 40; each <g> has a translate() that positions the piece.
 function makePieceSvg(pk, sizePx) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 45 45');
-  svg.setAttribute('width', sizePx);
-  svg.setAttribute('height', sizePx);
-  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  // sprite ID: 'wQ' → 'wq', 'bN' → 'bn'
-  use.setAttribute('href', `#${pk[0]}${pk[1].toLowerCase()}`);
-  svg.appendChild(use);
+  svg.setAttribute('viewBox', '0 0 40 40');
+  svg.setAttribute('width', String(sizePx));
+  svg.setAttribute('height', String(sizePx));
+  const id = pk[0] + pk[1].toLowerCase(); // 'wK' → 'wk', 'bN' → 'bn'
+  if (pieceCache && pieceCache.has(id)) {
+    // importNode adopts the element from the DOMParser document into ours
+    const clone = document.importNode(pieceCache.get(id), true);
+    clone.removeAttribute('id'); // avoid duplicate IDs in the DOM
+    svg.appendChild(clone);
+  }
   return svg;
 }
 
