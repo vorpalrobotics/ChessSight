@@ -550,7 +550,7 @@ function attemptPlace(sq, pieceKey) {
   if (!puzzleActive || phase !== 'recall') return;
 
   if (placed.has(sq)) {
-    flashSqWrong(sq);
+    flashSqWrong(sq, pieceKey);
     return;
   }
 
@@ -568,7 +568,7 @@ function attemptPlace(sq, pieceKey) {
   } else {
     misses++;
     document.getElementById('memory-misses').textContent = `Misses: ${misses}`;
-    flashSqWrong(sq);
+    flashSqWrong(sq, pieceKey);
   }
 }
 
@@ -612,7 +612,7 @@ function drawSqMark(sq, cssClass) {
   svg.appendChild(rect);
 }
 
-function flashSqWrong(sq) {
+function flashSqWrong(sq, pieceKey) {
   const svg = getSvg();
   if (!svg) return;
   const vb = svg.viewBox.baseVal;
@@ -624,6 +624,10 @@ function flashSqWrong(sq) {
   const y = (8 - rank) * sqSize;
   const pad = 3;
 
+  const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('pointer-events', 'none');
+
+  // Fading red rectangle
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   rect.setAttribute('x', x + pad);
   rect.setAttribute('y', y + pad);
@@ -631,9 +635,23 @@ function flashSqWrong(sq) {
   rect.setAttribute('height', sqSize - pad * 2);
   rect.setAttribute('rx', 4);
   rect.setAttribute('class', 'memory-sq-wrong');
-  rect.setAttribute('pointer-events', 'none');
-  svg.appendChild(rect);
-  setTimeout(() => rect.remove(), 1500);
+  group.appendChild(rect);
+
+  // Piece icon on top — stays at full opacity so it's readable throughout
+  if (pieceKey && pieceCache) {
+    const id = pieceKey[0] + pieceKey[1].toLowerCase();
+    if (pieceCache.has(id)) {
+      const pieceG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      pieceG.setAttribute('transform', `translate(${x},${y}) scale(${sqSize / 40})`);
+      const clone = document.importNode(pieceCache.get(id), true);
+      clone.removeAttribute('id');
+      pieceG.appendChild(clone);
+      group.appendChild(pieceG);
+    }
+  }
+
+  svg.appendChild(group);
+  setTimeout(() => group.remove(), 1500);
 }
 
 function clearAllMarks() {
