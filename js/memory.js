@@ -486,29 +486,14 @@ function renderPalette() {
   container.classList.remove('hidden');
   container.innerHTML = '';
 
-  const whitePieces = PIECE_ORDER.map(t => 'w' + t).filter(pk => palette.has(pk));
-  const blackPieces = PIECE_ORDER.map(t => 'b' + t).filter(pk => palette.has(pk));
-
-  if (whitePieces.length > 0) container.appendChild(buildPaletteRow(whitePieces, 'White'));
-  if (blackPieces.length > 0) container.appendChild(buildPaletteRow(blackPieces, 'Black'));
-}
-
-function buildPaletteRow(pieceKeys, label) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'memory-palette-row-wrap';
-
-  const lbl = document.createElement('span');
-  lbl.className = 'memory-palette-label';
-  lbl.textContent = label;
-  wrapper.appendChild(lbl);
+  const allPieces = [...PIECE_ORDER.map(t => 'w' + t), ...PIECE_ORDER.map(t => 'b' + t)]
+    .filter(pk => (palette.get(pk) ?? 0) > 0);
 
   const row = document.createElement('div');
   row.className = 'memory-palette-row';
-  wrapper.appendChild(row);
 
-  for (const pk of pieceKeys) {
+  for (const pk of allPieces) {
     const count = palette.get(pk) ?? 0;
-    if (count <= 0) continue;
 
     const slot = document.createElement('div');
     slot.className = 'memory-piece-slot';
@@ -531,7 +516,7 @@ function buildPaletteRow(pieceKeys, label) {
     row.appendChild(slot);
   }
 
-  return wrapper;
+  container.appendChild(row);
 }
 
 // --- Drag-and-drop (Pointer Events API) ---
