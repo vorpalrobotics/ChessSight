@@ -2126,6 +2126,25 @@ button:disabled {
   color: #fff;
 }
 
+/* Start-at setting row */
+.drill-setting-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  max-width: calc(var(--board-size) + 4px);
+  width: 100%;
+}
+.drill-setting-row select {
+  font-size: 0.78rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
 /* Piece palette */
 #memory-palette {
   max-width: calc(var(--board-size) + 4px);

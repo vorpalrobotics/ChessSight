@@ -53,33 +53,135 @@ function makePieceSvg(pk, sizePx) {
   return svg;
 }
 
-// Varied positions: 4–12 pieces each
-const POSITIONS = [
-  '8/8/3k4/8/3K4/8/8/3R4 w - - 0 1',
-  '8/8/3k4/3p4/3P4/3K4/8/8 w - - 0 1',
-  'r7/8/3k4/8/8/3K4/8/R7 w - - 0 1',
-  '8/3k4/8/8/4B3/8/3K4/8 w - - 0 1',
-  '8/3k4/4n3/8/8/4N3/3K4/8 w - - 0 1',
-  '3k4/3r4/8/8/8/8/3R4/3K4 w - - 0 1',
-  '8/pp3k2/8/8/8/8/PP3K2/8 w - - 0 1',
-  'r4k2/5p2/8/8/8/8/5P2/R4K2 w - - 0 1',
-  '5k2/2r2p2/8/8/8/8/2R2P2/5K2 w - - 0 1',
-  '3rk3/3p4/8/8/8/8/3P4/3RK3 w - - 0 1',
-  '4k3/2b1n3/8/8/8/8/2B1N3/4K3 w - - 0 1',
-  '3k4/pp1n1ppp/8/8/8/8/PP1N1PPP/3K4 w - - 0 1',
-  '8/pp2k1pp/8/8/8/8/PP2K1PP/8 w - - 0 1',
-  'r4rk1/8/8/8/8/8/8/R4RK1 w - - 0 1',
-  'r1b1k3/pp3ppp/8/8/8/8/PP3PPP/R1B1K3 w - - 0 1',
-  '3k4/3b4/8/1pp5/1PP5/8/3B4/3K4 w - - 0 1',
-  '2bk4/2p5/8/8/8/8/2P5/2BK4 w - - 0 1',
-  '8/2k5/2r5/8/8/2R5/2K5/8 w - - 0 1',
-  '1r2k3/5b2/8/8/8/8/5B2/1R2K3 w - - 0 1',
-  'r1bqk3/pppp4/8/8/8/8/PPPP4/R1BQK3 w - - 0 1',
-  '8/3kbp2/8/8/8/8/3KBP2/8 w - - 0 1',
-  '3rk3/3bp3/8/8/8/8/3BP3/3RK3 w - - 0 1',
-  'r3k3/p1p2p2/8/8/8/8/P1P2P2/R3K3 w - - 0 1',
-  '2r2rk1/5p2/8/8/8/8/5P2/2R2RK1 w - - 0 1',
-];
+const LICHESS_PUZZLE_URL = 'https://lichess.org/api/puzzle/next';
+
+// All 64 squares used for random position generation
+const ALL_SQUARES = Array.from('abcdefgh').flatMap(f =>
+  Array.from({length: 8}, (_, i) => f + (i + 1)));
+
+// --- Adaptive position: generation (levels 2–6) & Lichess fetch (levels 7+) ---
+
+function sqToIndex(sq) {
+  return (8 - parseInt(sq[1])) * 8 + (sq.charCodeAt(0) - 97);
+}
+
+function isAdjacent(sq1, sq2) {
+  return Math.abs(sq1.charCodeAt(0) - sq2.charCodeAt(0)) <= 1 &&
+         Math.abs(sq1.charCodeAt(1) - sq2.charCodeAt(1)) <= 1;
+}
+
+function pickPiece(sq) {
+  const rank = parseInt(sq[1]);
+  const pool = (rank === 1 || rank === 8) ? ['q','r','b','n'] : ['q','r','b','n','p'];
+  const type  = pool[Math.floor(Math.random() * pool.length)];
+  const color = Math.random() < 0.5 ? 'w' : 'b';
+  return color === 'w' ? type.toUpperCase() : type;
+}
+
+function buildFenBoard(arr) {
+  const rows = [];
+  for (let row = 0; row < 8; row++) {
+    let s = ''; let empty = 0;
+    for (let col = 0; col < 8; col++) {
+      const p = arr[row * 8 + col];
+      if (p) { if (empty) { s += empty; empty = 0; } s += p; } else { empty++; }
+    }
+    if (empty) s += empty;
+    rows.push(s);
+  }
+  return rows.join('/');
+}
+
+function tryGeneratePosition(pieceCount) {
+  const sqs = shuffleArray([...ALL_SQUARES]);
+  const arr  = new Array(64).fill('');
+
+  // White king
+  const wkSq = sqs.shift();
+  arr[sqToIndex(wkSq)] = 'K';
+
+  // Black king — not adjacent to white king
+  const bkIdx = sqs.findIndex(s => !isAdjacent(wkSq, s));
+  if (bkIdx === -1) return null;
+  const bkSq = sqs.splice(bkIdx, 1)[0];
+  arr[sqToIndex(bkSq)] = 'k';
+
+  // Remaining pieces
+  let placed = 0;
+  for (let i = 0; i < sqs.length && placed < pieceCount - 2; i++, placed++) {
+    arr[sqToIndex(sqs[i])] = pickPiece(sqs[i]);
+  }
+  if (placed < pieceCount - 2) return null;
+
+  const fenBoard = buildFenBoard(arr);
+  for (const stm of ['w', 'b']) {
+    const fen = `${fenBoard} ${stm} - - 0 1`;
+    try { const c = new Chess(); if (c.load(fen) !== false) return fen; } catch { /* skip */ }
+  }
+  return null;
+}
+
+function generatePosition(pieceCount) {
+  for (let i = 0; i < 100; i++) {
+    const fen = tryGeneratePosition(pieceCount);
+    if (fen) return fen;
+  }
+  return '8/8/8/8/8/8/7k/K7 w - - 0 1'; // absolute fallback
+}
+
+function countPieces(fen) {
+  return fen ? fen.split(' ')[0].replace(/[^a-zA-Z]/g, '').length : 0;
+}
+
+function extractFen(data) {
+  // Prefer a direct fen field if Lichess includes one
+  if (data?.puzzle?.fen) return data.puzzle.fen;
+  if (data?.game?.fen)   return data.game.fen;
+
+  // Reconstruct by replaying game PGN to initialPly half-moves
+  const pgn        = data?.game?.pgn;
+  const initialPly = data?.puzzle?.initialPly;
+  if (!pgn || initialPly === undefined) return null;
+  try {
+    const full = new Chess();
+    full.loadPgn(pgn);
+    const moves = full.history();
+    const pos   = new Chess();
+    for (let i = 0; i < Math.min(initialPly, moves.length); i++) pos.move(moves[i]);
+    return pos.fen();
+  } catch (e) {
+    console.warn('Memory: failed to extract FEN', e);
+    return null;
+  }
+}
+
+async function fetchBestPuzzle(regime, targetPieces) {
+  const url = regime === 'endgame'
+    ? `${LICHESS_PUZZLE_URL}?theme=endgame`
+    : LICHESS_PUZZLE_URL;
+
+  const results = await Promise.all(
+    Array.from({length: 5}, () => fetch(url).then(r => r.json()).catch(() => null))
+  );
+
+  const candidates = results
+    .filter(Boolean)
+    .map(data => ({ fen: extractFen(data) }))
+    .filter(c => c.fen)
+    .map(c => ({ fen: c.fen, pieces: countPieces(c.fen) }));
+
+  if (candidates.length === 0) return generatePosition(Math.min(targetPieces, 6));
+
+  // Pick the candidate whose piece count is closest to the target level
+  candidates.sort((a, b) => Math.abs(a.pieces - targetPieces) - Math.abs(b.pieces - targetPieces));
+  return candidates[0].fen;
+}
+
+async function getNextPosition() {
+  if (drillLevel <= 6)  return generatePosition(drillLevel);
+  if (drillLevel <= 12) return fetchBestPuzzle('endgame', drillLevel);
+  return fetchBestPuzzle('general', drillLevel);
+}
 
 // --- Module state ---
 let board = null;
@@ -94,7 +196,7 @@ let palette = new Map();     // pieceKey → remaining count
 let placed = new Map();      // square → pieceKey (correctly placed)
 let misses = 0;
 let puzzleCount = 0;
-let positionQueue = [];
+let drillLevel = 2;   // current target piece count; advances on success, stays on fail
 const drillResults = [];
 
 // Study timer
@@ -131,7 +233,6 @@ export async function startMemory() {
   registerPause(pauseDrill, resumeDrill);
   await loadSprite();
   resetDrill();
-  positionQueue = shuffleArray([...POSITIONS]);
   await loadNextPuzzle();
 }
 
@@ -170,9 +271,10 @@ async function loadNextPuzzle() {
   resetUI();
   puzzleCount++;
   document.getElementById('memory-puzzle-num').textContent = `#${puzzleCount}`;
+  updateLevelDisplay();
 
-  if (positionQueue.length === 0) positionQueue = shuffleArray([...POSITIONS]);
-  currentFen = positionQueue.shift();
+  if (drillLevel > 6) setStatus('Loading…');
+  currentFen = await getNextPosition();
 
   answerKey = buildAnswerKey(currentFen);
   palette = buildPaletteCounts(answerKey);
@@ -294,6 +396,7 @@ function finishRecall(allCorrect) {
   updateSessionStats();
 
   if (allCorrect) {
+    drillLevel++;   // advance one level on success
     // Pulse the placed marks — use rAF so the marks drawn by renderRecallBoard are ready
     requestAnimationFrame(() => {
       document.getElementById('memory-board')
@@ -301,6 +404,7 @@ function finishRecall(allCorrect) {
         .forEach(el => el.classList.add('pulsing'));
     });
   } else {
+    // drillLevel unchanged — failure keeps you at the same level
     // Show correct solution for missed squares
     board.setPosition(currentFen, false);
     requestAnimationFrame(() => {
@@ -646,7 +750,7 @@ function resetDrill() {
   dragPieceKey = null;
   puzzleCount = 0;
   drillResults.length = 0;
-  positionQueue = [];
+  drillLevel = getMinLevel();  // each session starts at the setting's floor
   waitingForContinue = false;
   document.getElementById('memory-session-time').textContent = '';
   document.getElementById('memory-session-acc').textContent  = '';
@@ -665,6 +769,19 @@ function resetUI() {
 
 function setStatus(msg) {
   document.getElementById('memory-status').textContent = msg;
+}
+
+function getMinLevel() {
+  const el = document.getElementById('select-memory-min-pieces');
+  if (!el || el.value === 'unlimited') return 2;
+  return parseInt(el.value, 10) || 2;
+}
+
+function updateLevelDisplay() {
+  const el = document.getElementById('memory-level');
+  if (!el) return;
+  const regime = drillLevel <= 6 ? 'gen' : drillLevel <= 12 ? 'end' : 'open';
+  el.textContent = `L${drillLevel} · ${regime}`;
 }
 
 function getPositionsPerDrill() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.56</title>
+  <title>ChessSight v0.1.57</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.56</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.57</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -723,6 +723,7 @@
       <div class="drill-top-left">
         <h2>Memory</h2>
         <span id="memory-puzzle-num">#1</span>
+        <span id="memory-level" class="drill-difficulty">L2 · gen</span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
@@ -758,7 +759,19 @@
       <span id="memory-session-time" class="session-stat"></span>
       <span id="memory-session-acc" class="session-stat"></span>
     </div>
-    <p class="drill-rule">Study the position, then place each piece back from memory. Drag pieces from the palette onto the correct squares.</p>
+    <div class="drill-setting-row">
+      <label for="select-memory-min-pieces">Start at:</label>
+      <select id="select-memory-min-pieces">
+        <option value="2">2 pieces</option>
+        <option value="3">3 pieces</option>
+        <option value="4">4 pieces</option>
+        <option value="5">5 pieces</option>
+        <option value="6">6–10 pieces</option>
+        <option value="11">11–16 pieces</option>
+        <option value="unlimited">Unlimited</option>
+      </select>
+    </div>
+    <p class="drill-rule">Study the position, then place each piece back from memory. Succeed to advance a level; press SHOW and the level stays.</p>
   </div>
 
   <!-- ── Screen 11: Drill summary ── -->
