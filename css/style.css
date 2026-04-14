@@ -2109,6 +2109,14 @@ button:disabled {
   transition: width 0.1s linear;
 }
 
+#memory-study-click-hint {
+  flex: 1;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
 #btn-memory-ready {
   font-size: 0.78rem;
   font-weight: 700;

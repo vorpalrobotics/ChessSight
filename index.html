@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.60</title>
+  <title>ChessSight v0.1.61</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.60</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.61</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -740,6 +740,7 @@
       <div id="memory-study-bar-wrap">
         <div id="memory-study-bar"></div>
       </div>
+      <p id="memory-study-click-hint" class="hidden">Click the board when ready to solve</p>
       <button id="btn-memory-ready">READY</button>
     </div>
 
@@ -758,6 +759,15 @@
       <span class="session-label">Session:</span>
       <span id="memory-session-time" class="session-stat"></span>
       <span id="memory-session-acc" class="session-stat"></span>
+    </div>
+    <div class="drill-setting-row">
+      <label for="select-memory-time-limit">Time limit:</label>
+      <select id="select-memory-time-limit">
+        <option value="slow">Slow</option>
+        <option value="medium" selected>Medium</option>
+        <option value="fast">Fast</option>
+        <option value="click">Click to solve</option>
+      </select>
     </div>
     <div class="drill-setting-row">
       <label for="select-memory-min-pieces">Start at:</label>

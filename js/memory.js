@@ -314,12 +314,15 @@ async function loadNextPuzzle() {
   }
 
   const pieceCount = answerKey.size;
-  studyDuration = Math.max(8000, pieceCount * 2000);
+  const timeLimitMode = getTimeLimitMode();
+  if (timeLimitMode === 'slow')        studyDuration = Math.max(15000, pieceCount * 3500);
+  else if (timeLimitMode === 'fast')   studyDuration = Math.max(4000,  pieceCount * 1000);
+  else                                 studyDuration = Math.max(8000,  pieceCount * 2000);
   studyElapsedMs = 0;
   fadingStarted = false;
 
   showStudyPhase();
-  startStudyTimer();
+  if (timeLimitMode !== 'click') startStudyTimer();
   updateSessionStats();
 }
 
@@ -327,10 +330,13 @@ function showStudyPhase() {
   phase = 'study';
   puzzleActive = true;
 
+  const isClick = getTimeLimitMode() === 'click';
   document.getElementById('memory-board').classList.remove('pieces-fading');
   document.getElementById('memory-study-overlay').classList.remove('hidden');
   document.getElementById('memory-palette').classList.add('hidden');
   document.getElementById('memory-study-bar').style.width = '100%';
+  document.getElementById('memory-study-bar-wrap').classList.toggle('hidden', isClick);
+  document.getElementById('memory-study-click-hint').classList.toggle('hidden', !isClick);
   document.getElementById('btn-memory-ready').disabled = false;
   document.getElementById('btn-memory-show').classList.add('hidden');
   document.getElementById('memory-recall-stats').classList.add('hidden');
@@ -349,7 +355,7 @@ function tickStudy() {
   const pct = Math.max(0, (remaining / studyDuration) * 100);
   document.getElementById('memory-study-bar').style.width = pct + '%';
 
-  if (!fadingStarted && remaining <= 3000) {
+  if (!fadingStarted && remaining <= 3000 && getTimeLimitMode() !== 'click') {
     fadingStarted = true;
     document.getElementById('memory-board').classList.add('pieces-fading');
   }
@@ -453,6 +459,7 @@ function puzzleComplete() {
 }
 
 function onBoardClick() {
+  if (phase === 'study' && getTimeLimitMode() === 'click') { onReady(); return; }
   if (!waitingForContinue) return;
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
@@ -814,6 +821,11 @@ function getMinLevel() {
   const el = document.getElementById('select-memory-min-pieces');
   if (!el || el.value === 'unlimited') return 2;
   return parseInt(el.value, 10) || 2;
+}
+
+function getTimeLimitMode() {
+  const el = document.getElementById('select-memory-time-limit');
+  return el ? el.value : 'medium';
 }
 
 function updateLevelDisplay() {
