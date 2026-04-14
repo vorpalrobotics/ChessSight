@@ -9,6 +9,8 @@ import { fetchLoosePuzzle } from './loose.js';
 import { fetchUnderPuzzle } from './under.js';
 import { generateQueenPuzzle } from './queen.js';
 import { generateHangGrabPuzzle } from './hanggrab.js';
+import { generateKnightPuzzle, buildKnightFen, bfs, knightMoves, blackPawnAttacks } from './knight.js';
+import { scoreKnightDifficulty } from './difficulty.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -21,6 +23,7 @@ const DRILL_DEFS = {
   under:    { label: 'UNDERGUARDED',    type: 'click', fetch: fetchUnderPuzzle    },
   queen:    { label: 'QUEEN ATTACK',   type: 'click', fetch: generateQueenPuzzle },
   hanggrab: { label: 'HANG GRAB',      type: 'click', fetch: generateHangGrabPuzzle },
+  knight:   { label: 'KNIGHT ROUTE',  type: 'knight', fetch: generateKnightPuzzle  },
 };
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -42,6 +45,14 @@ let puzzleMisses = 0;         // wrong clicks this puzzle (not yet in sessionMis
 // Count drill per-puzzle state
 let correctW = false;
 let correctB = false;
+
+// Knight Route per-puzzle state
+let knightPos = '';
+let knightPath = [];
+let knightInvalidClicks = 0;
+let knightObstacles = new Set();
+let knightBlackPawns = new Set();
+let knightBlackAttacked = new Set();
 
 // Session totals
 let puzzleCount = 0;
@@ -143,9 +154,10 @@ async function loadNextPuzzle() {
   void labelEl.offsetWidth; // force reflow to restart animation
   labelEl.classList.add('pop');
 
-  const isCount = def.type === 'count';
+  const isCount  = def.type === 'count';
+  const isKnight = def.type === 'knight';
   document.getElementById('mix-count-panel').classList.toggle('hidden', !isCount);
-  document.getElementById('btn-mix-done-click').classList.toggle('hidden', isCount);
+  document.getElementById('btn-mix-done-click').classList.toggle('hidden', isCount || isKnight);
 
   const showBtn = document.getElementById('btn-mix-show');
   showBtn.textContent = 'SHOW';
@@ -162,18 +174,36 @@ async function loadNextPuzzle() {
   setStatus('Loading…');
   currentPuzzle = await Promise.resolve(def.fetch());
 
+  let fen = currentPuzzle.fen;
+  if (isKnight) {
+    fen = buildKnightFen(currentPuzzle.startSq, currentPuzzle.whitePawns, currentPuzzle.blackPawns);
+    knightPos            = currentPuzzle.startSq;
+    knightPath           = [];
+    knightInvalidClicks  = 0;
+    knightObstacles      = currentPuzzle.blocked;
+    knightBlackPawns     = currentPuzzle.blackPawns;
+    knightBlackAttacked  = blackPawnAttacks(currentPuzzle.blackPawns);
+  }
+
   if (board) {
-    board.setPosition(currentPuzzle.fen, false);
+    board.setPosition(fen, false);
   } else {
     board = new Chessboard(document.getElementById('mix-board'), {
-      position: currentPuzzle.fen,
+      position: fen,
       orientation: COLOR.white,
       style: { pieces: { file: PIECES_URL } },
       extensions: [{ class: Arrows, props: { sprite: ARROWS_SVG_URL, headSize: 6 } }],
     });
   }
 
-  if (currentPuzzle.difficulty !== undefined) {
+  if (isKnight) {
+    const score = scoreKnightDifficulty(currentPuzzle);
+    const { text, cls } = diffLabel(score);
+    const el = document.getElementById('mix-diff');
+    el.textContent = text;
+    el.className = `drill-difficulty ${cls}`;
+    requestAnimationFrame(() => drawMixKnightTarget(currentPuzzle.targetSq));
+  } else if (currentPuzzle.difficulty !== undefined) {
     const { text, cls } = diffLabel(currentPuzzle.difficulty);
     const el = document.getElementById('mix-diff');
     el.textContent = text;
@@ -190,9 +220,13 @@ async function loadNextPuzzle() {
 // ─── Board click (click drills) ───────────────────────────────────────────────
 
 function handleBoardClick(e) {
-  if (!currentDrill || DRILL_DEFS[currentDrill].type !== 'click') return;
+  if (!currentDrill) return;
+  const dtype = DRILL_DEFS[currentDrill].type;
+  if (dtype !== 'click' && dtype !== 'knight') return;
   if (waitingToAdvance) { loadNextPuzzle(); return; }
   if (!puzzleActive) return;
+
+  if (dtype === 'knight') { handleKnightBoardClick(e); return; }
 
   const sq = sqFromClick(e);
   if (!sq) return;
@@ -254,11 +288,10 @@ function handleClickDone() {
 
 function handleShow() {
   if (!currentDrill) return;
-  if (DRILL_DEFS[currentDrill].type === 'count') {
-    handleCountShow();
-  } else {
-    handleClickShow();
-  }
+  const dtype = DRILL_DEFS[currentDrill].type;
+  if (dtype === 'count')  handleCountShow();
+  else if (dtype === 'knight') handleKnightShow();
+  else handleClickShow();
 }
 
 function handleClickShow() {
@@ -486,7 +519,8 @@ function removeOverlay(sq) {
 
 function clearOverlays() {
   const boardEl = document.getElementById('mix-board');
-  if (boardEl) boardEl.querySelectorAll('[data-mix-sq]').forEach(el => el.remove());
+  if (!boardEl) return;
+  boardEl.querySelectorAll('[data-mix-sq], [data-knight], [data-knight-sq], .knight-continue-msg, .knight-board-msg').forEach(el => el.remove());
 }
 
 function flashSqRed(sq) {
@@ -503,6 +537,194 @@ function flashSqRed(sq) {
   rect.setAttribute('class', 'hg-sq-flash');
   svg.appendChild(rect);
   setTimeout(() => rect.remove(), 600);
+}
+
+// ─── Knight Route handlers ─────────────────────────────────────────────────────
+
+function handleKnightBoardClick(e) {
+  const sq = sqFromClick(e);
+  if (!sq) return;
+
+  // Tap current pos = undo last move
+  if (sq === knightPos && knightPath.length > 0) {
+    const undone = knightPath.pop();
+    knightPos = knightPath.length > 0 ? knightPath[knightPath.length - 1] : currentPuzzle.startSq;
+    const boardEl = document.getElementById('mix-board');
+    if (boardEl) boardEl.querySelectorAll(`[data-knight-sq="${undone}"]`).forEach(el => el.remove());
+    return;
+  }
+
+  if (sq === currentPuzzle.startSq || knightPath.includes(sq)) return;
+
+  if (!knightMoves(knightPos, knightObstacles).includes(sq)) {
+    knightInvalidClicks++;
+    puzzleMisses++;
+    updateMissesDisplay();
+    mixFlashInvalid(sq);
+    if (knightMoves(knightPos).includes(sq)) {
+      if (knightBlackPawns.has(sq))        mixShowBoardMsg('Capture not allowed in this drill');
+      else if (knightBlackAttacked.has(sq)) mixShowBoardMsg('The pawn could capture you there');
+    }
+    return;
+  }
+
+  knightPath.push(sq);
+  knightPos = sq;
+  const sqClass = knightPath.length > currentPuzzle.optimalDist ? 'knight-sq-over' : 'knight-sq-path';
+  drawMixPathSquare(sq, knightPath.length, sqClass);
+
+  if (sq === currentPuzzle.targetSq) finishKnightPuzzle();
+}
+
+function finishKnightPuzzle() {
+  puzzleActive = false;
+  stopTimer();
+
+  const pathLen    = knightPath.length;
+  const extraMoves = Math.max(0, pathLen - currentPuzzle.optimalDist);
+  const totalMisses = puzzleMisses + extraMoves;
+  const isOptimal  = extraMoves === 0 && knightInvalidClicks === 0;
+
+  sessionMisses += totalMisses;
+  document.getElementById('mix-misses').textContent = `Misses: ${sessionMisses}`;
+  drillResults.push({ seconds, correct: isOptimal ? 1 : 0, misses: totalMisses, drill: currentDrill });
+  upsertDrillDay('mix', { seconds, correct: isOptimal ? 1 : 0, misses: totalMisses, puzzleId: `mix-knight-${puzzleCount}` });
+  updateSessionStats();
+
+  if (isOptimal) {
+    const boardEl = document.getElementById('mix-board');
+    if (boardEl) boardEl.querySelectorAll('.knight-sq-path').forEach(el => el.classList.add('pulsing'));
+    setTimeout(loadNextPuzzle, 1500);
+  } else {
+    drawMixContinueMsg();
+    waitingToAdvance = true;
+  }
+}
+
+function handleKnightShow() {
+  if (!puzzleActive) return;
+  puzzleActive = false;
+  stopTimer();
+
+  const remainingBudget = currentPuzzle.optimalDist - knightPath.length;
+  const { dist: remainDist, path: completionPath } =
+    remainingBudget >= 0 ? bfs(knightPos, currentPuzzle.targetSq, knightObstacles) : { dist: Infinity, path: [] };
+  const onOptimal = remainDist === remainingBudget;
+
+  if (onOptimal && knightPath.length > 0) {
+    const base = knightPath.length;
+    completionPath.forEach((sq, i) => drawMixPathSquare(sq, base + i + 1, 'knight-sq-extend'));
+    puzzleMisses += completionPath.length;
+  } else {
+    const boardEl = document.getElementById('mix-board');
+    if (boardEl) boardEl.querySelectorAll('[data-knight-sq]').forEach(el => el.remove());
+    currentPuzzle.optimalPath.forEach((sq, i) => drawMixPathSquare(sq, i + 1, 'knight-sq-optimal'));
+    puzzleMisses += currentPuzzle.optimalDist;
+  }
+
+  const totalMisses = puzzleMisses;
+  sessionMisses += totalMisses;
+  document.getElementById('mix-misses').textContent = `Misses: ${sessionMisses}`;
+  drillResults.push({ seconds, correct: 0, misses: totalMisses, drill: currentDrill });
+  upsertDrillDay('mix', { seconds, correct: 0, misses: totalMisses, puzzleId: `mix-knight-${puzzleCount}` });
+  updateSessionStats();
+
+  drawMixContinueMsg();
+  waitingToAdvance = true;
+}
+
+// ─── Knight SVG helpers (operating on mix-board) ──────────────────────────────
+
+function knightSqToXY(sq, sqSize) {
+  return { x: (sq.charCodeAt(0) - 97) * sqSize, y: (7 - (parseInt(sq[1]) - 1)) * sqSize };
+}
+
+function drawMixKnightTarget(sq) {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const { x, y } = knightSqToXY(sq, sqSize);
+  const pad = 3;
+
+  const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  border.setAttribute('x', x + pad); border.setAttribute('y', y + pad);
+  border.setAttribute('width', sqSize - pad * 2); border.setAttribute('height', sqSize - pad * 2);
+  border.setAttribute('rx', 4); border.setAttribute('class', 'knight-target-border');
+  border.setAttribute('data-knight', 'target');
+  svg.appendChild(border);
+
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  icon.setAttribute('x', x + sqSize / 2); icon.setAttribute('y', y + sqSize / 2);
+  icon.setAttribute('text-anchor', 'middle'); icon.setAttribute('dominant-baseline', 'central');
+  icon.setAttribute('font-size', sqSize * 0.52); icon.setAttribute('class', 'knight-target-icon');
+  icon.setAttribute('data-knight', 'target');
+  icon.textContent = '◎';
+  svg.appendChild(icon);
+}
+
+function drawMixPathSquare(sq, num, cssClass) {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const { x, y } = knightSqToXY(sq, sqSize);
+  const pad = 3;
+
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x + pad); rect.setAttribute('y', y + pad);
+  rect.setAttribute('width', sqSize - pad * 2); rect.setAttribute('height', sqSize - pad * 2);
+  rect.setAttribute('rx', 4); rect.setAttribute('class', cssClass);
+  rect.setAttribute('data-knight-sq', sq);
+  svg.appendChild(rect);
+
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', x + sqSize / 2); text.setAttribute('y', y + sqSize / 2);
+  text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('font-size', sqSize * 0.36); text.setAttribute('class', cssClass + '-num');
+  text.setAttribute('data-knight-sq', sq);
+  text.textContent = num;
+  svg.appendChild(text);
+}
+
+function mixFlashInvalid(sq) {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const { x, y } = knightSqToXY(sq, sqSize);
+  const pad = 3;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x + pad); rect.setAttribute('y', y + pad);
+  rect.setAttribute('width', sqSize - pad * 2); rect.setAttribute('height', sqSize - pad * 2);
+  rect.setAttribute('rx', 4); rect.setAttribute('class', 'knight-sq-invalid');
+  svg.appendChild(rect);
+  setTimeout(() => rect.remove(), 600);
+}
+
+function mixShowBoardMsg(msg) {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const boardW = sqSize * 8;
+  svg.querySelectorAll('.knight-board-msg').forEach(el => el.remove());
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', boardW / 2); text.setAttribute('y', boardW / 2);
+  text.setAttribute('text-anchor', 'middle'); text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('font-size', sqSize * 0.44); text.setAttribute('class', 'knight-board-msg');
+  text.textContent = msg;
+  svg.appendChild(text);
+  setTimeout(() => text.remove(), 2000);
+}
+
+function drawMixContinueMsg() {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const boardW = sqSize * 8;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', boardW / 2); text.setAttribute('y', boardW - sqSize * 0.15);
+  text.setAttribute('text-anchor', 'middle'); text.setAttribute('font-size', sqSize * 0.48);
+  text.setAttribute('class', 'knight-continue-msg');
+  text.textContent = 'Click anywhere to continue';
+  svg.appendChild(text);
 }
 
 function sqFromClick(e) {

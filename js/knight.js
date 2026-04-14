@@ -14,7 +14,7 @@ function sqName(f, r) { return String.fromCharCode(97 + f) + (r + 1); }
 const KNIGHT_DELTAS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
 
 // Returns legal knight moves from sq, excluding blocked squares (future: pawns etc.)
-function knightMoves(sq, blocked = new Set()) {
+export function knightMoves(sq, blocked = new Set()) {
   const f = fileOf(sq), r = rankOf(sq);
   const result = [];
   for (const [df, dr] of KNIGHT_DELTAS) {
@@ -29,7 +29,7 @@ function knightMoves(sq, blocked = new Set()) {
 
 // BFS: returns { dist, path } — path is [sq1,...,targetSq] not including `from`.
 // blocked: Set of squares the knight cannot land on.
-function bfs(from, to, blocked = new Set()) {
+export function bfs(from, to, blocked = new Set()) {
   if (from === to) return { dist: 0, path: [] };
   const pred = new Map([[from, null]]);
   const queue = [from];
@@ -52,7 +52,7 @@ function bfs(from, to, blocked = new Set()) {
 }
 
 // Returns squares attacked by black pawns (diagonally toward rank 1)
-function blackPawnAttacks(blackPawns) {
+export function blackPawnAttacks(blackPawns) {
   const attacked = new Set();
   for (const sq of blackPawns) {
     const f = fileOf(sq), r = rankOf(sq);
@@ -66,7 +66,7 @@ function blackPawnAttacks(blackPawns) {
 
 // ─── FEN builder ─────────────────────────────────────────────────────────────
 
-function buildFen(knightSq, whitePawns = new Set(), blackPawns = new Set()) {
+export function buildKnightFen(knightSq, whitePawns = new Set(), blackPawns = new Set()) {
   const rows = [];
   for (let rank = 7; rank >= 0; rank--) {
     let row = '', empty = 0;
@@ -112,6 +112,8 @@ function placePawns(count, candidates) {
   }
   return pawns;
 }
+
+export function generateKnightPuzzle() { return generatePosition(); }
 
 function generatePosition() {
   for (let attempt = 0; attempt < 1000; attempt++) {
@@ -228,7 +230,7 @@ function loadNextPuzzle() {
   currentPath        = [];
   currentPos         = pos.startSq;
 
-  const fen = buildFen(pos.startSq, pos.whitePawns, pos.blackPawns);
+  const fen = buildKnightFen(pos.startSq, pos.whitePawns, pos.blackPawns);
   if (!board) {
     board = new Chessboard(document.getElementById('knight-board'), {
       position: fen,
