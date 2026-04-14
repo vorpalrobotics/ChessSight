@@ -2189,11 +2189,15 @@ button:disabled {
   cursor: grab;
   user-select: none;
   touch-action: none;
-  padding: 0.05rem 0.15rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   background: var(--surface2);
   border: 2px solid transparent;
   transition: border-color 0.1s;
+  overflow: hidden;
 }
 .memory-piece-slot:hover {
   border-color: #3a9fd0;

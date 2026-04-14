@@ -513,6 +513,8 @@ function buildPaletteRow(pieceKeys, label) {
     const slot = document.createElement('div');
     slot.className = 'memory-piece-slot';
     slot.dataset.pieceKey = pk;
+    slot.style.width  = palettePx + 'px';
+    slot.style.height = palettePx + 'px';
 
     const svgEl = makePieceSvg(pk, palettePx);
     svgEl.classList.add('memory-piece-svg');
