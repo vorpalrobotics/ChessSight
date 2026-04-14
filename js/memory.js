@@ -340,7 +340,7 @@ function showStudyPhase() {
   document.getElementById('btn-memory-ready').disabled = false;
   document.getElementById('btn-memory-show').classList.add('hidden');
   document.getElementById('memory-recall-stats').classList.add('hidden');
-  setStatus('Memorise the position');
+  setStatus('');
 }
 
 function startStudyTimer() {
@@ -442,7 +442,7 @@ function finishRecall(allCorrect) {
     });
   }
 
-  drawContinueMsg();
+  if (!allCorrect) drawContinueMsg();
   waitingForContinue = true;
 }
 
