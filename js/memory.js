@@ -70,12 +70,9 @@ function isAdjacent(sq1, sq2) {
          Math.abs(sq1.charCodeAt(1) - sq2.charCodeAt(1)) <= 1;
 }
 
-function pickPiece(sq) {
-  const rank = parseInt(sq[1]);
-  const pool = (rank === 1 || rank === 8) ? ['q','r','b','n'] : ['q','r','b','n','p'];
-  const type  = pool[Math.floor(Math.random() * pool.length)];
-  const color = Math.random() < 0.5 ? 'w' : 'b';
-  return color === 'w' ? type.toUpperCase() : type;
+// Returns 'light' or 'dark' for a square string like 'e4'
+function sqColor(sq) {
+  return (sq.charCodeAt(0) - 97 + parseInt(sq[1])) % 2 === 0 ? 'light' : 'dark';
 }
 
 function buildFenBoard(arr) {
@@ -106,10 +103,34 @@ function tryGeneratePosition(pieceCount) {
   const bkSq = sqs.splice(bkIdx, 1)[0];
   arr[sqToIndex(bkSq)] = 'k';
 
-  // Remaining pieces
+  // Track counts and bishop square-colors per side to enforce realistic limits.
+  const counts      = { w: { q:0, r:0, b:0, n:0, p:0 }, b: { q:0, r:0, b:0, n:0, p:0 } };
+  const bishopSqCol = { w: new Set(), b: new Set() }; // 'light' / 'dark' already used
+  const MAX         = { q:1, r:2, b:2, n:2, p:8 };
+
   let placed = 0;
-  for (let i = 0; i < sqs.length && placed < pieceCount - 2; i++, placed++) {
-    arr[sqToIndex(sqs[i])] = pickPiece(sqs[i]);
+  for (let i = 0; i < sqs.length && placed < pieceCount - 2; i++) {
+    const sq   = sqs[i];
+    const rank = parseInt(sq[1]);
+    const sc   = sqColor(sq);
+    const types = rank === 1 || rank === 8 ? ['q','r','b','n'] : ['q','r','b','n','p'];
+
+    // Build pool of valid (type, color) pairs for this square
+    const pool = [];
+    for (const col of ['w', 'b']) {
+      for (const t of types) {
+        if (counts[col][t] >= MAX[t]) continue;
+        if (t === 'b' && bishopSqCol[col].has(sc)) continue; // same-color bishop already placed
+        pool.push({ t, col });
+      }
+    }
+    if (pool.length === 0) continue; // no valid piece fits here — skip square, don't count
+
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    counts[pick.col][pick.t]++;
+    if (pick.t === 'b') bishopSqCol[pick.col].add(sc);
+    arr[sqToIndex(sq)] = pick.col === 'w' ? pick.t.toUpperCase() : pick.t;
+    placed++;
   }
   if (placed < pieceCount - 2) return null;
 
