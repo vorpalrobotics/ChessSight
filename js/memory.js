@@ -257,7 +257,9 @@ function beginRecall() {
   document.getElementById('memory-timer').textContent = '0:00';
   recallInterval = setInterval(tickRecall, 1000);
 
-  renderPalette();
+  const boardEl = document.getElementById('memory-board');
+  const squarePx = Math.round(boardEl.offsetWidth / 8);
+  renderPalette(squarePx);
 }
 
 function tickRecall() {
@@ -340,7 +342,7 @@ function onBoardClick() {
 
 // --- Palette rendering ---
 
-function renderPalette() {
+function renderPalette(squarePx) {
   const container = document.getElementById('memory-palette');
   container.classList.remove('hidden');
   container.innerHTML = '';
@@ -348,11 +350,11 @@ function renderPalette() {
   const whitePieces = PIECE_ORDER.map(t => 'w' + t).filter(pk => palette.has(pk));
   const blackPieces = PIECE_ORDER.map(t => 'b' + t).filter(pk => palette.has(pk));
 
-  if (whitePieces.length > 0) container.appendChild(buildPaletteRow(whitePieces, 'White'));
-  if (blackPieces.length > 0) container.appendChild(buildPaletteRow(blackPieces, 'Black'));
+  if (whitePieces.length > 0) container.appendChild(buildPaletteRow(whitePieces, 'White', squarePx));
+  if (blackPieces.length > 0) container.appendChild(buildPaletteRow(blackPieces, 'Black', squarePx));
 }
 
-function buildPaletteRow(pieceKeys, label) {
+function buildPaletteRow(pieceKeys, label, squarePx) {
   const wrapper = document.createElement('div');
   wrapper.className = 'memory-palette-row-wrap';
 
@@ -373,7 +375,7 @@ function buildPaletteRow(pieceKeys, label) {
     slot.className = 'memory-piece-slot';
     slot.dataset.pieceKey = pk;
 
-    const svgEl = makePieceSvg(pk, 36);
+    const svgEl = makePieceSvg(pk, squarePx);
     svgEl.classList.add('memory-piece-svg');
     slot.appendChild(svgEl);
 
@@ -384,7 +386,7 @@ function buildPaletteRow(pieceKeys, label) {
       slot.appendChild(badge);
     }
 
-    attachDragHandlers(slot, pk);
+    attachDragHandlers(slot, pk, squarePx);
     row.appendChild(slot);
   }
 
@@ -393,7 +395,7 @@ function buildPaletteRow(pieceKeys, label) {
 
 // --- Drag-and-drop (Pointer Events API) ---
 
-function attachDragHandlers(slot, pk) {
+function attachDragHandlers(slot, pk, squarePx) {
   slot.addEventListener('pointerdown', (e) => {
     if (!puzzleActive || phase !== 'recall') return;
     if ((palette.get(pk) ?? 0) <= 0) return;
@@ -403,7 +405,7 @@ function attachDragHandlers(slot, pk) {
 
     dragClone = document.createElement('div');
     dragClone.className = 'memory-drag-clone';
-    dragClone.appendChild(makePieceSvg(pk, 52));
+    dragClone.appendChild(makePieceSvg(pk, Math.round(squarePx * 1.3)));
     dragClone.style.left = e.clientX + 'px';
     dragClone.style.top = e.clientY + 'px';
     document.body.appendChild(dragClone);
