@@ -378,7 +378,7 @@ function beginRecall() {
   document.getElementById('btn-memory-ready').disabled = true;
   document.getElementById('btn-memory-show').classList.remove('hidden');
   document.getElementById('memory-recall-stats').classList.remove('hidden');
-  setStatus('Place pieces from memory');
+  setStatus('');
 
   recallSeconds = 0;
   document.getElementById('memory-timer').textContent = '0:00';
