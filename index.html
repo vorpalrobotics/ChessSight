@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.73</title>
+  <title>ChessSight v0.1.74</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.73</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.74</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -707,13 +707,15 @@
         <div class="disc-review-depth-row">
           <label for="select-review-depth" class="disc-review-depth-label">Engine depth</label>
           <select id="select-review-depth" class="disc-review-depth-select">
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16" selected>16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-            <option value="19">19</option>
-            <option value="20">20</option>
+            <option value="12">12 (~1800)</option>
+            <option value="13">13 (~2000)</option>
+            <option value="14">14 (~2200)</option>
+            <option value="15">15 (~2400)</option>
+            <option value="16" selected>16 (~2600)</option>
+            <option value="17">17 (~2700)</option>
+            <option value="18">18 (~2800)</option>
+            <option value="19">19 (~2900)</option>
+            <option value="20">20 (~3000)</option>
           </select>
         </div>
         <button id="btn-disc-review-exit" class="disc-review-exit-btn">&#8592; Back to Results</button>

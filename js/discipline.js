@@ -1,5 +1,6 @@
 import { Chessboard, COLOR, INPUT_EVENT_TYPE } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Markers } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/markers/Markers.js';
+import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { addDisciplineGame } from './storage.js';
@@ -7,6 +8,7 @@ import { registerPause } from './pause.js';
 
 const PIECES_URL  = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const MARKERS_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.svg';
+const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
 
 const PHASE = { CHECKS: 0, CAPTURES: 1, LOOSE: 2, CANDIDATES: 3, MOVE: 4 };
 
@@ -259,7 +261,10 @@ async function startGame() {
       position: fen,
       orientation: boardOrientation,
       style: { pieces: { file: PIECES_URL } },
-      extensions: [{ class: Markers, props: { sprite: MARKERS_URL } }],
+      extensions: [
+        { class: Markers, props: { sprite: MARKERS_URL } },
+        { class: Arrows, props: { sprite: ARROWS_SVG_URL, headSize: 6 } },
+      ],
     });
   } else {
     board.disableMoveInput();
@@ -925,6 +930,7 @@ function exitReviewMode() {
   reviewActive = false;
   reviewEvalGen++;          // invalidate any in-flight eval
   if (discEngine) discEngine.stop();
+  if (board) board.removeArrows();
   document.getElementById('disc-review-thinking').classList.add('hidden');
   document.getElementById('disc-game-area').classList.add('hidden');
   document.getElementById('disc-game-over').classList.remove('hidden');
@@ -959,6 +965,7 @@ function renderReviewPly() {
   document.getElementById('btn-disc-review-next' ).disabled = reviewPly === total;
   document.getElementById('btn-disc-review-end'  ).disabled = reviewPly === total;
 
+  board.removeArrows();
   resetEvalDisplay();
   updateReviewEval(fen);
 }
@@ -999,6 +1006,14 @@ async function updateReviewEval(fen) {
           : 'disc-review-score disc-review-score-equal';
     }
 
-    bestEl.textContent = bestMove ? `Best: ${uciToSan(fen, bestMove)}` : 'Best: —';
+    if (bestMove) {
+      bestEl.textContent = `Best: ${uciToSan(fen, bestMove)}`;
+      const sideToMove = fen.split(' ')[1];
+      const arrowClass = sideToMove === 'w' ? 'arrow-white-cap' : 'arrow-black-cap';
+      board.removeArrows();
+      board.addArrow({ class: arrowClass }, bestMove.slice(0, 2), bestMove.slice(2, 4));
+    } else {
+      bestEl.textContent = 'Best: —';
+    }
   } catch { /* ignore */ }
 }

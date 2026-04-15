@@ -2099,13 +2099,13 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.9rem;
   margin-bottom: 0.6rem;
 }
 
 .disc-review-score {
   font-family: monospace;
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   font-weight: 700;
   min-width: 5.5rem;
   text-align: center;
@@ -2116,7 +2116,7 @@ button:disabled {
 .disc-review-score-equal { color: var(--text-muted); }
 
 .disc-review-best-move {
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: var(--text-muted);
 }
 
