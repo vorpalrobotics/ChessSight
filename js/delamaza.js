@@ -154,6 +154,7 @@ let sessionMisses = 0;
 let currentValidSqs = [];
 let foundSqs = new Set();
 let puzzleActive = false;
+let waitingToAdvance = false;
 let autoAdvanceTimer = null;
 let sessionTimerInterval = null;
 let pauseStart = 0;
@@ -165,6 +166,7 @@ export function initDeLaMaza(navigateFn, onPerfectFn) {
   onPerfect = onPerfectFn;
 
   document.getElementById('btn-dlm-show').addEventListener('click', handleShow);
+  document.getElementById('btn-dlm-no-solution').addEventListener('click', handleNoSolutionClick);
   document.getElementById('btn-dlm-done').addEventListener('click', () => {
     stopSession();
     navigate('screen-select');
@@ -235,10 +237,14 @@ function stopSession() {
   if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleActive = false;
+  waitingToAdvance = false;
+  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
 }
 
 function loadPosition() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  waitingToAdvance = false;
+  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
 
   const pieceSq = SPIRAL[spiralIndex];
   currentValidSqs = computeValidSquares(KING_SQ, pieceSq, chosenPiece);
@@ -262,8 +268,8 @@ function loadPosition() {
 
   if (currentValidSqs.length === 0) {
     puzzleActive = false;
-    showBoardMessage('No queen squares');
-    autoAdvanceTimer = setTimeout(advancePosition, 1200);
+    showBoardMessage('No queen squares', true);
+    document.getElementById('btn-dlm-no-solution').classList.remove('hidden');
   }
 }
 
@@ -298,6 +304,12 @@ function endSession() {
 // ─── Board interaction ────────────────────────────────────────────────────────
 
 function handleBoardClick(e) {
+  if (waitingToAdvance) {
+    waitingToAdvance = false;
+    clearMarks();
+    advancePosition();
+    return;
+  }
   if (!puzzleActive) return;
   const boardEl = document.getElementById('dlm-board');
   const rect = boardEl.getBoundingClientRect();
@@ -334,7 +346,14 @@ function handleShow() {
     }
   }
   document.getElementById('dlm-misses').textContent = `Misses: ${sessionMisses}`;
-  autoAdvanceTimer = setTimeout(advancePosition, 1500);
+  drawContinueMsg();
+  waitingToAdvance = true;
+}
+
+function handleNoSolutionClick() {
+  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
+  clearMarks();
+  advancePosition();
 }
 
 // ─── Timer display ────────────────────────────────────────────────────────────
@@ -389,7 +408,7 @@ function flashMark(sq) {
   setTimeout(() => rect.remove(), 500);
 }
 
-function showBoardMessage(text) {
+function showBoardMessage(text, persist = false) {
   const info = getSvgInfo();
   if (!info) return;
   const { svg, sqSize } = info;
@@ -403,7 +422,22 @@ function showBoardMessage(text) {
   el.setAttribute('class', 'dlm-board-msg');
   el.textContent = text;
   svg.appendChild(el);
-  setTimeout(() => el.remove(), 1100);
+  if (!persist) setTimeout(() => el.remove(), 1100);
+}
+
+function drawContinueMsg() {
+  const info = getSvgInfo();
+  if (!info) return;
+  const { svg, sqSize } = info;
+  const boardW = sqSize * 8;
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', boardW / 2);
+  text.setAttribute('y', boardW - sqSize * 0.15);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('font-size', sqSize * 0.48);
+  text.setAttribute('class', 'dlm-board-msg');
+  text.textContent = 'Click anywhere to continue';
+  svg.appendChild(text);
 }
 
 function clearMarks() {

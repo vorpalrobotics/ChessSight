@@ -601,6 +601,21 @@ header h1 {
   color: #fff;
 }
 
+#btn-dlm-no-solution {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 1rem;
+  background: #1b6e42;
+  border: 1px solid #27ae60;
+  color: #fff;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+#btn-dlm-no-solution:hover {
+  background: #27ae60;
+  border-color: #52d68a;
+}
+
 /* Custom arrow colors for Captures SHOW feature */
 .cm-chessboard .arrow-white-cap {
   filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.7));
