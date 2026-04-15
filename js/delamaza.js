@@ -268,7 +268,6 @@ function loadPosition() {
 
   if (currentValidSqs.length === 0) {
     puzzleActive = false;
-    showBoardMessage('No queen squares', true);
     document.getElementById('btn-dlm-no-solution').classList.remove('hidden');
   }
 }
