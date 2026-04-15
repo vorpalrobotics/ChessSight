@@ -174,6 +174,7 @@ let currentBlackPawns = new Set();
 let currentBlackAttacked = new Set();  // squares attacked by black pawns
 let currentObstacles = new Set();      // full blocked set: white + black + attacked
 let waitingToAdvance = false;
+let solutionShown = false;
 const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
@@ -345,7 +346,17 @@ function finishPuzzle() {
 // ─── SHOW button ──────────────────────────────────────────────────────────────
 
 function handleShow() {
-  if (waitingToAdvance) { loadNextPuzzle(); return; }
+  if (waitingToAdvance) {
+    if (!solutionShown) {
+      // Puzzle finished sub-optimally — show the best route without changing scores
+      clearPathMarks();
+      currentOptimalPath.forEach((sq, i) => drawPathSquare(sq, i + 1, 'knight-sq-optimal'));
+      solutionShown = true;
+    } else {
+      loadNextPuzzle();
+    }
+    return;
+  }
   if (!puzzleActive) return;
   puzzleActive = false;
   stopTimer();
@@ -606,6 +617,7 @@ function resetDrill() {
 function resetUI() {
   misses = seconds = invalidClicks = 0;
   waitingToAdvance = false;
+  solutionShown = false;
   clearAllMarks();
   document.getElementById('knight-timer').textContent  = '0:00';
   document.getElementById('knight-misses').textContent = 'Misses: 0';
