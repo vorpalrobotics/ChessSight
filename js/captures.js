@@ -459,8 +459,9 @@ function resetUI() {
   document.getElementById('captures-timer').textContent = '0:00';
   document.getElementById('captures-misses').textContent = 'Misses: 0';
   document.querySelectorAll('#screen-captures .digit-btn').forEach(b =>
-    b.classList.remove('correct', 'incorrect')
+    b.classList.remove('correct', 'incorrect', 'flashing')
   );
+  if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
 }
 
 function setStatus(msg) {

@@ -63,7 +63,8 @@ function showScreen(id) {
     document.querySelectorAll('.drill-pause-btn').forEach(b => b.textContent = '⏸');
   }
   if (id === 'screen-summary') {
-    if (document.getElementById('stat-accuracy').textContent === '100%') {
+    const count = parseInt(document.getElementById('stat-count').textContent, 10);
+    if (count >= 5 && document.getElementById('stat-accuracy').textContent === '100%') {
       launchChessConfetti();
     }
   }
