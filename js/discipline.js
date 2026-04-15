@@ -1008,10 +1008,8 @@ async function updateReviewEval(fen) {
 
     if (bestMove) {
       bestEl.textContent = `Best: ${uciToSan(fen, bestMove)}`;
-      const sideToMove = fen.split(' ')[1];
-      const arrowClass = sideToMove === 'w' ? 'arrow-white-cap' : 'arrow-black-cap';
       board.removeArrows();
-      board.addArrow({ class: arrowClass }, bestMove.slice(0, 2), bestMove.slice(2, 4));
+      board.addArrow({ class: 'arrow-review-best' }, bestMove.slice(0, 2), bestMove.slice(2, 4));
     } else {
       bestEl.textContent = 'Best: —';
     }
