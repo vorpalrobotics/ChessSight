@@ -121,29 +121,29 @@ export async function syncToday() {
     return;
   }
 
-  const totalMinutes = Math.max(1, Math.round(drillData.total / 60));
+  const totalMinutes = Math.round(drillData.total / 60 * 100) / 100;
 
   // Build drill breakdown for notes and customFields
   const DRILL_NAMES = {
-    checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces',
-    under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route',
-    'dlm-rook': 'Spiral (Rook)', 'dlm-bishop': 'Spiral (Bishop)',
-    'dlm-knight': 'Spiral (Knight)', mix: 'Mix', memory: 'Memory',
-    discipline: 'Move Discipline',
+    checks: 'Checks', captures: 'Captures', loose: 'Loose',
+    under: 'Underguarded', queen: 'QueenAttack', knight: 'KnightRoute',
+    'dlm-rook': 'SpiralRook', 'dlm-bishop': 'SpiralBishop',
+    'dlm-knight': 'SpiralKnight', mix: 'Mix', memory: 'Memory',
+    discipline: 'Discipline',
   };
 
   const parts = [];
   const customBreakdown = {};
   for (const [drill, secs] of Object.entries(drillData.byDrill)) {
     if (secs < 30) continue;
-    const mins = Math.max(1, Math.round(secs / 60));
-    parts.push(`${DRILL_NAMES[drill] ?? drill}: ${mins} min`);
+    const mins = Math.round(secs / 60 * 100) / 100;
+    parts.push(`${DRILL_NAMES[drill] ?? drill}:${mins}m`);
     customBreakdown[drill] = mins;
   }
 
   const notes = parts.length
-    ? `ChessSight training — ${parts.join(', ')}`
-    : 'ChessSight training';
+    ? `ChessSight--${parts.join(', ')}. `
+    : 'ChessSight. ';
 
   const documentId = `${VIMSY_APP_ID}-${today}`;  // same ID each day → idempotent
 
@@ -171,7 +171,7 @@ export async function syncToday() {
     errors:      [],
   };
 
-  vimsyLog(`[Upload] Uploading ${totalMinutes} min of training…`, 'info');
+  vimsyLog(`[Upload] Uploading ${totalMinutes}m of training…`, 'info');
   const path = `users/${user.uid}/externalAppData/${VIMSY_APP_ID}/documents/${documentId}`;
   vimsyLog(`[Upload] Path: ${path}`, 'info');
 
