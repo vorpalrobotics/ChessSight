@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.71</title>
+  <title>ChessSight v0.1.72</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.71</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.72</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -690,6 +690,22 @@
         <p class="disc-panel-msg">Only one legal move — phases skipped. Make your move.</p>
       </div>
 
+      <!-- Review panel -->
+      <div id="disc-panel-review" class="disc-panel hidden">
+        <div class="disc-review-nav">
+          <button id="btn-disc-review-start" class="disc-review-nav-btn" title="Start">|&#9664;</button>
+          <button id="btn-disc-review-prev"  class="disc-review-nav-btn" title="Previous">&#9664;</button>
+          <span   id="disc-review-ply"       class="disc-review-ply-label">Start</span>
+          <button id="btn-disc-review-next"  class="disc-review-nav-btn" title="Next">&#9654;</button>
+          <button id="btn-disc-review-end"   class="disc-review-nav-btn" title="End">&#9654;|</button>
+        </div>
+        <div class="disc-review-eval">
+          <span id="disc-review-score" class="disc-review-score">—</span>
+          <span id="disc-review-best"  class="disc-review-best-move">Best: —</span>
+        </div>
+        <button id="btn-disc-review-exit" class="disc-review-exit-btn">&#8592; Back to Results</button>
+      </div>
+
       <div id="disc-feedback" class="disc-feedback"></div>
     </div>
 
@@ -710,6 +726,7 @@
           <div class="disc-over-row"><span>Game time</span>            <span id="disc-stat-time">—</span></div>
         </div>
         <div class="disc-over-actions">
+          <button id="btn-disc-review">Review Game</button>
           <button id="btn-disc-again">Play Again</button>
           <button id="btn-disc-over-menu">&#8592; Menu</button>
         </div>

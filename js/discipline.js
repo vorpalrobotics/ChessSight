@@ -102,6 +102,11 @@ let waitingLooseContinue = false;
 let looseComplete = false;   // true once auto-advance fires from handleBoardClick
 let discPauseStart = 0;
 
+// Review mode state
+let fenHistory = [];   // FEN after each half-move (index 0 = initial position)
+let reviewPly = 0;
+let reviewActive = false;
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export function initDiscipline(navigateFn, onWinFn) {
@@ -156,6 +161,23 @@ export function initDiscipline(navigateFn, onWinFn) {
     document.getElementById('disc-setup').classList.remove('hidden');
   });
   document.getElementById('btn-disc-over-menu').addEventListener('click', () => navigate('screen-select'));
+  document.getElementById('btn-disc-review').addEventListener('click', enterReviewMode);
+
+  // Review controls
+  document.getElementById('btn-disc-review-start').addEventListener('click', () => navigateReview(-Infinity));
+  document.getElementById('btn-disc-review-prev' ).addEventListener('click', () => navigateReview(-1));
+  document.getElementById('btn-disc-review-next' ).addEventListener('click', () => navigateReview(1));
+  document.getElementById('btn-disc-review-end'  ).addEventListener('click', () => navigateReview(Infinity));
+  document.getElementById('btn-disc-review-exit' ).addEventListener('click', exitReviewMode);
+
+  // Keyboard navigation in review mode
+  document.addEventListener('keydown', e => {
+    if (!reviewActive) return;
+    if      (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { navigateReview(-1);        e.preventDefault(); }
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  { navigateReview(1);         e.preventDefault(); }
+    else if (e.key === 'Home')                                  { navigateReview(-Infinity); e.preventDefault(); }
+    else if (e.key === 'End')                                   { navigateReview(Infinity);  e.preventDefault(); }
+  });
 
   // Render digit button rows (done once; reused every game)
   buildDigitRow('disc-checks-w-digits',   'cw');
@@ -620,6 +642,8 @@ function resumeGame() {
 function cleanupDrill() {
   isGameActive = false;
   waitingLooseContinue = false;
+  reviewActive = false;
+  if (discEngine) discEngine.stop();
   if (board) board.disableMoveInput();
   clearSqMarks();
   clearContinueMsg();
@@ -630,7 +654,7 @@ function cleanupDrill() {
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 
-const PANELS = ['checks', 'captures', 'loose', 'candidates', 'move', 'engine', 'forced'];
+const PANELS = ['checks', 'captures', 'loose', 'candidates', 'move', 'engine', 'forced', 'review'];
 
 function showPanel(name) {
   PANELS.forEach(p =>
@@ -832,4 +856,126 @@ function clearContinueMsg() {
 
 function formatTime(s) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+// ─── Game Review ──────────────────────────────────────────────────────────────
+
+function buildFenHistory() {
+  const temp = new Chess();
+  fenHistory = [temp.fen()];
+  for (const mv of chess.history({ verbose: true })) {
+    temp.move(mv);
+    fenHistory.push(temp.fen());
+  }
+}
+
+function uciToSan(fen, uci) {
+  try {
+    const tmp = new Chess();
+    tmp.load(fen);
+    const mv = tmp.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] ?? 'q' });
+    return mv ? mv.san : uci;
+  } catch { return uci; }
+}
+
+function formatScore(cp, fen) {
+  if (cp === null) return '?';
+  // Convert to white's perspective (Stockfish scores are from side-to-move POV)
+  const fromWhite = fen.split(' ')[1] === 'w' ? cp : -cp;
+  if (Math.abs(cp) >= 99000) return fromWhite > 0 ? '+M' : '-M';
+  const pawns = fromWhite / 100;
+  return pawns >= 0 ? `+${pawns.toFixed(2)}` : pawns.toFixed(2);
+}
+
+function enterReviewMode() {
+  buildFenHistory();
+  reviewPly = fenHistory.length - 1;
+  reviewActive = true;
+
+  document.getElementById('disc-game-over').classList.add('hidden');
+  document.getElementById('disc-game-area').classList.remove('hidden');
+  document.getElementById('btn-disc-book').classList.add('hidden');
+  document.getElementById('btn-disc-exit').classList.add('hidden');
+  document.getElementById('btn-disc-resign').classList.add('hidden');
+  document.getElementById('disc-turn-num').textContent = '';
+  setPhaseIndicator('GAME REVIEW');
+  setFeedback('');
+  clearSqMarks();
+  clearMoveMarkers();
+  showPanel('review');
+  renderReviewPly();
+}
+
+function exitReviewMode() {
+  reviewActive = false;
+  if (discEngine) discEngine.stop();
+  document.getElementById('disc-game-area').classList.add('hidden');
+  document.getElementById('disc-game-over').classList.remove('hidden');
+}
+
+function navigateReview(delta) {
+  const newPly = Math.max(0, Math.min(fenHistory.length - 1, reviewPly + delta));
+  if (newPly === reviewPly) return;
+  reviewPly = newPly;
+  renderReviewPly();
+}
+
+function renderReviewPly() {
+  const fen = fenHistory[reviewPly];
+  board.setPosition(fen, false);
+
+  // Build move label
+  let label;
+  if (reviewPly === 0) {
+    label = 'Start';
+  } else {
+    const moveNum = Math.ceil(reviewPly / 2);
+    const whiteMoved = reviewPly % 2 === 1;
+    label = whiteMoved ? `Move ${moveNum} (White)` : `Move ${moveNum} (Black)`;
+  }
+  document.getElementById('disc-review-ply').textContent = label;
+
+  // Enable/disable nav buttons
+  const total = fenHistory.length - 1;
+  document.getElementById('btn-disc-review-start').disabled = reviewPly === 0;
+  document.getElementById('btn-disc-review-prev' ).disabled = reviewPly === 0;
+  document.getElementById('btn-disc-review-next' ).disabled = reviewPly === total;
+  document.getElementById('btn-disc-review-end'  ).disabled = reviewPly === total;
+
+  // Reset eval display while loading
+  const scoreEl = document.getElementById('disc-review-score');
+  scoreEl.textContent = '…';
+  scoreEl.className = 'disc-review-score';
+  document.getElementById('disc-review-best').textContent = 'Best: …';
+
+  updateReviewEval(fen);
+}
+
+async function updateReviewEval(fen) {
+  if (!discEngine || !reviewActive) return;
+  try {
+    discEngine.stop();
+    const { score, bestMove } = await discEngine.evaluate(fen, 18);
+
+    // Bail if user navigated away before eval completed
+    if (!reviewActive || fenHistory[reviewPly] !== fen) return;
+
+    const scoreEl = document.getElementById('disc-review-score');
+    const bestEl  = document.getElementById('disc-review-best');
+
+    scoreEl.textContent = formatScore(score, fen);
+
+    if (score === null) {
+      scoreEl.className = 'disc-review-score';
+    } else {
+      const fromWhite = fen.split(' ')[1] === 'w' ? score : -score;
+      scoreEl.className = Math.abs(score) >= 99000 || fromWhite > 50
+        ? 'disc-review-score disc-review-score-white'
+        : fromWhite < -50
+          ? 'disc-review-score disc-review-score-black'
+          : 'disc-review-score disc-review-score-equal';
+    }
+
+    bestEl.textContent = bestMove ? `Best: ${uciToSan(fen, bestMove)}` : 'Best: —';
+  } catch { /* ignore cancelled evals */ }
 }

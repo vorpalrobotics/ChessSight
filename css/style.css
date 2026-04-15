@@ -2058,6 +2058,85 @@ button:disabled {
   color: #fff;
 }
 
+.disc-over-actions { flex-wrap: wrap; }
+
+/* --- Review panel --- */
+.disc-review-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.55rem;
+}
+
+.disc-review-nav-btn {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.9rem;
+  background: var(--surface2);
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.disc-review-nav-btn:hover:not(:disabled) {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}
+
+.disc-review-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.disc-review-ply-label {
+  min-width: 8rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.disc-review-eval {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.disc-review-score {
+  font-family: monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  min-width: 5.5rem;
+  text-align: center;
+}
+
+.disc-review-score-white { color: #27ae60; }
+.disc-review-score-black { color: #e94560; }
+.disc-review-score-equal { color: var(--text-muted); }
+
+.disc-review-best-move {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.disc-review-exit-btn {
+  padding: 0.3rem 1rem;
+  font-size: 0.82rem;
+  background: var(--surface2);
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.disc-review-exit-btn:hover {
+  background: #1a5ca8;
+  border-color: #3a80d0;
+  color: #fff;
+}
+
 /* --- Chess-piece confetti celebration --- */
 #confetti-container {
   position: fixed;
