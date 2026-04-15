@@ -16,6 +16,7 @@ import { initMix, startMix } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
 import { getAllRecords, getDisciplineGames, exportAllData, importAllData } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
+import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal } from './vimsy.js';
 
 // --- Screen management ---
 const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-summary', 'screen-engine'];
@@ -221,6 +222,31 @@ const DRILL_COLORS = {
 
 let chartTime = null, chartAcc = null;
 
+// --- Cloud Sync / Vimsy modal ---
+const modalVimsy = document.getElementById('modal-vimsy');
+
+document.getElementById('btn-cloud-sync').addEventListener('click', async () => {
+  hamburgerDropdown.classList.add('hidden');
+  await renderVimsyModal();
+  modalVimsy.classList.remove('hidden');
+});
+
+document.getElementById('btn-vimsy-close').addEventListener('click', () => {
+  modalVimsy.classList.add('hidden');
+});
+
+modalVimsy.addEventListener('click', (e) => {
+  if (e.target === modalVimsy) modalVimsy.classList.add('hidden');
+});
+
+document.getElementById('btn-vimsy-connect').addEventListener('click', connectVimsy);
+document.getElementById('btn-vimsy-disconnect').addEventListener('click', disconnectVimsy);
+document.getElementById('btn-vimsy-sync').addEventListener('click', syncToday);
+document.getElementById('btn-vimsy-clear-log').addEventListener('click', () => {
+  document.getElementById('vimsy-activity-log').innerHTML = '';
+});
+
+// --- History modal (charts) ---
 const modalHistory = document.getElementById('modal-history');
 
 document.getElementById('btn-history').addEventListener('click', async () => {
@@ -823,3 +849,4 @@ initMix(showScreen);
 initDeLaMaza(showScreen, launchChessConfetti);
 initDiscipline(showScreen, launchChessConfetti);
 initMemory(showScreen);
+initVimsy();

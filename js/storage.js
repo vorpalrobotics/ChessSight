@@ -142,6 +142,29 @@ export async function importAllData({ drillDays = [], disciplineGames = [] }) {
 }
 
 /**
+ * Return total seconds trained on a given date, broken down by drill.
+ * @param {string} dateStr  "YYYY-MM-DD"
+ * @returns {{ total: number, byDrill: Object<string, number> }}
+ */
+export async function getDrillSecondsForDate(dateStr) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).index('date').getAll(dateStr);
+    req.onsuccess = () => {
+      const byDrill = {};
+      let total = 0;
+      for (const rec of req.result) {
+        byDrill[rec.drill] = (byDrill[rec.drill] || 0) + rec.totalSeconds;
+        total += rec.totalSeconds;
+      }
+      resolve({ total, byDrill });
+    };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+/**
  * Return every record in the store, sorted newest-date first.
  */
 export async function getAllRecords() {
