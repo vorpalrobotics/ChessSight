@@ -241,8 +241,10 @@ function loadNextPuzzle() {
     board.setPosition(fen, false);
   }
 
-  // Draw target after board has rendered
-  requestAnimationFrame(() => drawTargetSquare(pos.targetSq));
+  // Double-rAF: the first frame lets cm-chessboard finish any ResizeObserver-
+  // triggered re-render (fired when the screen becomes visible on restart);
+  // the second frame draws the target after that re-render completes.
+  requestAnimationFrame(() => requestAnimationFrame(() => drawTargetSquare(pos.targetSq)));
 
   updateSessionStats();
   puzzleActive = true;
