@@ -2120,6 +2120,45 @@ button:disabled {
   color: var(--text-muted);
 }
 
+@keyframes disc-review-spin {
+  0%   { transform: rotate(0deg);   }
+  25%  { transform: rotate(90deg);  }
+  50%  { transform: rotate(180deg); }
+  75%  { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.disc-review-thinking {
+  font-size: 1.1rem;
+  display: inline-block;
+  animation: disc-review-spin 1.2s steps(4, end) infinite;
+  opacity: 0.7;
+}
+
+.disc-review-depth-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.disc-review-depth-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.disc-review-depth-select {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.4rem;
+  background: var(--surface2);
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+}
+
 .disc-review-exit-btn {
   padding: 0.3rem 1rem;
   font-size: 0.82rem;

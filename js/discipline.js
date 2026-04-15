@@ -106,6 +106,7 @@ let discPauseStart = 0;
 let fenHistory = [];   // FEN after each half-move (index 0 = initial position)
 let reviewPly = 0;
 let reviewActive = false;
+let reviewEvalGen = 0;  // generation counter — discards stale evals after navigation
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -169,6 +170,20 @@ export function initDiscipline(navigateFn, onWinFn) {
   document.getElementById('btn-disc-review-next' ).addEventListener('click', () => navigateReview(1));
   document.getElementById('btn-disc-review-end'  ).addEventListener('click', () => navigateReview(Infinity));
   document.getElementById('btn-disc-review-exit' ).addEventListener('click', exitReviewMode);
+
+  // Review depth selector — restore saved value
+  const depthSel = document.getElementById('select-review-depth');
+  const savedDepth = localStorage.getItem('disc-review-depth');
+  if (savedDepth) depthSel.value = savedDepth;
+  depthSel.addEventListener('change', () => {
+    localStorage.setItem('disc-review-depth', depthSel.value);
+    // Re-run eval at new depth for current position
+    if (reviewActive) {
+      const fen = fenHistory[reviewPly];
+      resetEvalDisplay();
+      updateReviewEval(fen);
+    }
+  });
 
   // Keyboard navigation in review mode
   document.addEventListener('keydown', e => {
@@ -908,7 +923,9 @@ function enterReviewMode() {
 
 function exitReviewMode() {
   reviewActive = false;
+  reviewEvalGen++;          // invalidate any in-flight eval
   if (discEngine) discEngine.stop();
+  document.getElementById('disc-review-thinking').classList.add('hidden');
   document.getElementById('disc-game-area').classList.add('hidden');
   document.getElementById('disc-game-over').classList.remove('hidden');
 }
@@ -942,23 +959,29 @@ function renderReviewPly() {
   document.getElementById('btn-disc-review-next' ).disabled = reviewPly === total;
   document.getElementById('btn-disc-review-end'  ).disabled = reviewPly === total;
 
-  // Reset eval display while loading
-  const scoreEl = document.getElementById('disc-review-score');
-  scoreEl.textContent = '…';
-  scoreEl.className = 'disc-review-score';
-  document.getElementById('disc-review-best').textContent = 'Best: …';
-
+  resetEvalDisplay();
   updateReviewEval(fen);
+}
+
+function resetEvalDisplay() {
+  const scoreEl = document.getElementById('disc-review-score');
+  scoreEl.textContent = '—';
+  scoreEl.className = 'disc-review-score';
+  document.getElementById('disc-review-thinking').classList.remove('hidden');
+  document.getElementById('disc-review-best').textContent = 'Best: —';
 }
 
 async function updateReviewEval(fen) {
   if (!discEngine || !reviewActive) return;
+  const myGen = ++reviewEvalGen;
+  const depth = parseInt(document.getElementById('select-review-depth').value, 10) || 16;
   try {
-    discEngine.stop();
-    const { score, bestMove } = await discEngine.evaluate(fen, 18);
+    const { score, bestMove } = await discEngine.evaluate(fen, depth);
 
-    // Bail if user navigated away before eval completed
-    if (!reviewActive || fenHistory[reviewPly] !== fen) return;
+    // Bail if user navigated away or a newer eval was started
+    if (!reviewActive || reviewEvalGen !== myGen) return;
+
+    document.getElementById('disc-review-thinking').classList.add('hidden');
 
     const scoreEl = document.getElementById('disc-review-score');
     const bestEl  = document.getElementById('disc-review-best');
@@ -977,5 +1000,5 @@ async function updateReviewEval(fen) {
     }
 
     bestEl.textContent = bestMove ? `Best: ${uciToSan(fen, bestMove)}` : 'Best: —';
-  } catch { /* ignore cancelled evals */ }
+  } catch { /* ignore */ }
 }
