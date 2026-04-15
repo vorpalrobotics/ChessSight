@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vimsy External App Integration Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .status-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-left: 4px solid #ccc;
+    }
+    .status-box.connected {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+    .status-box.error {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    .status-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .status-detail {
+      color: #666;
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .section:last-child {
+      border-bottom: none;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 10px;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover:not(:disabled) {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+    .btn-warning:hover:not(:disabled) {
+      background: #e0a800;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .hidden {
+      display: none;
+    }
+    .activity-log {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      background: white;
+    }
+    .log-entry.success {
+      border-left: 3px solid #28a745;
+    }
+    .log-entry.error {
+      border-left: 3px solid #dc3545;
+      background: #fff5f5;
+    }
+    .log-entry.info {
+      border-left: 3px solid #667eea;
+    }
+    .log-time {
+      color: #666;
+      font-size: 11px;
+    }
+    .log-message {
+      color: #333;
+      margin-top: 4px;
+    }
+    .log-detail {
+      color: #666;
+      font-size: 11px;
+      margin-top: 4px;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Vimsy External App Integration Test</h1>
+    <p class="subtitle">Test the external app data import system</p>
+
+    <!-- Status Box -->
+    <div id="statusBox" class="status-box">
+      <div class="status-label">Status: Not Connected</div>
+      <div id="statusDetails"></div>
+    </div>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="section">
+      <button id="loginBtn" class="btn-primary" onclick="loginToFirebase()">
+        🔐 Login to Firebase
+      </button>
+    </div>
+
+    <!-- Upload Section (hidden until logged in) -->
+    <div id="uploadSection" class="section hidden">
+      <div class="section-title">Upload Test Data to Vimsy</div>
+      
+      <div class="form-group">
+        <label for="durationInput">Duration (minutes):</label>
+        <input type="number" id="durationInput" value="10" min="1" max="999">
+      </div>
+
+      <button id="uploadBtn" class="btn-success" onclick="uploadChessPuzzleActivity()">
+        ⬆️ Upload Chess Puzzle Activity
+      </button>
+
+      <button id="retryBtn" class="btn-warning hidden" onclick="retryLastUpload()">
+        🔄 Retry Upload
+      </button>
+
+      <button id="deleteBtn" class="btn-danger" onclick="deleteTestDocuments()">
+        🗑️ Delete All Test Documents
+      </button>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="section">
+      <div class="section-title">Activity Log</div>
+      <div id="activityLog" class="activity-log">
+        <div class="log-entry info">
+          <div class="log-time">Ready</div>
+          <div class="log-message">Waiting for login...</div>
+        </div>
+      </div>
+      <button class="btn-warning" onclick="clearLog()" style="margin-top: 10px;">
+        Clear Log
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ============================================================================
+    // STEP 1: FIREBASE CONFIGURATION
+    // ============================================================================
+    // This is the same Firebase project that Vimsy uses.
+    // Your app MUST use the same project for integration to work.
+    
+    const firebaseConfig = {
+      "apiKey": "AIzaSyAf5eAoatlp9cf8Fn7eJJy7hISE25_3aGg",
+      "authDomain": "studio-6393664499-ac49e.firebaseapp.com",
+      "projectId": "studio-6393664499-ac49e",
+      "appId": "1:1075087361735:web:f5538786ae0c389ebba0e2",
+      "messagingSenderId": "1075087361735"
+    };
+
+    console.log('[Firebase] Initializing with config:', firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    console.log('[Firebase] Initialized successfully');
+
+    // Global state
+    let currentUser = null;
+    let lastUploadData = null;
+    let statusMonitorUnsubscribe = null;
+
+    // ============================================================================
+    // STEP 2: AUTHENTICATION
+    // ============================================================================
+    // User must be authenticated to write to their Vimsy data.
+    // This uses Google Sign-In (same as Vimsy).
+    
+    function loginToFirebase() {
+      console.log('[Auth] Starting login flow...');
+      logActivity('Starting login...', null, 'info');
+      
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          currentUser = result.user;
+          console.log('[Auth] Login successful:', {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName
+          });
+          
+          logActivity('✓ Login successful', currentUser.email, 'success');
+          updateUIForLoggedInUser();
+        })
+        .catch((error) => {
+          console.error('[Auth] Login failed:', error);
+          logActivity('✗ Login failed: ' + error.message, null, 'error');
+          alert('Login failed: ' + error.message);
+        });
+    }
+
+    // Listen for auth state changes
+    auth.onAuthStateChanged((user) => {
+      console.log('[Auth] Auth state changed:', user ? user.email : 'signed out');
+      if (user) {
+        currentUser = user;
+        updateUIForLoggedInUser();
+      } else {
+        currentUser = null;
+        updateUIForLoggedOutUser();
+      }
+    });
+
+    // ============================================================================
+    // STEP 3: CREATE IMPORT DOCUMENT
+    // ============================================================================
+    // This is the standardized format that Vimsy expects.
+    // Key fields:
+    // - metadata.appId: Your app's unique identifier (lowercase-with-dashes)
+    // - metadata.userId: Must match authenticated user's UID
+    // - data.type: "Mind" for mental activities (also: Fitness, Sleep, Body, etc.)
+    // - data.items[].activityId: 2 = Chess Puzzles in Vimsy
+    // - status: Always "pending" when creating (Vimsy changes it later)
+    
+    function createVimsyImportDocument(userId, durationMinutes) {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      const doc = {
+        metadata: {
+          appId: "chess-test-app",              // Change this for your app
+          appName: "Chess Test App",            // Change this for your app
+          version: "1.0",                       // Schema version (always "1.0")
+          timestamp: now.toISOString(),         // When document was created
+          userId: userId,                       // MUST match authenticated user
+          documentId: `chess-test-${Date.now()}`  // Unique ID (timestamp-based)
+        },
+        data: {
+          type: "Mind",                         // Data type: Mind, Fitness, Sleep, etc.
+          items: [{
+            date: today,                        // Date for activity (YYYY-MM-DD)
+            activityId: 2,                      // 2 = Chess Puzzles in Vimsy
+            duration: durationMinutes,          // Duration in minutes
+            notes: "Test import from Chess Test App",
+            customFields: {                     // App-specific data (optional)
+              testData: true,
+              timestamp: now.toISOString()
+            }
+          }]
+        },
+        status: "pending",                      // Always "pending" when creating
+        processedAt: null,                      // Vimsy sets this when processed
+        errors: []                              // Vimsy adds errors if import fails
+      };
+
+      console.log('[Document] Created import document:', doc);
+      return doc;
+    }
+
+    // ============================================================================
+    // STEP 4: UPLOAD TO FIRESTORE
+    // ============================================================================
+    // Write to the externalAppData staging area.
+    // Path format: users/{userId}/externalAppData/{appId}/{documentId}
+    // 
+    // CRITICAL: The path structure must match exactly:
+    // - {userId} must match authenticated user's UID
+    // - {appId} must match metadata.appId in the document
+    // - {documentId} must be unique for each import
+    
+    async function uploadChessPuzzleActivity() {
+      if (!currentUser) {
+        alert('Please login first');
+        return;
+      }
+
+      const durationInput = document.getElementById('durationInput');
+      const duration = parseInt(durationInput.value);
+      
+      if (!duration || duration < 1) {
+        alert('Please enter a valid duration (1 or more minutes)');
+        return;
+      }
+
+      console.log('[Upload] Starting upload process...');
+      logActivity('Creating document...', null, 'info');
+
+      // Disable upload button during upload
+      const uploadBtn = document.getElementById('uploadBtn');
+      uploadBtn.disabled = true;
+
+      try {
+        // Create the document
+        const doc = createVimsyImportDocument(currentUser.uid, duration);
+        lastUploadData = { userId: currentUser.uid, duration: duration, doc: doc };
+
+        // Build the Firestore path
+        // IMPORTANT: Path must have even number of segments (collection/doc/collection/doc/...)
+        const path = `users/${currentUser.uid}/externalAppData/${doc.metadata.appId}/documents/${doc.metadata.documentId}`;
+        console.log('[Upload] Firestore path:', path);
+        logActivity('Uploading to Firestore...', path, 'info');
+
+        // Upload to Firestore
+        await db.doc(path).set(doc);
+        
+        console.log('[Upload] ✓ Upload successful');
+        logActivity('✓ Document uploaded successfully', doc.metadata.documentId, 'success');
+
+        // Hide retry button, show success
+        document.getElementById('retryBtn').classList.add('hidden');
+
+        // Start monitoring status
+        monitorDocumentStatus(currentUser.uid, doc.metadata.appId, doc.metadata.documentId);
+
+      } catch (error) {
+        console.error('[Upload] ✗ Upload failed:', error);
+        logActivity('✗ Upload failed: ' + error.message, error.code, 'error');
+        
+        // Show retry button
+        document.getElementById('retryBtn').classList.remove('hidden');
+        
+        alert('Upload failed: ' + error.message);
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    }
+
+    // ============================================================================
+    // STEP 5: MONITOR IMPORT STATUS (OPTIONAL)
+    // ============================================================================
+    // Watch the document to see when Vimsy processes it.
+    // Vimsy will update the document's "status" field to:
+    // - "processed" = Import successful
+    // - "error" = Import failed (check "errors" array for details)
+    
+    function monitorDocumentStatus(userId, appId, documentId) {
+      // Clean up any existing listener
+      if (statusMonitorUnsubscribe) {
+        statusMonitorUnsubscribe();
+      }
+
+      const path = `users/${userId}/externalAppData/${appId}/documents/${documentId}`;
+      console.log('[Monitor] Starting status monitor for:', path);
+      logActivity('Monitoring import status...', null, 'info');
+
+      statusMonitorUnsubscribe = db.doc(path).onSnapshot((snapshot) => {
+        if (snapshot.exists) {
+          const doc = snapshot.data();
+          console.log('[Monitor] Status update:', doc.status, doc);
+
+          if (doc.status === 'processed') {
+            console.log('[Monitor] ✓ Vimsy processed the import successfully');
+            logActivity('✓ Vimsy imported the data successfully!', 
+                       'Check Vimsy for today\'s Chess Puzzle activity', 'success');
+            
+            // Stop monitoring
+            if (statusMonitorUnsubscribe) {
+              statusMonitorUnsubscribe();
+              statusMonitorUnsubscribe = null;
+            }
+          } else if (doc.status === 'error') {
+            console.error('[Monitor] ✗ Vimsy import failed:', doc.errors);
+            logActivity('✗ Vimsy import failed', 
+                       'Errors: ' + doc.errors.join(', '), 'error');
+            
+            // Stop monitoring
+            if (statusMonitorUnsubscribe) {
+              statusMonitorUnsubscribe();
+              statusMonitorUnsubscribe = null;
+            }
+          }
+        }
+      }, (error) => {
+        console.error('[Monitor] Snapshot error:', error);
+        logActivity('✗ Monitor error: ' + error.message, null, 'error');
+      });
+    }
+
+    // ============================================================================
+    // RETRY UPLOAD
+    // ============================================================================
+    // Retry the last failed upload with the same parameters
+    
+    function retryLastUpload() {
+      if (!lastUploadData) {
+        alert('No previous upload to retry');
+        return;
+      }
+
+      console.log('[Retry] Retrying last upload...');
+      logActivity('Retrying upload...', null, 'info');
+      uploadChessPuzzleActivity();
+    }
+
+    // ============================================================================
+    // DELETE TEST DOCUMENTS
+    // ============================================================================
+    // Delete all test documents from the externalAppData staging area.
+    // This is useful for cleanup during testing.
+    
+    async function deleteTestDocuments() {
+      if (!currentUser) {
+        alert('Please login first');
+        return;
+      }
+
+      if (!confirm('Delete all test documents from Firestore? This cannot be undone.')) {
+        return;
+      }
+
+      console.log('[Delete] Starting deletion process...');
+      logActivity('Querying test documents...', null, 'info');
+
+      try {
+        const appId = 'chess-test-app';
+        const collectionPath = `users/${currentUser.uid}/externalAppData/${appId}/documents`;
+        
+        console.log('[Delete] Querying collection:', collectionPath);
+        const snapshot = await db.collection(collectionPath).get();
+
+        if (snapshot.empty) {
+          console.log('[Delete] No documents found');
+          logActivity('No test documents found', null, 'info');
+          alert('No test documents found to delete');
+          return;
+        }
+
+        console.log('[Delete] Found', snapshot.size, 'documents');
+        logActivity(`Found ${snapshot.size} documents, deleting...`, null, 'info');
+
+        // Delete each document
+        const deletePromises = [];
+        snapshot.forEach((doc) => {
+          console.log('[Delete] Deleting:', doc.id);
+          deletePromises.push(doc.ref.delete());
+        });
+
+        await Promise.all(deletePromises);
+
+        console.log('[Delete] ✓ All documents deleted');
+        logActivity('✓ Deleted ' + snapshot.size + ' test documents', null, 'success');
+        alert('Deleted ' + snapshot.size + ' test documents');
+
+      } catch (error) {
+        console.error('[Delete] ✗ Deletion failed:', error);
+        logActivity('✗ Deletion failed: ' + error.message, error.code, 'error');
+        alert('Deletion failed: ' + error.message);
+      }
+    }
+
+    // ============================================================================
+    // UI HELPERS
+    // ============================================================================
+    
+    function updateUIForLoggedInUser() {
+      const statusBox = document.getElementById('statusBox');
+      const statusDetails = document.getElementById('statusDetails');
+      const loginSection = document.getElementById('loginSection');
+      const uploadSection = document.getElementById('uploadSection');
+
+      statusBox.className = 'status-box connected';
+      statusBox.querySelector('.status-label').textContent = 'Status: ✓ Connected to Firebase';
+      statusDetails.innerHTML = `
+        <div class="status-detail"><strong>User:</strong> ${currentUser.email}</div>
+        <div class="status-detail"><strong>User ID:</strong> ${currentUser.uid}</div>
+      `;
+
+      loginSection.classList.add('hidden');
+      uploadSection.classList.remove('hidden');
+    }
+
+    function updateUIForLoggedOutUser() {
+      const statusBox = document.getElementById('statusBox');
+      const statusDetails = document.getElementById('statusDetails');
+      const loginSection = document.getElementById('loginSection');
+      const uploadSection = document.getElementById('uploadSection');
+
+      statusBox.className = 'status-box';
+      statusBox.querySelector('.status-label').textContent = 'Status: Not Connected';
+      statusDetails.innerHTML = '';
+
+      loginSection.classList.remove('hidden');
+      uploadSection.classList.add('hidden');
+    }
+
+    function logActivity(message, detail = null, type = 'info') {
+      const log = document.getElementById('activityLog');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+
+      entry.innerHTML = `
+        <div class="log-time">${timeStr}</div>
+        <div class="log-message">${message}</div>
+        ${detail ? `<div class="log-detail">${detail}</div>` : ''}
+      `;
+
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+
+      // Also log to console
+      console.log(`[Log:${type}] ${message}`, detail || '');
+    }
+
+    function clearLog() {
+      const log = document.getElementById('activityLog');
+      log.innerHTML = `
+        <div class="log-entry info">
+          <div class="log-time">Ready</div>
+          <div class="log-message">Log cleared</div>
+        </div>
+      `;
+      console.log('[Log] Activity log cleared');
+    }
+  </script>
+</body>
+</html>
