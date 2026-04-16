@@ -772,7 +772,7 @@ header h1 {
   margin-top: 0.1rem;
 }
 /* ── Mix drill ── */
-.mix-select-panel {
+#mix-select-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -794,9 +794,10 @@ header h1 {
 }
 
 .mix-checkbox-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
 }
 
 .mix-checkbox-grid label {
