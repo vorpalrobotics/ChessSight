@@ -474,7 +474,7 @@ header h1 {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-discipline, #screen-dlm {
+#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-discipline, #screen-dlm, #screen-mix {
   display: flex;
   flex-direction: column;
   align-items: center;
