@@ -15,13 +15,26 @@ function fileOf(sq) { return sq.charCodeAt(0) - 97; }
 function rankOf(sq) { return parseInt(sq[1]) - 1; }
 function sqName(f, r) { return String.fromCharCode(97 + f) + (r + 1); }
 
-const QUEEN_DIRS = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+const QUEEN_DIRS  = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+const ROOK_DIRS   = [[1,0],[-1,0],[0,1],[0,-1]];
+const BISHOP_DIRS = [[1,1],[1,-1],[-1,1],[-1,-1]];
+const KNIGHT_HOPS = [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]];
 
-function computeQueenAttacks(queenSq, occupied) {
+function computeAttacks(attackerSq, attackerType, occupied) {
   const attacks = new Set();
-  const qf = fileOf(queenSq), qr = rankOf(queenSq);
-  for (const [df, dr] of QUEEN_DIRS) {
-    let f = qf + df, r = qr + dr;
+  const af = fileOf(attackerSq), ar = rankOf(attackerSq);
+  if (attackerType === 'n') {
+    for (const [df, dr] of KNIGHT_HOPS) {
+      const f = af + df, r = ar + dr;
+      if (f >= 0 && f < 8 && r >= 0 && r < 8) attacks.add(sqName(f, r));
+    }
+    return attacks;
+  }
+  const dirs = attackerType === 'q' ? QUEEN_DIRS
+             : attackerType === 'r' ? ROOK_DIRS
+             : BISHOP_DIRS;
+  for (const [df, dr] of dirs) {
+    let f = af + df, r = ar + dr;
     while (f >= 0 && f < 8 && r >= 0 && r < 8) {
       const sq = sqName(f, r);
       attacks.add(sq);
@@ -59,8 +72,8 @@ function blackPieceCovers(type, fromSq, targetSq, occupied) {
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5 };
 
 function isDefended(targetSq, pos) {
-  const { queenSq, wPawns, bPieces, bPawns } = pos;
-  const occupied = new Set([queenSq, ...wPawns, ...bPieces.map(p => p.sq), ...bPawns]);
+  const { attackerSq, wPawns, bPieces, bPawns } = pos;
+  const occupied = new Set([attackerSq, ...wPawns, ...bPieces.map(p => p.sq), ...bPawns]);
   const tf = fileOf(targetSq), tr = rankOf(targetSq);
 
   // Black pawn at (pf, pr) attacks (pf±1, pr−1).
@@ -79,16 +92,16 @@ function isDefended(targetSq, pos) {
 }
 
 function computeValidTargets(pos) {
-  const { queenSq, wPawns, bPieces, bPawns } = pos;
-  const occupied = new Set([queenSq, ...wPawns, ...bPieces.map(p => p.sq), ...bPawns]);
-  const qAtks = computeQueenAttacks(queenSq, occupied);
+  const { attackerSq, attackerType, wPawns, bPieces, bPawns } = pos;
+  const occupied = new Set([attackerSq, ...wPawns, ...bPieces.map(p => p.sq), ...bPawns]);
+  const atks = computeAttacks(attackerSq, attackerType, occupied);
   const targets = [];
   for (const { sq, type } of bPieces) {
-    if (qAtks.has(sq) && !isDefended(sq, pos))
+    if (atks.has(sq) && !isDefended(sq, pos))
       targets.push({ sq, value: PIECE_VALUE[type], type });
   }
   for (const sq of bPawns) {
-    if (qAtks.has(sq) && !isDefended(sq, pos))
+    if (atks.has(sq) && !isDefended(sq, pos))
       targets.push({ sq, value: 1, type: 'p' });
   }
   return targets;
@@ -99,15 +112,18 @@ function computeValidTargets(pos) {
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randInt(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
 
+const ATTACKER_TYPES = ['q', 'r', 'n', 'b'];
+
 function generatePosition() {
   const TYPES = ['b', 'n', 'r'];
   let lastPos = null;
 
-  for (let attempt = 0; attempt < 60; attempt++) {
+  for (let attempt = 0; attempt < 80; attempt++) {
+    const attackerType = pick(ATTACKER_TYPES);
     const occupied = new Set();
 
-    const queenSq = pick(ALL_SQS);
-    occupied.add(queenSq);
+    const attackerSq = pick(ALL_SQS);
+    occupied.add(attackerSq);
 
     // 0–4 white pawns on ranks 2–4 (index 1–3)
     const wPawns = [];
@@ -145,21 +161,23 @@ function generatePosition() {
       const sq = pick(avail); bPawns.push(sq); occupied.add(sq);
     }
 
-    const pos = { queenSq, wPawns, bPieces, bPawns };
+    const pos = { attackerSq, attackerType, wPawns, bPieces, bPawns };
     lastPos = pos;
 
-    // Require queen to attack at least one black piece/pawn, otherwise regenerate
-    const qAtks = computeQueenAttacks(queenSq, occupied);
-    if ([...bPieces.map(p => p.sq), ...bPawns].some(sq => qAtks.has(sq))) return pos;
+    // Require attacker to reach at least one black piece/pawn, otherwise regenerate
+    const atks = computeAttacks(attackerSq, attackerType, occupied);
+    if ([...bPieces.map(p => p.sq), ...bPawns].some(sq => atks.has(sq))) return pos;
   }
 
   return lastPos; // fallback: queen may attack nothing; student will PASS
 }
 
+const ATTACKER_LETTER = { q: 'Q', r: 'R', n: 'N', b: 'B' };
+
 function buildFen(pos) {
-  const { queenSq, wPawns, bPieces, bPawns } = pos;
+  const { attackerSq, attackerType, wPawns, bPieces, bPawns } = pos;
   const pm = {};
-  pm[queenSq] = 'Q';
+  pm[attackerSq] = ATTACKER_LETTER[attackerType];
   wPawns.forEach(sq => { pm[sq] = 'P'; });
   bPieces.forEach(({ sq, type }) => { pm[sq] = type; }); // lowercase = black
   bPawns.forEach(sq => { pm[sq] = 'p'; });
@@ -204,7 +222,7 @@ export function generateHangGrabPuzzle() {
   return {
     fen: buildFen(pos),
     targets: new Set(validTargets.map(t => t.sq)),
-    pieceSquares: new Set([pos.queenSq, ...pos.wPawns, ...pos.bPieces.map(p => p.sq), ...pos.bPawns]),
+    pieceSquares: new Set([pos.attackerSq, ...pos.wPawns, ...pos.bPieces.map(p => p.sq), ...pos.bPawns]),
     type: 'hanggrab',
   };
 }
@@ -277,10 +295,10 @@ function handleBoardClick(e) {
   const sq = sqFromClick(e);
   if (!sq) return;
 
-  const { queenSq, wPawns, bPieces, bPawns } = currentPos;
+  const { attackerSq, wPawns, bPieces, bPawns } = currentPos;
 
-  // Ignore white pieces (queen / pawns)
-  if (sq === queenSq || wPawns.includes(sq)) return;
+  // Ignore white pieces (attacker / pawns)
+  if (sq === attackerSq || wPawns.includes(sq)) return;
 
   // Only respond to clicks on actual black pieces
   const isBlack = bPieces.some(p => p.sq === sq) || bPawns.includes(sq);
