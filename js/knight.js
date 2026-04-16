@@ -348,7 +348,10 @@ function finishPuzzle() {
 function handleShow() {
   if (waitingToAdvance) {
     if (!solutionShown) {
-      // Puzzle finished sub-optimally — show the best route without changing scores
+      // Puzzle finished sub-optimally — clear the "click to continue" prompt and
+      // show the optimal route without re-recording scores
+      const boardEl = document.getElementById('knight-board');
+      if (boardEl) boardEl.querySelectorAll('.knight-continue-msg').forEach(el => el.remove());
       clearPathMarks();
       currentOptimalPath.forEach((sq, i) => drawPathSquare(sq, i + 1, 'knight-sq-optimal'));
       solutionShown = true;
