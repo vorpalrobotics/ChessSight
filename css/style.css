@@ -310,6 +310,15 @@ header h1 {
   font-size: 0.8rem;
   color: var(--text-muted);
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+.legend-item:hover {
+  color: var(--text);
+}
+.legend-item.legend-item-hidden {
+  opacity: 0.35;
 }
 
 .legend-dot {

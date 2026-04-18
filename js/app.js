@@ -319,8 +319,8 @@ async function renderCharts() {
 
   // Build shared legend HTML
   const legend = document.getElementById('chart-legend');
-  legend.innerHTML = drills.map(d =>
-    `<span class="legend-item">
+  legend.innerHTML = drills.map((d, i) =>
+    `<span class="legend-item" data-idx="${i}">
        <span class="legend-dot" style="background:${DRILL_COLORS[d]}"></span>
        ${DRILL_LABELS[d]}
      </span>`
@@ -362,6 +362,19 @@ async function renderCharts() {
     type: 'line',
     data: { labels: dateLabels, datasets: accDatasets },
     options: commonOpts('accuracy', 100, v => `${v}%`),
+  });
+
+  // Wire legend click → toggle both charts
+  legend.querySelectorAll('.legend-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const i = parseInt(item.dataset.idx, 10);
+      const nowHidden = !chartTime.getDatasetMeta(i).hidden;
+      chartTime.setDatasetVisibility(i, !nowHidden);
+      chartAcc.setDatasetVisibility(i, !nowHidden);
+      chartTime.update();
+      chartAcc.update();
+      item.classList.toggle('legend-item-hidden', nowHidden);
+    });
   });
 }
 
