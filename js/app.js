@@ -368,12 +368,12 @@ async function renderCharts() {
   legend.querySelectorAll('.legend-item').forEach(item => {
     item.addEventListener('click', () => {
       const i = parseInt(item.dataset.idx, 10);
-      const nowHidden = !chartTime.getDatasetMeta(i).hidden;
-      chartTime.setDatasetVisibility(i, !nowHidden);
-      chartAcc.setDatasetVisibility(i, !nowHidden);
+      const visible = chartTime.isDatasetVisible(i);
+      chartTime.setDatasetVisibility(i, !visible);
+      chartAcc.setDatasetVisibility(i, !visible);
       chartTime.update();
       chartAcc.update();
-      item.classList.toggle('legend-item-hidden', nowHidden);
+      item.classList.toggle('legend-item-hidden', visible);
     });
   });
 }
