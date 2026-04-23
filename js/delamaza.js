@@ -248,6 +248,7 @@ function loadPosition() {
   currentValidSqs = computeValidSquares(KING_SQ, pieceSq, chosenPiece);
   foundSqs = new Set();
   puzzleActive = true;
+  document.getElementById('btn-dlm-no-solution').disabled = false;
 
   document.getElementById('dlm-progress').textContent = `${spiralIndex + 1} / 63`;
 
@@ -321,6 +322,7 @@ function handleBoardClick(e) {
   if (currentValidSqs.includes(sq)) {
     foundSqs.add(sq);
     drawMark(sq, 'dlm-sq-found');
+    document.getElementById('btn-dlm-no-solution').disabled = true;
     if (foundSqs.size === currentValidSqs.length) {
       puzzleActive = false;
       autoAdvanceTimer = setTimeout(advancePosition, 500);
