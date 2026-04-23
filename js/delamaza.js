@@ -238,13 +238,11 @@ function stopSession() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleActive = false;
   waitingToAdvance = false;
-  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
 }
 
 function loadPosition() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   waitingToAdvance = false;
-  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
 
   const pieceSq = SPIRAL[spiralIndex];
   currentValidSqs = computeValidSquares(KING_SQ, pieceSq, chosenPiece);
@@ -268,7 +266,6 @@ function loadPosition() {
 
   if (currentValidSqs.length === 0) {
     puzzleActive = false;
-    document.getElementById('btn-dlm-no-solution').classList.remove('hidden');
   }
 }
 
@@ -350,7 +347,6 @@ function handleShow() {
 }
 
 function handleNoSolutionClick() {
-  document.getElementById('btn-dlm-no-solution').classList.add('hidden');
   clearMarks();
   advancePosition();
 }
