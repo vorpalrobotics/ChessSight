@@ -347,8 +347,23 @@ function handleShow() {
 }
 
 function handleNoSolutionClick() {
-  clearMarks();
-  advancePosition();
+  if (waitingToAdvance) return;
+  const unfound = currentValidSqs.filter(sq => !foundSqs.has(sq));
+  if (unfound.length > 0) {
+    // Wrong — solutions existed; reveal them in red and penalise
+    puzzleActive = false;
+    for (const sq of unfound) {
+      sessionMisses++;
+      drawMark(sq, 'dlm-sq-missed');
+    }
+    document.getElementById('dlm-misses').textContent = `Misses: ${sessionMisses}`;
+    drawContinueMsg();
+    waitingToAdvance = true;
+  } else {
+    // Correct — nothing to find
+    clearMarks();
+    advancePosition();
+  }
 }
 
 // ─── Timer display ────────────────────────────────────────────────────────────
