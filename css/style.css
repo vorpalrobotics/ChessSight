@@ -294,6 +294,7 @@ header h1 {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+  padding-top: 1rem;
 }
 #modal-history #chart-no-data {
   flex-shrink: 0;
@@ -307,25 +308,34 @@ header h1 {
 
 .chart-tab-row {
   display: flex;
-  gap: 0.4rem;
-  margin-bottom: 1.1rem;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--surface2);
 }
 
 .chart-tab-btn {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 0.25rem 0.9rem;
-  background: var(--surface2);
-  border: 1px solid var(--surface2);
+  padding: 0.45rem 1.4rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
   color: var(--text-muted);
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0;
   letter-spacing: 0.04em;
   cursor: pointer;
+  margin-bottom: -2px;
+  transition: color 0.15s, background 0.15s;
+}
+.chart-tab-btn:hover {
+  color: var(--text);
+  background: var(--surface2);
 }
 .chart-tab-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--surface);
+  border-color: var(--surface2);
+  border-bottom: 2px solid var(--surface);
+  color: var(--text);
 }
 
 .radar-charts-row {
