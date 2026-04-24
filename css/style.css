@@ -269,7 +269,43 @@ header h1 {
 .chart-range-buttons {
   display: flex;
   gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.chart-tab-row {
+  display: flex;
+  gap: 0.4rem;
   margin-bottom: 1.1rem;
+}
+
+.chart-tab-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.9rem;
+  background: var(--surface2);
+  border: 1px solid var(--surface2);
+  color: var(--text-muted);
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.chart-tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.radar-charts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.radar-chart-wrap {
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
 }
 
 .range-btn {

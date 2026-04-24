@@ -220,7 +220,7 @@ const DRILL_COLORS = {
   'dlm-knight': '#44ccff',
 };
 
-let chartTime = null, chartAcc = null;
+let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
 
 // --- Cloud Sync / Vimsy modal ---
 const modalVimsy = document.getElementById('modal-vimsy');
@@ -263,9 +263,25 @@ modalHistory.addEventListener('click', (e) => {
   if (e.target === modalHistory) modalHistory.classList.add('hidden');
 });
 
+// Tab switching
+document.getElementById('btn-tab-graph').addEventListener('click', () => {
+  document.getElementById('chart-tab-graph').classList.remove('hidden');
+  document.getElementById('chart-tab-radar').classList.add('hidden');
+  document.getElementById('btn-tab-graph').classList.add('active');
+  document.getElementById('btn-tab-radar').classList.remove('active');
+});
+document.getElementById('btn-tab-radar').addEventListener('click', () => {
+  document.getElementById('chart-tab-graph').classList.add('hidden');
+  document.getElementById('chart-tab-radar').classList.remove('hidden');
+  document.getElementById('btn-tab-graph').classList.remove('active');
+  document.getElementById('btn-tab-radar').classList.add('active');
+});
+
 async function renderCharts() {
-  if (chartTime) { chartTime.destroy(); chartTime = null; }
-  if (chartAcc)  { chartAcc.destroy();  chartAcc  = null; }
+  if (chartTime)      { chartTime.destroy();      chartTime      = null; }
+  if (chartAcc)       { chartAcc.destroy();       chartAcc       = null; }
+  if (chartRadarAcc)  { chartRadarAcc.destroy();  chartRadarAcc  = null; }
+  if (chartRadarTime) { chartRadarTime.destroy(); chartRadarTime = null; }
 
   const noData = document.getElementById('chart-no-data');
   const wrap   = document.getElementById('chart-wrap');
@@ -375,6 +391,69 @@ async function renderCharts() {
       chartAcc.update();
       item.classList.toggle('legend-item-hidden', visible);
     });
+  });
+
+  // ── Radar charts ──────────────────────────────────────────────────────────
+  const RADAR_DRILLS = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'hanggrab'];
+  const RADAR_LABELS = ['Checks', 'Captures', 'Loose', 'Underguarded', 'Queen Atk', 'Knight', 'Hang Grab'];
+
+  const radarAcc = [], radarTime = [];
+  for (const drill of RADAR_DRILLS) {
+    const recs      = records.filter(r => r.drill === drill);
+    const totCorrect = recs.reduce((s, r) => s + r.totalCorrect, 0);
+    const totMisses  = recs.reduce((s, r) => s + r.totalMisses,  0);
+    const totSecs    = recs.reduce((s, r) => s + r.totalSeconds, 0);
+    const totPos     = recs.reduce((s, r) => s + r.positions,    0);
+    radarAcc.push( totCorrect + totMisses > 0 ? Math.round(totCorrect / (totCorrect + totMisses) * 100) : 0);
+    radarTime.push(totPos > 0 ? Math.round(totSecs / totPos) : 0);
+  }
+
+  const timeMax = Math.ceil(Math.max(...radarTime, 10) / 5) * 5;
+
+  const rGridColor  = 'rgba(255,255,255,0.1)';
+  const rLabelColor = '#bbb';
+  const rTickColor  = '#777';
+
+  function radarOpts(max, tickCb) {
+    return {
+      responsive: true,
+      aspectRatio: 1,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${tickCb(ctx.raw)}` } },
+      },
+      scales: {
+        r: {
+          min: 0, max,
+          ticks: { color: rTickColor, backdropColor: 'transparent', stepSize: max / 4 },
+          grid:        { color: rGridColor },
+          angleLines:  { color: rGridColor },
+          pointLabels: { color: rLabelColor, font: { size: 11 } },
+        },
+      },
+    };
+  }
+
+  chartRadarAcc = new Chart(document.getElementById('chart-radar-acc'), {
+    type: 'radar',
+    data: {
+      labels: RADAR_LABELS,
+      datasets: [{ label: 'Accuracy', data: radarAcc,
+        borderColor: '#3a9fd0', backgroundColor: 'rgba(58,159,208,0.2)',
+        borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#3a9fd0' }],
+    },
+    options: radarOpts(100, v => `${v}%`),
+  });
+
+  chartRadarTime = new Chart(document.getElementById('chart-radar-time'), {
+    type: 'radar',
+    data: {
+      labels: RADAR_LABELS,
+      datasets: [{ label: 'Avg Time', data: radarTime,
+        borderColor: '#f0a030', backgroundColor: 'rgba(240,160,48,0.2)',
+        borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f0a030' }],
+    },
+    options: radarOpts(timeMax, v => `${v}s`),
   });
 }
 

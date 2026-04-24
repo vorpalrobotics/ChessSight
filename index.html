@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.1.93</title>
+  <title>ChessSight v0.1.94</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.1.93</span>
+      <h1>ChessSight</h1><span class="version-label">v0.1.94</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -942,16 +942,36 @@
         <button class="range-btn" disabled>Quarter</button>
         <button class="range-btn" disabled>Month</button>
       </div>
+      <div class="chart-tab-row">
+        <button id="btn-tab-graph" class="chart-tab-btn active">Graph</button>
+        <button id="btn-tab-radar" class="chart-tab-btn">Radar</button>
+      </div>
       <div id="chart-no-data" class="data-empty hidden">No data yet — complete some puzzles first.</div>
       <div id="chart-wrap">
-        <div id="chart-legend" class="chart-legend"></div>
-        <div class="chart-section">
-          <div class="chart-title">Avg Time (sec / puzzle)</div>
-          <div class="chart-container"><canvas id="chart-time"></canvas></div>
+        <!-- Graph tab -->
+        <div id="chart-tab-graph">
+          <div id="chart-legend" class="chart-legend"></div>
+          <div class="chart-section">
+            <div class="chart-title">Avg Time (sec / puzzle)</div>
+            <div class="chart-container"><canvas id="chart-time"></canvas></div>
+          </div>
+          <div class="chart-section">
+            <div class="chart-title">Accuracy %</div>
+            <div class="chart-container"><canvas id="chart-acc"></canvas></div>
+          </div>
         </div>
-        <div class="chart-section">
-          <div class="chart-title">Accuracy %</div>
-          <div class="chart-container"><canvas id="chart-acc"></canvas></div>
+        <!-- Radar tab -->
+        <div id="chart-tab-radar" class="hidden">
+          <div class="radar-charts-row">
+            <div class="radar-chart-wrap">
+              <div class="chart-title">Accuracy %</div>
+              <canvas id="chart-radar-acc"></canvas>
+            </div>
+            <div class="radar-chart-wrap">
+              <div class="chart-title">Avg Time (sec / puzzle)</div>
+              <canvas id="chart-radar-time"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
