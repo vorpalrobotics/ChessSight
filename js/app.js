@@ -227,6 +227,7 @@ const DEFAULT_GOAL     = { acc: 95, time: 10 };
 
 let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
 let activeRange = 'all';
+let radarTooltipCleanups = [];
 
 function filterByRange(records, range) {
   if (range === 'all') return records;
@@ -330,7 +331,62 @@ async function renderGoals() {
   });
 }
 
+function attachRadarTooltip(chart, dataArr, goals, formatFn, goalField, goalSuffix) {
+  const canvas = chart.canvas;
+  const tip = document.createElement('div');
+  tip.className = 'radar-label-tip hidden';
+  document.body.appendChild(tip);
+
+  const ac = new AbortController();
+  const { signal } = ac;
+
+  function tryShow(clientX, clientY) {
+    const items = chart.scales.r?._pointLabelItems;
+    if (!items?.length) { tip.classList.add('hidden'); return; }
+
+    const rect = canvas.getBoundingClientRect();
+    const mx = clientX - rect.left;
+    const my = clientY - rect.top;
+
+    let best = -1, bestDist = 44;
+    items.forEach((item, i) => {
+      const cx = (item.left + item.right) / 2;
+      const cy = (item.top + item.bottom) / 2;
+      if (Math.hypot(cx - mx, cy - my) < bestDist) {
+        bestDist = Math.hypot(cx - mx, cy - my);
+        best = i;
+      }
+    });
+
+    if (best < 0) { tip.classList.add('hidden'); return; }
+
+    const drill = GOAL_DRILLS[best];
+    const g = goals[drill] || DEFAULT_GOAL;
+    const val = dataArr[best];
+    tip.innerHTML =
+      `<span class="rtip-name">${GOAL_LABELS_FULL[best]}</span>` +
+      `<span class="rtip-val">${val > 0 ? formatFn(val) : '–'}</span>` +
+      `<span class="rtip-goal">goal: ${g[goalField]}${goalSuffix}</span>`;
+    tip.style.left = (Math.min(clientX + 14, window.innerWidth - 170)) + 'px';
+    tip.style.top  = (clientY - 10) + 'px';
+    tip.classList.remove('hidden');
+  }
+
+  canvas.addEventListener('mousemove', e => tryShow(e.clientX, e.clientY), { signal });
+  canvas.addEventListener('mouseleave', () => tip.classList.add('hidden'), { signal });
+  canvas.addEventListener('click', e => tryShow(e.clientX, e.clientY), { signal });
+  canvas.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    tryShow(t.clientX, t.clientY);
+    setTimeout(() => tip.classList.add('hidden'), 3000);
+  }, { signal, passive: true });
+
+  radarTooltipCleanups.push(() => { ac.abort(); tip.remove(); });
+}
+
 async function renderCharts() {
+  radarTooltipCleanups.forEach(fn => fn());
+  radarTooltipCleanups = [];
   if (chartTime)      { chartTime.destroy();      chartTime      = null; }
   if (chartAcc)       { chartAcc.destroy();       chartAcc       = null; }
   if (chartRadarAcc)  { chartRadarAcc.destroy();  chartRadarAcc  = null; }
@@ -520,6 +576,9 @@ async function renderCharts() {
     },
     options: radarOpts(timeMax, v => `${v}s`, timeMet),
   });
+
+  attachRadarTooltip(chartRadarAcc,  radarAcc,  goals, v => `${v}%`, 'acc',  '%');
+  attachRadarTooltip(chartRadarTime, radarTime, goals, v => `${v}s`, 'time', 's');
 }
 
 // --- Export / Import ---

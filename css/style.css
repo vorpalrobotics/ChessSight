@@ -364,6 +364,25 @@ header h1 {
   margin-bottom: 0.6rem;
 }
 
+/* ── Radar label tooltip ── */
+.radar-label-tip {
+  position: fixed;
+  z-index: 9999;
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: 7px;
+  padding: 0.45rem 0.75rem;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+}
+.radar-label-tip.hidden { display: none; }
+.rtip-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+.rtip-val  { font-size: 0.78rem; color: var(--text-muted); }
+.rtip-goal { font-size: 0.78rem; color: var(--accent); }
+
 /* ── Goals tab ── */
 .goals-table {
   width: 100%;
