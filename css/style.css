@@ -310,7 +310,7 @@ header h1 {
   display: flex;
   gap: 0;
   margin-bottom: 0;
-  border-bottom: 2px solid var(--surface2);
+  border-bottom: 2px solid var(--accent);
 }
 
 .chart-tab-btn {
@@ -333,7 +333,7 @@ header h1 {
 }
 .chart-tab-btn.active {
   background: var(--surface);
-  border-color: var(--surface2);
+  border-color: var(--accent);
   border-bottom: 2px solid var(--surface);
   color: var(--text);
 }
