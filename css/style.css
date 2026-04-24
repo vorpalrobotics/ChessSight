@@ -364,6 +364,45 @@ header h1 {
   margin-bottom: 0.6rem;
 }
 
+/* ── Goals tab ── */
+.goals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.goals-table th {
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--surface2);
+  white-space: nowrap;
+}
+.goals-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--surface2);
+}
+.goals-drill-name {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.goals-input {
+  background: var(--surface2);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
+  width: 5rem;
+  text-align: center;
+}
+.goals-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .range-btn {
   font-size: 0.78rem;
   font-weight: 600;

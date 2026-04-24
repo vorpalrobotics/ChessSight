@@ -14,7 +14,7 @@ import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
 import { initMix, startMix } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
-import { getAllRecords, getDisciplineGames, exportAllData, importAllData } from './storage.js';
+import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoals, setGoal } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal } from './vimsy.js';
 
@@ -220,6 +220,11 @@ const DRILL_COLORS = {
   'dlm-knight': '#44ccff',
 };
 
+const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','dlm-rook','dlm-bishop','dlm-knight'];
+const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
+const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Sp:Rook','Sp:Bishop','Sp:Knight'];
+const DEFAULT_GOAL     = { acc: 95, time: 10 };
+
 let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
 let activeRange = 'all';
 
@@ -286,18 +291,44 @@ document.querySelectorAll('.chart-range-buttons .range-btn').forEach(btn => {
 });
 
 // Tab switching
-document.getElementById('btn-tab-graph').addEventListener('click', () => {
-  document.getElementById('chart-tab-graph').classList.remove('hidden');
-  document.getElementById('chart-tab-radar').classList.add('hidden');
-  document.getElementById('btn-tab-graph').classList.add('active');
-  document.getElementById('btn-tab-radar').classList.remove('active');
-});
-document.getElementById('btn-tab-radar').addEventListener('click', () => {
-  document.getElementById('chart-tab-graph').classList.add('hidden');
-  document.getElementById('chart-tab-radar').classList.remove('hidden');
-  document.getElementById('btn-tab-graph').classList.remove('active');
-  document.getElementById('btn-tab-radar').classList.add('active');
-});
+const HISTORY_TABS = ['graph', 'radar', 'goals'];
+async function switchTab(activeId) {
+  HISTORY_TABS.forEach(t => {
+    document.getElementById(`chart-tab-${t}`).classList.toggle('hidden', t !== activeId);
+    document.getElementById(`btn-tab-${t}`).classList.toggle('active', t === activeId);
+  });
+  if (activeId === 'goals')  { await renderGoals(); }
+  if (activeId === 'radar')  { await renderCharts(); }
+}
+HISTORY_TABS.forEach(t =>
+  document.getElementById(`btn-tab-${t}`).addEventListener('click', () => switchTab(t))
+);
+
+async function renderGoals() {
+  const goals = await getGoals();
+  const tbody = document.getElementById('goals-table-body');
+  tbody.innerHTML = GOAL_DRILLS.map((drill, i) => {
+    const g = goals[drill] || DEFAULT_GOAL;
+    return `<tr>
+      <td class="goals-drill-name">${GOAL_LABELS_FULL[i]}</td>
+      <td><input class="goals-input" type="number" min="0" max="100" step="1"
+          data-drill="${drill}" data-field="acc" value="${g.acc}"></td>
+      <td><input class="goals-input" type="number" min="0" step="1"
+          data-drill="${drill}" data-field="time" value="${g.time}"></td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('.goals-input').forEach(inp => {
+    inp.addEventListener('change', async () => {
+      const drill = inp.dataset.drill;
+      const field = inp.dataset.field;
+      const saved = (await getGoals())[drill] || { ...DEFAULT_GOAL };
+      saved[field] = Math.max(0, Number(inp.value));
+      inp.value = saved[field];
+      await setGoal(drill, saved.acc, saved.time);
+    });
+  });
+}
 
 async function renderCharts() {
   if (chartTime)      { chartTime.destroy();      chartTime      = null; }
@@ -309,6 +340,7 @@ async function renderCharts() {
   const wrap   = document.getElementById('chart-wrap');
 
   let records;
+  const goals = await getGoals();
   try { records = await getAllRecords(); }
   catch (err) {
     noData.textContent = `Error reading data: ${err.message}`;
@@ -418,12 +450,9 @@ async function renderCharts() {
   });
 
   // ── Radar charts ──────────────────────────────────────────────────────────
-  const RADAR_DRILLS = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'hanggrab'];
-  const RADAR_LABELS = ['Checks', 'Captures', 'Loose', 'Underguarded', 'Queen Atk', 'Knight', 'Hang Grab'];
-
   const radarAcc = [], radarTime = [];
-  for (const drill of RADAR_DRILLS) {
-    const recs      = records.filter(r => r.drill === drill);
+  for (const drill of GOAL_DRILLS) {
+    const recs       = records.filter(r => r.drill === drill);
     const totCorrect = recs.reduce((s, r) => s + r.totalCorrect, 0);
     const totMisses  = recs.reduce((s, r) => s + r.totalMisses,  0);
     const totSecs    = recs.reduce((s, r) => s + r.totalSeconds, 0);
@@ -432,13 +461,24 @@ async function renderCharts() {
     radarTime.push(totPos > 0 ? Math.round(totSecs / totPos) : 0);
   }
 
+  const accMet  = GOAL_DRILLS.map((d, i) => {
+    const g = goals[d] || DEFAULT_GOAL;
+    return radarAcc[i]  >= g.acc;
+  });
+  const timeMet = GOAL_DRILLS.map((d, i) => {
+    const g = goals[d] || DEFAULT_GOAL;
+    return radarTime[i] > 0 && radarTime[i] <= g.time;
+  });
+  const radarAccLabels  = GOAL_LABELS_RADAR.map((l, i) => accMet[i]  ? `✓ ${l}` : l);
+  const radarTimeLabels = GOAL_LABELS_RADAR.map((l, i) => timeMet[i] ? `✓ ${l}` : l);
+
   const timeMax = Math.ceil(Math.max(...radarTime, 10) / 5) * 5;
 
   const rGridColor  = 'rgba(255,255,255,0.1)';
   const rLabelColor = '#bbb';
   const rTickColor  = '#777';
 
-  function radarOpts(max, tickCb) {
+  function radarOpts(max, tickCb, metArr) {
     return {
       responsive: true,
       aspectRatio: 1,
@@ -452,7 +492,10 @@ async function renderCharts() {
           ticks: { color: rTickColor, backdropColor: 'transparent', stepSize: max / 4 },
           grid:        { color: rGridColor },
           angleLines:  { color: rGridColor },
-          pointLabels: { color: rLabelColor, font: { size: 11 } },
+          pointLabels: {
+            color: ctx => metArr[ctx.index] ? '#4caf50' : rLabelColor,
+            font:  { size: 11 },
+          },
         },
       },
     };
@@ -461,18 +504,18 @@ async function renderCharts() {
   chartRadarAcc = new Chart(document.getElementById('chart-radar-acc'), {
     type: 'radar',
     data: {
-      labels: RADAR_LABELS,
+      labels: radarAccLabels,
       datasets: [{ label: 'Accuracy', data: radarAcc,
         borderColor: '#3a9fd0', backgroundColor: 'rgba(58,159,208,0.2)',
         borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#3a9fd0' }],
     },
-    options: radarOpts(100, v => `${v}%`),
+    options: radarOpts(100, v => `${v}%`, accMet),
   });
 
   chartRadarTime = new Chart(document.getElementById('chart-radar-time'), {
     type: 'radar',
     data: {
-      labels: RADAR_LABELS,
+      labels: radarTimeLabels,
       datasets: [{ label: 'Avg Time', data: radarTime,
         borderColor: '#f0a030', backgroundColor: 'rgba(240,160,48,0.2)',
         borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f0a030' }],

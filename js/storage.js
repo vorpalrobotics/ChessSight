@@ -1,7 +1,8 @@
 const DB_NAME = 'ChessSight';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE = 'drillDays';
 const GAME_STORE = 'disciplineGames';
+const GOALS_STORE = 'goals';
 
 // Lazy singleton DB connection
 let _dbPromise = null;
@@ -21,6 +22,10 @@ function openDB() {
       // v2: per-game discipline records
       if (!db.objectStoreNames.contains(GAME_STORE)) {
         db.createObjectStore(GAME_STORE, { keyPath: 'id', autoIncrement: true });
+      }
+      // v3: per-drill training goals
+      if (!db.objectStoreNames.contains(GOALS_STORE)) {
+        db.createObjectStore(GOALS_STORE, { keyPath: 'drill' });
       }
     };
 
@@ -161,6 +166,40 @@ export async function getDrillSecondsForDate(dateStr) {
       resolve({ total, byDrill });
     };
     req.onerror = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return all goal records as a map: { [drill]: { drill, acc, time } }.
+ * Missing drills are absent from the map (callers should apply defaults).
+ */
+export async function getGoals() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(GOALS_STORE, 'readonly');
+    const req = tx.objectStore(GOALS_STORE).getAll();
+    req.onsuccess = () => {
+      const map = {};
+      for (const rec of req.result) map[rec.drill] = rec;
+      resolve(map);
+    };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Upsert a goal for one drill.
+ * @param {string} drill  e.g. 'captures'
+ * @param {number} acc    minimum accuracy % (0-100)
+ * @param {number} time   maximum seconds per puzzle
+ */
+export async function setGoal(drill, acc, time) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(GOALS_STORE, 'readwrite');
+    tx.objectStore(GOALS_STORE).put({ drill, acc, time });
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
   });
 }
 
