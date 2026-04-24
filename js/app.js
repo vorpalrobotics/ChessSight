@@ -261,6 +261,8 @@ const modalHistory = document.getElementById('modal-history');
 
 document.getElementById('btn-history').addEventListener('click', async () => {
   hamburgerDropdown.classList.add('hidden');
+  const hdr = document.querySelector('header');
+  if (hdr) document.documentElement.style.setProperty('--header-h', hdr.offsetHeight + 'px');
   await renderCharts();
   modalHistory.classList.remove('hidden');
 });
@@ -344,7 +346,7 @@ async function renderCharts() {
       tension: 0.3,
       pointRadius: 4,
       pointHoverRadius: 6,
-      spanGaps: false,
+      spanGaps: true,
       fill: false,
     }));
   }
@@ -360,7 +362,7 @@ async function renderCharts() {
   legend.innerHTML = drills.map((d, i) =>
     `<span class="legend-item" data-idx="${i}">
        <span class="legend-dot" style="background:${DRILL_COLORS[d]}"></span>
-       ${DRILL_LABELS[d]}
+       <span class="legend-label">${DRILL_LABELS[d]}</span>
      </span>`
   ).join('');
 

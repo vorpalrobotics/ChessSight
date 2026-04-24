@@ -266,6 +266,39 @@ header h1 {
 }
 
 /* ── History charts ── */
+/* ── History modal: full-bleed below header ── */
+#modal-history {
+  align-items: flex-start;
+  top: var(--header-h, 68px);
+  background: rgba(0,0,0,0.75);
+}
+#modal-history .modal-box {
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - var(--header-h, 68px));
+  max-height: none;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+#modal-history .modal-box > h2,
+#modal-history .chart-range-buttons,
+#modal-history .chart-tab-row {
+  flex-shrink: 0;
+}
+#modal-history #chart-wrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+#modal-history #chart-no-data {
+  flex-shrink: 0;
+}
+
 .chart-range-buttons {
   display: flex;
   gap: 0.5rem;
@@ -367,7 +400,10 @@ header h1 {
   color: var(--text);
 }
 .legend-item.legend-item-hidden {
-  opacity: 0.35;
+  opacity: 0.5;
+}
+.legend-item.legend-item-hidden .legend-label {
+  text-decoration: line-through;
 }
 
 .legend-dot {
