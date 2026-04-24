@@ -221,6 +221,16 @@ const DRILL_COLORS = {
 };
 
 let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
+let activeRange = 'all';
+
+function filterByRange(records, range) {
+  if (range === 'all') return records;
+  const days = parseInt(range, 10);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - (days - 1));
+  const cutoffStr = cutoff.toLocaleDateString('sv');
+  return records.filter(r => r.date >= cutoffStr);
+}
 
 // --- Cloud Sync / Vimsy modal ---
 const modalVimsy = document.getElementById('modal-vimsy');
@@ -263,6 +273,16 @@ modalHistory.addEventListener('click', (e) => {
   if (e.target === modalHistory) modalHistory.classList.add('hidden');
 });
 
+// Range buttons
+document.querySelectorAll('.chart-range-buttons .range-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('.chart-range-buttons .range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeRange = btn.dataset.range;
+    await renderCharts();
+  });
+});
+
 // Tab switching
 document.getElementById('btn-tab-graph').addEventListener('click', () => {
   document.getElementById('chart-tab-graph').classList.remove('hidden');
@@ -294,6 +314,8 @@ async function renderCharts() {
     wrap.classList.add('hidden');
     return;
   }
+
+  records = filterByRange(records, activeRange);
 
   if (records.length === 0) {
     noData.classList.remove('hidden');
