@@ -479,6 +479,7 @@ async function renderCharts() {
   const rTickColor  = '#777';
 
   function radarOpts(max, tickCb, metArr) {
+    const labelColors = metArr.map(m => m ? '#4caf50' : rLabelColor);
     return {
       responsive: true,
       aspectRatio: 1,
@@ -492,10 +493,7 @@ async function renderCharts() {
           ticks: { color: rTickColor, backdropColor: 'transparent', stepSize: max / 4 },
           grid:        { color: rGridColor },
           angleLines:  { color: rGridColor },
-          pointLabels: {
-            color: ctx => metArr[ctx.index] ? '#4caf50' : rLabelColor,
-            font:  { size: 11 },
-          },
+          pointLabels: { color: labelColors, font: { size: 11 } },
         },
       },
     };
