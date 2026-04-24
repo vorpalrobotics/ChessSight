@@ -518,7 +518,7 @@ async function renderCharts() {
         borderColor: '#f0a030', backgroundColor: 'rgba(240,160,48,0.2)',
         borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f0a030' }],
     },
-    options: radarOpts(timeMax, v => `${v}s`),
+    options: radarOpts(timeMax, v => `${v}s`, timeMet),
   });
 }
 
