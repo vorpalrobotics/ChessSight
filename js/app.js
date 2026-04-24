@@ -265,20 +265,21 @@ document.getElementById('btn-vimsy-clear-log').addEventListener('click', () => {
 // --- History modal (charts) ---
 const modalHistory = document.getElementById('modal-history');
 
+function openHistoryModal() { modalHistory.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function closeHistoryModal() { modalHistory.classList.add('hidden'); document.body.style.overflow = ''; }
+
 document.getElementById('btn-history').addEventListener('click', async () => {
   hamburgerDropdown.classList.add('hidden');
   const hdr = document.querySelector('header');
   if (hdr) document.documentElement.style.setProperty('--header-h', hdr.offsetHeight + 'px');
   await renderCharts();
-  modalHistory.classList.remove('hidden');
+  openHistoryModal();
 });
 
-document.getElementById('btn-history-modal-close').addEventListener('click', () => {
-  modalHistory.classList.add('hidden');
-});
+document.getElementById('btn-history-modal-close').addEventListener('click', closeHistoryModal);
 
 modalHistory.addEventListener('click', (e) => {
-  if (e.target === modalHistory) modalHistory.classList.add('hidden');
+  if (e.target === modalHistory) closeHistoryModal();
 });
 
 // Range buttons

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.3</title>
+  <title>ChessSight v0.2.4</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.3</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.4</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -937,14 +937,16 @@
   <div id="modal-history" class="modal-backdrop hidden">
     <div class="modal-box modal-box-wide">
       <button class="modal-close" id="btn-history-modal-close">&times;</button>
-      <h2>History</h2>
-      <div class="chart-range-buttons">
-        <button class="range-btn active" data-range="all">All</button>
-        <button class="range-btn" data-range="365">Year</button>
-        <button class="range-btn" data-range="90">Quarter</button>
-        <button class="range-btn" data-range="30">Month</button>
-        <button class="range-btn" data-range="7">Week</button>
-        <button class="range-btn" data-range="1">Today</button>
+      <div class="chart-header-row">
+        <h2>History</h2>
+        <div class="chart-range-buttons">
+          <button class="range-btn active" data-range="all">All</button>
+          <button class="range-btn" data-range="365">Year</button>
+          <button class="range-btn" data-range="90">Quarter</button>
+          <button class="range-btn" data-range="30">Month</button>
+          <button class="range-btn" data-range="7">Week</button>
+          <button class="range-btn" data-range="1">Today</button>
+        </div>
       </div>
       <div class="chart-tab-row">
         <button id="btn-tab-graph" class="chart-tab-btn active">Graph</button>
