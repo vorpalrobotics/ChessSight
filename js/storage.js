@@ -1,8 +1,9 @@
 const DB_NAME = 'ChessSight';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const STORE = 'drillDays';
 const GAME_STORE = 'disciplineGames';
 const GOALS_STORE = 'goals';
+const PB_STORE = 'personalBests';
 
 // Lazy singleton DB connection
 let _dbPromise = null;
@@ -26,6 +27,10 @@ function openDB() {
       // v3: per-drill training goals
       if (!db.objectStoreNames.contains(GOALS_STORE)) {
         db.createObjectStore(GOALS_STORE, { keyPath: 'drill' });
+      }
+      // v4: per-drill personal bests
+      if (!db.objectStoreNames.contains(PB_STORE)) {
+        db.createObjectStore(PB_STORE, { keyPath: 'drill' });
       }
     };
 
@@ -200,6 +205,51 @@ export async function setGoal(drill, acc, time) {
     tx.objectStore(GOALS_STORE).put({ drill, acc, time });
     tx.oncomplete = () => resolve();
     tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return the personal best record for a drill, or undefined if none exists.
+ */
+export async function getPersonalBest(drill) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(PB_STORE, 'readonly');
+    const req = tx.objectStore(PB_STORE).get(drill);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Upsert (overwrite) the personal best for a drill.
+ * @param {string} drill
+ * @param {{ drill, score, positions, correct, misses, seconds, date }} data
+ */
+export async function setPersonalBest(drill, data) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PB_STORE, 'readwrite');
+    tx.objectStore(PB_STORE).put(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return all personal best records as a map: { [drill]: record }.
+ */
+export async function getAllPersonalBests() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(PB_STORE, 'readonly');
+    const req = tx.objectStore(PB_STORE).getAll();
+    req.onsuccess = () => {
+      const map = {};
+      for (const rec of req.result) map[rec.drill] = rec;
+      resolve(map);
+    };
+    req.onerror = e => reject(e.target.error);
   });
 }
 

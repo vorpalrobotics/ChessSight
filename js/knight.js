@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { checkAndUpdatePB, showPBCelebration } from './pb.js';
 import { scoreKnightDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -570,19 +571,21 @@ function getPositionsPerDrill() {
   return parseInt(el.value, 10);
 }
 
-function showSummary() {
+async function showSummary() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   stopTimer();
   document.getElementById('btn-summary-again').onclick = restartDrill;
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
   if (count > 0) {
-    const avgTime      = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
+    const totalSeconds = drillResults.reduce((s, r) => s + r.seconds, 0);
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
     const totalMisses  = drillResults.reduce((s, r) => s + r.misses,  0);
     const accuracy = Math.round(totalCorrect / Math.max(1, totalCorrect + totalMisses) * 100);
-    document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
+    document.getElementById('stat-avg-time').textContent = formatTime(Math.round(totalSeconds / count));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+    const isPB = await checkAndUpdatePB('knight', count, totalCorrect, totalMisses, totalSeconds);
+    if (isPB) await showPBCelebration();
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
     document.getElementById('stat-accuracy').textContent = '—';

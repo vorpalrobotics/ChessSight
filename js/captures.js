@@ -2,6 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
+import { checkAndUpdatePB, showPBCelebration } from './pb.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -386,7 +387,7 @@ function updateSessionStats() {
 
 // --- Summary ---
 
-function showSummary() {
+async function showSummary() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   stopTimer();
   // Wire "Play Again" to this drill's restart so the shared summary screen works for both drills
@@ -395,12 +396,14 @@ function showSummary() {
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
   if (count > 0) {
-    const avgTime = drillResults.reduce((s, r) => s + r.seconds, 0) / count;
+    const totalSeconds = drillResults.reduce((s, r) => s + r.seconds, 0);
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
     const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);
     const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
-    document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
+    document.getElementById('stat-avg-time').textContent = formatTime(Math.round(totalSeconds / count));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+    const isPB = await checkAndUpdatePB('captures', count, totalCorrect, totalMisses, totalSeconds);
+    if (isPB) await showPBCelebration();
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
     document.getElementById('stat-accuracy').textContent = '—';

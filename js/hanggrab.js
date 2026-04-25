@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { checkAndUpdatePB, showPBCelebration } from './pb.js';
 import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
@@ -391,7 +392,7 @@ function resumeDrill() {
 
 // ─── Summary ──────────────────────────────────────────────────────────────────
 
-function showSummary() {
+async function showSummary() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   endDrill();
 
@@ -400,11 +401,14 @@ function showSummary() {
   const n = drillResults.length;
   document.getElementById('stat-count').textContent = n;
   if (n > 0) {
+    const totalSeconds = drillResults.reduce((s, r) => s + r.seconds, 0);
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
-    const avgSecs = drillResults.reduce((s, r) => s + r.seconds, 0) / n;
+    const totalMisses  = drillResults.reduce((s, r) => s + r.misses, 0);
     const accuracy = Math.round(totalCorrect / n * 100);
-    document.getElementById('stat-avg-time').textContent = `${avgSecs.toFixed(1)}s`;
+    document.getElementById('stat-avg-time').textContent = `${(totalSeconds / n).toFixed(1)}s`;
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+    const isPB = await checkAndUpdatePB('hanggrab', n, totalCorrect, totalMisses, totalSeconds);
+    if (isPB) await showPBCelebration();
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
     document.getElementById('stat-accuracy').textContent = '—';

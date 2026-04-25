@@ -1,5 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
+import { checkAndUpdatePB, showPBCelebration } from './pb.js';
 import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
@@ -276,17 +277,21 @@ function advancePosition() {
   else loadPosition();
 }
 
-function endSession() {
+async function endSession() {
   stopSession();
   const elapsed = Math.round((Date.now() - sessionStart) / 1000);
 
   const pieceKey = { r: 'dlm-rook', b: 'dlm-bishop', n: 'dlm-knight' }[chosenPiece];
+  const correct = Math.max(0, 63 - sessionMisses);
   upsertDrillDay(pieceKey, {
     seconds: Math.round(elapsed / 63),
-    correct: Math.max(0, 63 - sessionMisses),
+    correct,
     misses: sessionMisses,
     puzzleId: `${chosenPiece}-full`,
   });
+
+  const isPB = await checkAndUpdatePB(pieceKey, 63, correct, sessionMisses, elapsed);
+  if (isPB) await showPBCelebration();
 
   document.getElementById('dlm-drill-area').classList.add('hidden');
   document.getElementById('dlm-end-time').textContent = formatTime(elapsed);
