@@ -370,16 +370,6 @@ header h1 {
   padding: 0.9rem 0.9rem 0.5rem;
 }
 
-.radar-chart-wrap .chart-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: center;
-  margin-bottom: 0.6rem;
-}
-
 /* ── Radar label tooltip ── */
 .radar-label-tip {
   position: fixed;
@@ -500,14 +490,19 @@ header h1 {
 
 .chart-section {
   margin-bottom: 1.25rem;
+  border: 1px solid var(--surface2);
+  border-radius: 8px;
+  padding: 0.9rem 0.9rem 0.6rem;
 }
 
 .chart-title {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 0.6rem;
 }
 
 .chart-container {
