@@ -1,6 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreKnightDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -577,6 +577,7 @@ async function showSummary() {
   document.getElementById('btn-summary-again').onclick = restartDrill;
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
+  await updateSummaryGoals('knight', count);
   if (count > 0) {
     const totalSeconds = drillResults.reduce((s, r) => s + r.seconds, 0);
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);

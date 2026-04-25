@@ -2,7 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreChecksDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -387,6 +387,7 @@ async function showSummary() {
 
   const count = drillResults.length;
   document.getElementById('stat-count').textContent = count;
+  await updateSummaryGoals('checks', count);
   if (count > 0) {
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
     const totalMisses = drillResults.reduce((s, r) => s + r.misses, 0);

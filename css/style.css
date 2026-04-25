@@ -1292,11 +1292,23 @@ header h1 {
   color: var(--text-muted);
 }
 
+.summary-rhs {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
 .summary-value {
   font-family: monospace;
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.summary-goal {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
 #summary-actions {

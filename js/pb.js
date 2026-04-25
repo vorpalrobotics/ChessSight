@@ -43,7 +43,32 @@ export async function checkGoals(drill, positions, correct, misses, seconds) {
   };
 }
 
-function makeCelebrationOverlay(iconText, labelText, extraTextClass) {
+/**
+ * Populate (or clear) the goal annotations on the shared drill summary screen.
+ * Call once per showSummary invocation before navigating.
+ */
+export async function updateSummaryGoals(drill, count) {
+  const timeEl = document.getElementById('stat-time-goal');
+  const accEl  = document.getElementById('stat-acc-goal');
+  if (count <= 0) {
+    timeEl.classList.add('hidden');
+    accEl.classList.add('hidden');
+    return;
+  }
+  const goals = await getGoals();
+  const g = goals[drill];
+  if (g) {
+    timeEl.textContent = `(goal: ${g.time}s)`;
+    accEl.textContent  = `(goal: ${g.acc}%)`;
+    timeEl.classList.remove('hidden');
+    accEl.classList.remove('hidden');
+  } else {
+    timeEl.classList.add('hidden');
+    accEl.classList.add('hidden');
+  }
+}
+
+iconText, labelText, extraTextClass) {
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.className = 'pb-celebration';

@@ -1,6 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
-import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
+import { upsertDrillDay, getGoals } from './storage.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
@@ -298,6 +298,11 @@ async function endSession() {
   document.getElementById('dlm-drill-area').classList.add('hidden');
   document.getElementById('dlm-end-time').textContent = formatTime(elapsed);
   document.getElementById('dlm-end-per-pos').textContent = `${(elapsed / 63).toFixed(1)}s`;
+  const goalEl = document.getElementById('dlm-end-time-goal');
+  const goals = await getGoals();
+  const g = goals[pieceKey];
+  if (g) { goalEl.textContent = `(goal: ${g.time}s)`; goalEl.classList.remove('hidden'); }
+  else   { goalEl.classList.add('hidden'); }
   document.getElementById('dlm-end-misses').textContent = sessionMisses;
   const pieceName = { r: 'Rook', b: 'Bishop', n: 'Knight' }[chosenPiece];
   document.getElementById('dlm-end-piece').textContent = pieceName;
