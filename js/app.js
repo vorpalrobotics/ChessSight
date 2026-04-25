@@ -490,7 +490,10 @@ async function renderCharts() {
   chartAcc = new Chart(document.getElementById('chart-acc'), {
     type: 'line',
     data: { labels: dateLabels, datasets: accDatasets },
-    options: commonOpts('accuracy', { suggestedMax: 100 }, v => `${v}%`),
+    options: commonOpts('accuracy', {
+      suggestedMax: 102,
+      afterBuildTicks: scale => { scale.ticks = scale.ticks.filter(t => t.value <= 100); },
+    }, v => `${v}%`),
   });
 
   // Wire legend click → toggle both charts
