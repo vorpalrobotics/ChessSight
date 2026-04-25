@@ -458,7 +458,7 @@ async function renderCharts() {
   const gridColor = 'rgba(255,255,255,0.07)';
   const tickColor = '#888';
 
-  function commonOpts(unitLabel, maxY, tickCb) {
+  function commonOpts(unitLabel, yOpts, tickCb) {
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -472,7 +472,7 @@ async function renderCharts() {
       scales: {
         x: { ticks: { color: tickColor, maxTicksLimit: 10 }, grid: { color: gridColor } },
         y: {
-          min: 0, ...(maxY !== undefined && { max: maxY }),
+          ...yOpts,
           ticks: { color: tickColor, callback: tickCb },
           grid: { color: gridColor },
           title: { display: true, text: unitLabel, color: tickColor, font: { size: 11 } },
@@ -484,13 +484,13 @@ async function renderCharts() {
   chartTime = new Chart(document.getElementById('chart-time'), {
     type: 'line',
     data: { labels: dateLabels, datasets: timeDatasets },
-    options: commonOpts('seconds', undefined, v => `${v}s`),
+    options: commonOpts('seconds', { min: 0 }, v => `${v}s`),
   });
 
   chartAcc = new Chart(document.getElementById('chart-acc'), {
     type: 'line',
     data: { labels: dateLabels, datasets: accDatasets },
-    options: commonOpts('accuracy', 100, v => `${v}%`),
+    options: commonOpts('accuracy', { suggestedMax: 100 }, v => `${v}%`),
   });
 
   // Wire legend click → toggle both charts
