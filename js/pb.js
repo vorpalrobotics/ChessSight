@@ -68,7 +68,7 @@ export async function updateSummaryGoals(drill, count) {
   }
 }
 
-iconText, labelText, extraTextClass) {
+function makeCelebrationOverlay(iconText, labelText, extraTextClass) {
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.className = 'pb-celebration';
