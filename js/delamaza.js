@@ -1,6 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
 import { registerPause } from './pause.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
@@ -290,6 +290,8 @@ async function endSession() {
     puzzleId: `${chosenPiece}-full`,
   });
 
+  const { accMet, timeMet } = await checkGoals(pieceKey, 63, correct, sessionMisses, elapsed);
+  if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
   const isPB = await checkAndUpdatePB(pieceKey, 63, correct, sessionMisses, elapsed);
   if (isPB) await showPBCelebration();
 

@@ -2863,3 +2863,8 @@ button:disabled {
   text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
   letter-spacing: 0.05em;
 }
+
+.pb-text.goal-text {
+  color: #4caf50;
+  text-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+}

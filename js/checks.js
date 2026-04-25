@@ -2,7 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
 import { scoreChecksDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -395,6 +395,8 @@ async function showSummary() {
     const avgTime = totalSeconds / count;
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(avgTime));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+    const { accMet, timeMet } = await checkGoals('checks', count, totalCorrect, totalMisses, totalSeconds);
+    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
     const isPB = await checkAndUpdatePB('checks', count, totalCorrect, totalMisses, totalSeconds);
     if (isPB) await showPBCelebration();
   } else {

@@ -1,6 +1,6 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration } from './pb.js';
 import { scoreQueenDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 
@@ -456,6 +456,8 @@ async function showSummary() {
     const accuracy = Math.round(totalCorrect / Math.max(1, totalCorrect + totalMisses) * 100);
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(totalSeconds / count));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+    const { accMet, timeMet } = await checkGoals('queen', count, totalCorrect, totalMisses, totalSeconds);
+    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
     const isPB = await checkAndUpdatePB('queen', count, totalCorrect, totalMisses, totalSeconds);
     if (isPB) await showPBCelebration();
   } else {
