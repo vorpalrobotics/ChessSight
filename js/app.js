@@ -205,7 +205,7 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', hanggrab: 'Hang Grab', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
 
 const DRILL_COLORS = {
   checks:       '#e94560',
@@ -215,6 +215,7 @@ const DRILL_COLORS = {
   // threats:   '#ff6b35',  // disabled
   queen:        '#c080ff',
   knight:       '#4ecdc4',
+  hanggrab:     '#26de81',
   'dlm-rook':   '#ff6688',
   'dlm-bishop': '#ffaa44',
   'dlm-knight': '#44ccff',
@@ -431,7 +432,7 @@ async function renderCharts() {
   const dates = [...new Set(records.map(r => r.date))].sort();
   const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
 
-  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'dlm-rook', 'dlm-bishop', 'dlm-knight'];
+  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'hanggrab', 'dlm-rook', 'dlm-bishop', 'dlm-knight'];
 
   function makeDatasets(valueFn) {
     return drills.map(drill => ({
