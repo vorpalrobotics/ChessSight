@@ -220,9 +220,9 @@ const DRILL_COLORS = {
   'dlm-knight': '#44ccff',
 };
 
-const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','dlm-rook','dlm-bishop','dlm-knight'];
-const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
-const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Sp:Rook','Sp:Bishop','Sp:Knight'];
+const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','hanggrab','dlm-rook','dlm-bishop','dlm-knight'];
+const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Hang Grab','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
+const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Hang Grab','Sp:Rook','Sp:Bishop','Sp:Knight'];
 const DEFAULT_GOAL     = { acc: 95, time: 10 };
 
 let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
