@@ -390,39 +390,75 @@ header h1 {
 .rtip-goal { font-size: 0.78rem; color: var(--accent); }
 
 /* ── Goals tab ── */
+.goals-table-wrap {
+  overflow-x: auto;
+}
+
 .goals-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
 }
+
 .goals-table th {
-  text-align: left;
-  padding: 0.45rem 0.75rem;
+  text-align: center;
+  padding: 0.35rem 0.5rem;
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   border-bottom: 1px solid var(--surface2);
   white-space: nowrap;
 }
-.goals-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--surface2);
+
+.goals-th-drill {
+  text-align: left !important;
+  vertical-align: bottom;
 }
+
+.goals-group-header {
+  color: var(--text) !important;
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent) !important;
+  padding-bottom: 0.3rem;
+}
+
+.goals-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--surface2);
+  white-space: nowrap;
+}
+
 .goals-drill-name {
   color: var(--text-muted);
   font-weight: 600;
+  text-align: left;
 }
+
+.goals-pb-val {
+  text-align: center;
+  color: var(--text);
+}
+
+.goals-pb-date {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
 .goals-input {
   background: var(--surface2);
   border: 1px solid transparent;
   border-radius: 4px;
   color: var(--text);
-  font-size: 0.85rem;
-  padding: 0.2rem 0.4rem;
-  width: 5rem;
+  font-size: 0.83rem;
+  padding: 0.2rem 0.3rem;
+  width: 4rem;
   text-align: center;
+  display: block;
+  margin: 0 auto;
 }
+
 .goals-input:focus {
   outline: none;
   border-color: var(--accent);

@@ -14,7 +14,7 @@ import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
 import { initMix, startMix } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
-import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoals, setGoal } from './storage.js';
+import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoals, setGoal, getAllPersonalBests } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal } from './vimsy.js';
 
@@ -307,12 +307,23 @@ HISTORY_TABS.forEach(t =>
 );
 
 async function renderGoals() {
-  const goals = await getGoals();
+  const [goals, pbs] = await Promise.all([getGoals(), getAllPersonalBests()]);
   const tbody = document.getElementById('goals-table-body');
   tbody.innerHTML = GOAL_DRILLS.map((drill, i) => {
-    const g = goals[drill] || DEFAULT_GOAL;
+    const g  = goals[drill] || DEFAULT_GOAL;
+    const pb = pbs[drill];
+    let pbAcc = '—', pbTime = '—', pbDate = '—';
+    if (pb) {
+      const total = pb.correct + pb.misses;
+      pbAcc  = total > 0 ? `${Math.round(pb.correct / total * 100)}%` : '—';
+      pbTime = pb.positions > 0 ? `${(pb.seconds / pb.positions).toFixed(1)}s` : '—';
+      pbDate = pb.date;
+    }
     return `<tr>
       <td class="goals-drill-name">${GOAL_LABELS_FULL[i]}</td>
+      <td class="goals-pb-val">${pbAcc}</td>
+      <td class="goals-pb-val">${pbTime}</td>
+      <td class="goals-pb-date">${pbDate}</td>
       <td><input class="goals-input" type="number" min="0" max="100" step="1"
           data-drill="${drill}" data-field="acc" value="${g.acc}"></td>
       <td><input class="goals-input" type="number" min="0" step="1"

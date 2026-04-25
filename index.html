@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.8</title>
+  <title>ChessSight v0.2.9</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.8</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.9</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -969,16 +969,25 @@
         </div>
         <!-- Goals tab -->
         <div id="chart-tab-goals" class="hidden">
-          <table class="goals-table">
-            <thead>
-              <tr>
-                <th>Drill</th>
-                <th>Min Accuracy (%)</th>
-                <th>Max Time (sec)</th>
-              </tr>
-            </thead>
-            <tbody id="goals-table-body"></tbody>
-          </table>
+          <div class="goals-table-wrap">
+            <table class="goals-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="goals-th-drill">Drill</th>
+                  <th colspan="3" class="goals-group-header">Personal Best</th>
+                  <th colspan="2" class="goals-group-header">Goals</th>
+                </tr>
+                <tr>
+                  <th>Acc</th>
+                  <th>Time</th>
+                  <th>Date</th>
+                  <th>Min Acc (%)</th>
+                  <th>Max Time (s)</th>
+                </tr>
+              </thead>
+              <tbody id="goals-table-body"></tbody>
+            </table>
+          </div>
         </div>
         <!-- Radar tab -->
         <div id="chart-tab-radar" class="hidden">
