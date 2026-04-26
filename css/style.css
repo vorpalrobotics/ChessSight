@@ -2880,3 +2880,23 @@ button:disabled {
   color: #4caf50;
   text-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
 }
+
+@keyframes pbSubPop {
+  0%   { transform: scale(0.3); opacity: 0; }
+  52%  { transform: scale(0.3); opacity: 0; }
+  67%  { transform: scale(1.05); opacity: 1; }
+  75%  { transform: scale(0.97); opacity: 1; }
+  82%  { transform: scale(1);    opacity: 1; }
+  92%  { transform: scale(1);    opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.pb-subtext {
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: monospace;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+  animation: pbSubPop 3s ease forwards;
+}

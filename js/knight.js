@@ -586,7 +586,7 @@ async function showSummary() {
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(totalSeconds / count));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
     const { accMet, timeMet } = await checkGoals('knight', count, totalCorrect, totalMisses, totalSeconds);
-    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
+    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet, accuracy, totalSeconds / count);
     const isPB = await checkAndUpdatePB('knight', count, totalCorrect, totalMisses, totalSeconds);
     if (isPB) await showPBCelebration();
   } else {

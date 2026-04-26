@@ -409,7 +409,7 @@ async function showSummary() {
     document.getElementById('stat-avg-time').textContent = `${(totalSeconds / n).toFixed(1)}s`;
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
     const { accMet, timeMet } = await checkGoals('hanggrab', n, totalCorrect, totalMisses, totalSeconds);
-    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
+    if (accMet || timeMet) await showGoalCelebration(accMet, timeMet, accuracy, totalSeconds / n);
     const isPB = await checkAndUpdatePB('hanggrab', n, totalCorrect, totalMisses, totalSeconds);
     if (isPB) await showPBCelebration();
   } else {

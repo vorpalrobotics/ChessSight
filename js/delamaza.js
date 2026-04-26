@@ -291,7 +291,10 @@ async function endSession() {
   });
 
   const { accMet, timeMet } = await checkGoals(pieceKey, 63, correct, sessionMisses, elapsed);
-  if (accMet || timeMet) await showGoalCelebration(accMet, timeMet);
+  if (accMet || timeMet) {
+    const dlmAcc = Math.round(correct / Math.max(1, correct + sessionMisses) * 100);
+    await showGoalCelebration(accMet, timeMet, dlmAcc, elapsed / 63);
+  }
   const isPB = await checkAndUpdatePB(pieceKey, 63, correct, sessionMisses, elapsed);
   if (isPB) await showPBCelebration();
 

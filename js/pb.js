@@ -68,7 +68,7 @@ export async function updateSummaryGoals(drill, count) {
   }
 }
 
-function makeCelebrationOverlay(iconText, labelText, extraTextClass) {
+function makeCelebrationOverlay(iconText, labelText, extraTextClass, subText) {
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.className = 'pb-celebration';
@@ -86,8 +86,15 @@ function makeCelebrationOverlay(iconText, labelText, extraTextClass) {
     const text = document.createElement('span');
     text.className = `pb-text${extraTextClass ? ' ' + extraTextClass : ''}`;
     text.textContent = labelText;
-
     inner.appendChild(text);
+
+    if (subText) {
+      const sub = document.createElement('span');
+      sub.className = 'pb-subtext';
+      sub.textContent = subText;
+      inner.appendChild(sub);
+    }
+
     overlay.appendChild(inner);
     document.body.appendChild(overlay);
 
@@ -102,11 +109,14 @@ function makeCelebrationOverlay(iconText, labelText, extraTextClass) {
  * Show a goal-met celebration overlay.
  * Returns a Promise that resolves after the animation completes (~3 s).
  */
-export function showGoalCelebration(accMet, timeMet) {
+export function showGoalCelebration(accMet, timeMet, accuracy, avgTime) {
   const label = (accMet && timeMet) ? 'ALL GOALS MET!'
               : accMet              ? 'ACCURACY GOAL MET!'
               :                       'TIME GOAL MET!';
-  return makeCelebrationOverlay('✓', label, 'goal-text');
+  const subText = (accMet && timeMet) ? `${accuracy}% Accuracy  ·  ${avgTime.toFixed(1)}s avg`
+                : accMet              ? `${accuracy}% Accuracy`
+                :                       `${avgTime.toFixed(1)}s avg`;
+  return makeCelebrationOverlay('✓', label, 'goal-text', subText);
 }
 
 /**
