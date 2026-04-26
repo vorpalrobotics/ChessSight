@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.18</title>
+  <title>ChessSight v0.2.19</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.18</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.19</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -154,9 +154,9 @@
         <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
       </button>
       <button class="mode-card" id="mode-bbgen">
-        <span class="mode-icon">🔨</span>
-        <span class="mode-name">BB Generator</span>
-        <span class="mode-desc">Generate &amp; approve Blunder Buster puzzles for the puzzle bank</span>
+        <span class="mode-icon">💥</span>
+        <span class="mode-name">Blunder Buster</span>
+        <span class="mode-desc">Watch black blunder, then grab the hanging piece — or PASS if nothing's free</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -1029,31 +1029,40 @@
     </div>
   </div>
 
-  <!-- ── Screen: BB Generator ── -->
+  <!-- ── Screen: Blunder Buster drill ── -->
   <div id="screen-bbgen" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>BB Generator</h2>
-        <span id="bbgen-count" class="puzzle-num">0 saved</span>
+        <h2>Blunder Buster</h2>
+        <span id="bb-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
-        <button id="btn-bbgen-home">&#8592; Home</button>
+        <button class="drill-pause-btn">⏸</button>
+        <button id="btn-bb-done">END DRILL</button>
       </div>
     </div>
 
     <div class="drill-board-wrap">
-      <div id="bbgen-board"></div>
+      <div id="bb-board"></div>
     </div>
 
-    <div id="bbgen-status" class="bbgen-status"></div>
-    <div id="bbgen-info" class="bbgen-info"></div>
-
-    <div class="bbgen-controls">
-      <button id="btn-bbgen-approve" class="btn-bbgen-approve" disabled>APPROVE</button>
-      <button id="btn-bbgen-reject" class="btn-bbgen-reject" disabled>REJECT</button>
+    <div class="drill-current-stats">
+      <span id="bb-timer">0.0s</span>
+      <span id="bb-misses">Misses: 0</span>
+      <button id="btn-bb-show">SHOW</button>
     </div>
 
-    <p class="drill-rule">Generate positions where black blunders — leaving a piece hanging. APPROVE to save to the puzzle bank; REJECT to skip. PASS positions (nothing to grab) are included at ~20%.</p>
+    <div class="hg-pass-row">
+      <button id="btn-bb-pass" class="hg-pass-btn">PASS — nothing to grab</button>
+    </div>
+
+    <div id="bb-status" class="hg-status"></div>
+    <div id="bb-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
+      <span id="bb-session-time" class="session-stat"></span>
+      <span id="bb-session-acc"  class="session-stat"></span>
+    </div>
+    <p class="drill-rule">Watch black's move, then click the hanging piece — or PASS if nothing is free to grab.</p>
   </div>
 
   <!-- Firebase SDK (for Vimsy Cloud Sync) — loaded before app.js so the global is available -->
