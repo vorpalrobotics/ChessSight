@@ -211,7 +211,7 @@ modalAbout.addEventListener('click', (e) => {
 });
 
 // --- History modal (charts) ---
-const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', hanggrab: 'Hang Grab', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
+const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', hanggrab: 'Hang Grab', bb: 'Blunder Buster', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
 
 const DRILL_COLORS = {
   checks:       '#e94560',
@@ -222,14 +222,15 @@ const DRILL_COLORS = {
   queen:        '#c080ff',
   knight:       '#4ecdc4',
   hanggrab:     '#26de81',
+  bb:           '#ff7043',
   'dlm-rook':   '#ff6688',
   'dlm-bishop': '#ffaa44',
   'dlm-knight': '#44ccff',
 };
 
-const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','hanggrab','dlm-rook','dlm-bishop','dlm-knight'];
-const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Hang Grab','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
-const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Hang Grab','Sp:Rook','Sp:Bishop','Sp:Knight'];
+const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','hanggrab','bb','dlm-rook','dlm-bishop','dlm-knight'];
+const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Hang Grab','Blunder Buster','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
+const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Hang Grab','Blunder','Sp:Rook','Sp:Bishop','Sp:Knight'];
 const DEFAULT_GOAL     = { acc: 95, time: 10 };
 
 let chartTime = null, chartAcc = null, chartRadarAcc = null, chartRadarTime = null;
@@ -438,7 +439,7 @@ async function renderCharts() {
   const dates = [...new Set(records.map(r => r.date))].sort();
   const dateLabels = dates.map(d => { const [, m, day] = d.split('-'); return `${m}/${day}`; });
 
-  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'hanggrab', 'dlm-rook', 'dlm-bishop', 'dlm-knight'];
+  const drills = ['checks', 'captures', 'loose', 'under', 'queen', 'knight', 'hanggrab', 'bb', 'dlm-rook', 'dlm-bishop', 'dlm-knight'];
 
   function makeDatasets(valueFn) {
     return drills.map(drill => ({

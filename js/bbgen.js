@@ -26,6 +26,23 @@ const drillResults   = [];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+// Used by the Mix drill — returns a mix-compatible puzzle object (no flash animation)
+export function generateBBPuzzle() {
+  const puz = generatePuzzle();
+  if (!puz) return { fen: '8/4k3/8/8/8/8/8/4K3 w - - 0 1', targets: new Set(), pieceSquares: new Set(), type: 'bb' };
+  let chess;
+  try { chess = new Chess(puz.fenAfter); } catch { return generateBBPuzzle(); }
+  const blackSqs = new Set();
+  for (let f = 0; f < 8; f++) {
+    for (let r = 0; r < 8; r++) {
+      const sq = sqName(f, r);
+      const p = chess.get(sq);
+      if (p && p.color === 'b') blackSqs.add(sq);
+    }
+  }
+  return { fen: puz.fenAfter, targets: new Set(puz.hangingSquares), pieceSquares: blackSqs, type: 'bb' };
+}
+
 export function initBBGen(navigateFn) {
   navigate = navigateFn;
   document.getElementById('btn-bb-done').addEventListener('click', showSummary);

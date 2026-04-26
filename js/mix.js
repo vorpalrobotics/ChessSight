@@ -9,6 +9,7 @@ import { fetchLoosePuzzle } from './loose.js';
 import { fetchUnderPuzzle } from './under.js';
 import { generateQueenPuzzle } from './queen.js';
 import { generateHangGrabPuzzle } from './hanggrab.js';
+import { generateBBPuzzle } from './bbgen.js';
 import { generateKnightPuzzle, buildKnightFen, bfs, knightMoves, blackPawnAttacks } from './knight.js';
 import { scoreKnightDifficulty } from './difficulty.js';
 
@@ -23,6 +24,7 @@ const DRILL_DEFS = {
   under:    { label: 'UNDERGUARDED',    type: 'click', fetch: fetchUnderPuzzle    },
   queen:    { label: 'QUEEN ATTACK',   type: 'click', fetch: generateQueenPuzzle },
   hanggrab: { label: 'HANG GRAB',      type: 'click', fetch: generateHangGrabPuzzle },
+  bb:       { label: 'BLUNDER BUSTER', type: 'click', fetch: generateBBPuzzle      },
   knight:   { label: 'KNIGHT ROUTE',  type: 'knight', fetch: generateKnightPuzzle  },
 };
 

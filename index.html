@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.19</title>
+  <title>ChessSight v0.2.20</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -15,7 +15,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.19</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.20</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -133,6 +133,11 @@
         <span class="mode-name">Hang Grab</span>
         <span class="mode-desc">Spot white's free captures — or PASS if there's nothing</span>
       </button>
+      <button class="mode-card" id="mode-bbgen">
+        <span class="mode-icon">💥</span>
+        <span class="mode-name">Blunder Buster</span>
+        <span class="mode-desc">Watch black blunder, then grab the hanging piece — or PASS if nothing's free</span>
+      </button>
       <button class="mode-card" id="mode-mix">
         <span class="mode-icon">🔀</span>
         <span class="mode-name">Mix</span>
@@ -152,11 +157,6 @@
         <span class="mode-icon">♔</span>
         <span class="mode-name">Move Discipline</span>
         <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
-      </button>
-      <button class="mode-card" id="mode-bbgen">
-        <span class="mode-icon">💥</span>
-        <span class="mode-name">Blunder Buster</span>
-        <span class="mode-desc">Watch black blunder, then grab the hanging piece — or PASS if nothing's free</span>
       </button>
     </div>
     <p class="copyright">Copyright &copy; 2026 <a href="https://vorpalrobotics.com" target="_blank" rel="noopener">Vorpal Robotics, LLC</a></p>
@@ -473,6 +473,7 @@
         <label><input type="checkbox" value="under"> Underguarded</label>
         <label><input type="checkbox" value="queen"> Queen Attack</label>
         <label><input type="checkbox" value="hanggrab"> Hang Grab</label>
+        <label><input type="checkbox" value="bb"> Blunder Buster</label>
         <label><input type="checkbox" value="knight"> Knight Route</label>
       </div>
       <button id="btn-mix-start" disabled>START MIX ▶</button>
