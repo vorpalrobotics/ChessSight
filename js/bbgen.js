@@ -207,14 +207,34 @@ function generatePuzzle() {
     if (!occ) continue;
 
     if (wantPass) {
-      const fen = buildFen(occ, 'w');
+      // PASS: black makes a move that leaves nothing hanging — same animation, no markers
+      const fenBefore = buildFen(occ, 'b');
       let chess;
-      try { chess = new Chess(fen); } catch { continue; }
-      if (chess.isCheck()) continue;         // white must not be in check
-      if (hangingBlack(chess).length > 0) continue;
+      try { chess = new Chess(fenBefore); } catch { continue; }
+      if (chess.isCheck()) continue;
+      if (whiteInCheck(chess)) continue;
+
+      const priorHang = new Set(hangingBlack(chess).map(h => h.sq));
+      const moves = chess.moves({ verbose: true });
+      if (!moves.length) continue;
+
+      const passMoves = [];
+      for (const mv of moves) {
+        chess.move(mv);
+        if (hangingBlack(chess).length === 0) {
+          passMoves.push({ mv, fenAfter: chess.fen() });
+        }
+        chess.undo();
+      }
+
+      if (!passMoves.length) continue;
+
+      const chosen = pick(passMoves);
       return {
-        fenBefore: fen, fenAfter: null,
-        blunderMove: null, hangingSquares: [], hangingPieces: [],
+        fenBefore,
+        fenAfter:    chosen.fenAfter,
+        blunderMove: { from: chosen.mv.from, to: chosen.mv.to, san: chosen.mv.san },
+        hangingSquares: [], hangingPieces: [],
         isPass: true, date: new Date().toLocaleDateString('sv'),
       };
     }
@@ -281,39 +301,30 @@ async function generateAndDisplay() {
 
   puzzle = result;
 
-  if (puzzle.isPass) {
-    board.setPosition(puzzle.fenBefore, false);
-    setStatus('PASS — no hanging pieces');
-    setInfo('Nothing to grab in this position');
-    busy = false;
-    setControls(true);
-    return;
-  }
-
-  // Show "before" state (position before black's blunder)
+  // Show "before" state, animate the move — same flow for both blunder and PASS
   board.setPosition(puzzle.fenBefore, false);
   setStatus("Before black's move…");
 
-  // Random flash 1–2.5 s (short in generator context for fast reviewing)
   await new Promise(r => setTimeout(r, randInt(1000, 2500)));
 
-  // Animate black's blundering move
   setStatus(`Black plays ${puzzle.blunderMove.san}`);
   await board.setPosition(puzzle.fenAfter, true);
 
-  // Let animation settle
   await new Promise(r => setTimeout(r, 500));
 
-  // Highlight hanging pieces
-  for (const sq of puzzle.hangingSquares) {
-    board.addMarker(HANG_MARKER, sq);
+  if (puzzle.isPass) {
+    setStatus('PASS — nothing to grab');
+    setInfo(`Black played ${puzzle.blunderMove.san}`);
+  } else {
+    for (const sq of puzzle.hangingSquares) {
+      board.addMarker(HANG_MARKER, sq);
+    }
+    const desc = puzzle.hangingPieces
+      .map(h => `${PIECE_NAMES[h.type]} on ${h.sq}`)
+      .join(', ');
+    setStatus(`Hanging: ${desc}`);
+    setInfo(`Blunder: ${puzzle.blunderMove.san}`);
   }
-
-  const desc = puzzle.hangingPieces
-    .map(h => `${PIECE_NAMES[h.type]} on ${h.sq}`)
-    .join(', ');
-  setStatus(`Hanging: ${desc}`);
-  setInfo(`Blunder: ${puzzle.blunderMove.san}`);
 
   busy = false;
   setControls(true);
