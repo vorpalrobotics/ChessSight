@@ -14,12 +14,13 @@ import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
 import { initMix, startMix } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
+import { initBBGen, startBBGen } from './bbgen.js';
 import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoals, setGoal, getAllPersonalBests } from './storage.js';
 import { togglePause, clearPause } from './pause.js';
 import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal } from './vimsy.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bbgen', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -134,6 +135,11 @@ document.getElementById('mode-discipline').addEventListener('click', () => {
 document.getElementById('mode-memory').addEventListener('click', () => {
   showScreen('screen-memory');
   startMemory();
+});
+
+document.getElementById('mode-bbgen').addEventListener('click', () => {
+  showScreen('screen-bbgen');
+  startBBGen();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {
@@ -1081,4 +1087,5 @@ initMix(showScreen);
 initDeLaMaza(showScreen, launchChessConfetti);
 initDiscipline(showScreen, launchChessConfetti);
 initMemory(showScreen);
+initBBGen(showScreen);
 initVimsy();

@@ -1,9 +1,10 @@
 const DB_NAME = 'ChessSight';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 const STORE = 'drillDays';
 const GAME_STORE = 'disciplineGames';
 const GOALS_STORE = 'goals';
 const PB_STORE = 'personalBests';
+const BB_STORE = 'bbPuzzles';
 
 // Lazy singleton DB connection
 let _dbPromise = null;
@@ -31,6 +32,10 @@ function openDB() {
       // v4: per-drill personal bests
       if (!db.objectStoreNames.contains(PB_STORE)) {
         db.createObjectStore(PB_STORE, { keyPath: 'drill' });
+      }
+      // v5: blunder buster generated puzzles
+      if (!db.objectStoreNames.contains(BB_STORE)) {
+        db.createObjectStore(BB_STORE, { keyPath: 'id', autoIncrement: true });
       }
     };
 
@@ -250,6 +255,33 @@ export async function getAllPersonalBests() {
       resolve(map);
     };
     req.onerror = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Save one approved BB puzzle record.
+ * id is auto-incremented by IDB.
+ */
+export async function addBBPuzzle(data) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(BB_STORE, 'readwrite');
+    tx.objectStore(BB_STORE).add(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return the total number of BB puzzle records saved.
+ */
+export async function getBBPuzzleCount() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(BB_STORE, 'readonly');
+    const req = tx.objectStore(BB_STORE).count();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = e => reject(e.target.error);
   });
 }
 
