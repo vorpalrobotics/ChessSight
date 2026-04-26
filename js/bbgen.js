@@ -129,6 +129,14 @@ function randomOccupied() {
     }
   }
 
+  // White pawns (1-3, ranks 2-6 — never on ranks 1 or 8)
+  for (let i = 0, n = randInt(1, 3); i < n; i++) {
+    for (let j = 0; j < 30; j++) {
+      const sq = sqName(randInt(0, 7), randInt(1, 5));
+      if (!occ[sq]) { occ[sq] = 'P'; break; }
+    }
+  }
+
   // Black pieces (2-4)
   for (let i = 0, n = randInt(2, 4); i < n; i++) {
     for (let j = 0; j < 30; j++) {
@@ -137,7 +145,28 @@ function randomOccupied() {
     }
   }
 
+  // Black pawns (1-3, ranks 3-7 — never on ranks 1 or 8)
+  for (let i = 0, n = randInt(1, 3); i < n; i++) {
+    for (let j = 0; j < 30; j++) {
+      const sq = sqName(randInt(0, 7), randInt(2, 6));
+      if (!occ[sq]) { occ[sq] = 'p'; break; }
+    }
+  }
+
   return occ;
+}
+
+function whiteInCheck(chess) {
+  for (let f = 0; f < 8; f++) {
+    for (let r = 0; r < 8; r++) {
+      const sq = sqName(f, r);
+      const p = chess.get(sq);
+      if (p && p.type === 'k' && p.color === 'w') {
+        return chess.attackers(sq, 'b').length > 0;
+      }
+    }
+  }
+  return false;
 }
 
 function hangingBlack(chess) {
@@ -181,7 +210,7 @@ function generatePuzzle() {
       const fen = buildFen(occ, 'w');
       let chess;
       try { chess = new Chess(fen); } catch { continue; }
-      if (chess.isCheck()) continue;
+      if (chess.isCheck()) continue;         // white must not be in check
       if (hangingBlack(chess).length > 0) continue;
       return {
         fenBefore: fen, fenAfter: null,
@@ -190,11 +219,12 @@ function generatePuzzle() {
       };
     }
 
-    // Blunder: black to move → find a move that creates a new hanging black piece
+    // Blunder: black to move → find a move that creates exactly one new hanging black piece
     const fenBefore = buildFen(occ, 'b');
     let chess;
     try { chess = new Chess(fenBefore); } catch { continue; }
-    if (chess.isCheck()) continue;
+    if (chess.isCheck()) continue;      // black must not be in check before moving
+    if (whiteInCheck(chess)) continue;  // white must not be in check (illegal position)
 
     const priorHang = new Set(hangingBlack(chess).map(h => h.sq));
     const moves = chess.moves({ verbose: true });
@@ -204,7 +234,7 @@ function generatePuzzle() {
     for (const mv of moves) {
       chess.move(mv);
       const newHangs = hangingBlack(chess).filter(h => !priorHang.has(h.sq));
-      if (newHangs.length) {
+      if (newHangs.length === 1) {   // exactly one new hang keeps puzzles clean
         blunders.push({ mv, fenAfter: chess.fen(), newHangs });
       }
       chess.undo();
