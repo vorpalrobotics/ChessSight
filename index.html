@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.37</title>
+  <title>ChessSight v0.2.38</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.37</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.38</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -232,7 +232,7 @@
   <div id="screen-captures" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Count Captures</h2>
+        <h2>Count Captures <span class="drill-info-btn" data-help="captures"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="captures-puzzle-num">#1</span>
         <span id="captures-diff" class="drill-difficulty"></span>
       </div>
@@ -276,7 +276,7 @@
   <div id="screen-loose" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Loose Pieces</h2>
+        <h2>Loose Pieces <span class="drill-info-btn" data-help="loose"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="loose-puzzle-num">#1</span>
         <span id="loose-diff" class="drill-difficulty"></span>
       </div>
@@ -309,7 +309,7 @@
   <div id="screen-under" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Underguarded</h2>
+        <h2>Underguarded <span class="drill-info-btn" data-help="under"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="under-puzzle-num">#1</span>
         <span id="under-diff" class="drill-difficulty"></span>
       </div>
@@ -383,7 +383,7 @@
   <div id="screen-queen" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Queen Attack</h2>
+        <h2>Queen Attack <span class="drill-info-btn" data-help="queen"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="queen-puzzle-num">#1</span>
         <span id="queen-diff" class="drill-difficulty"></span>
       </div>
@@ -416,7 +416,7 @@
   <div id="screen-knight" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Knight Route</h2>
+        <h2>Knight Route <span class="drill-info-btn" data-help="knight"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="knight-puzzle-num">#1</span>
         <span id="knight-diff" class="drill-difficulty"></span>
       </div>
@@ -449,7 +449,7 @@
   <div id="screen-hanggrab" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Hang Grab</h2>
+        <h2>Hang Grab <span class="drill-info-btn" data-help="hanggrab"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="hg-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
@@ -486,7 +486,7 @@
 
     <!-- Selection panel: shown on entry, hidden once session starts -->
     <div id="mix-select-panel">
-      <h2 class="mix-select-title">Mix Drill</h2>
+      <h2 class="mix-select-title">Mix Drill <span class="drill-info-btn" data-help="mix"><i class="fa-solid fa-circle-info"></i></span></h2>
       <p class="mix-select-desc">Select 2 or more drills to combine:</p>
       <div id="mix-checkboxes" class="mix-checkbox-grid">
         <label><input type="checkbox" value="checks"> Count Checks</label>
@@ -507,6 +507,7 @@
         <div class="drill-top-left">
           <span id="mix-drill-label" class="mix-drill-label">MIX</span>
           <span id="mix-puzzle-num">#1</span>
+          <span class="drill-info-btn" data-help="mix"><i class="fa-solid fa-circle-info"></i></span>
           <span id="mix-diff" class="drill-difficulty"></span>
         </div>
         <div class="drill-top-right">
@@ -550,7 +551,7 @@
   <div id="screen-dlm" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Spiral Vision</h2>
+        <h2>Spiral Vision <span class="drill-info-btn" data-help="dlm"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="dlm-progress">— / 63</span>
       </div>
       <div class="drill-top-right">
@@ -622,7 +623,7 @@
     <!-- Setup panel -->
     <div id="disc-setup">
       <div class="drill-top">
-        <div class="drill-top-left"><h2>Move Discipline</h2></div>
+        <div class="drill-top-left"><h2>Move Discipline <span class="drill-info-btn" data-help="discipline"><i class="fa-solid fa-circle-info"></i></span></h2></div>
       </div>
       <div class="disc-setup-body">
         <div class="disc-setup-row">
@@ -647,7 +648,7 @@
     <div id="disc-game-area" class="hidden">
       <div class="drill-top">
         <div class="drill-top-left">
-          <h2>Move Discipline</h2>
+          <h2>Move Discipline <span class="drill-info-btn" data-help="discipline"><i class="fa-solid fa-circle-info"></i></span></h2>
           <span id="disc-turn-num">Turn 1</span>
         </div>
         <div class="drill-top-right">
@@ -788,7 +789,7 @@
   <div id="screen-memory" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Memory</h2>
+        <h2>Memory <span class="drill-info-btn" data-help="memory"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="memory-puzzle-num">#1</span>
         <span id="memory-level" class="drill-difficulty">L2 · gen</span>
       </div>
@@ -1056,7 +1057,7 @@
   <div id="screen-bbgen" class="screen hidden">
     <div class="drill-top">
       <div class="drill-top-left">
-        <h2>Blunder Buster</h2>
+        <h2>Blunder Buster <span class="drill-info-btn" data-help="bb"><i class="fa-solid fa-circle-info"></i></span></h2>
         <span id="bb-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
