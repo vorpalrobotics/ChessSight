@@ -28,6 +28,8 @@ let puzzleStartTime  = Date.now();
 let timerInterval    = null;
 let autoAdvanceTimer = null;
 let pauseStart       = 0;
+let awaitingStudyTap = false;
+let studyTapResolve  = null;
 const drillResults   = [];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -314,6 +316,22 @@ function generatePuzzle() {
   return pickBestFromBank();
 }
 
+// ─── Study-tap helpers ────────────────────────────────────────────────────────
+
+function showStudyPrompt() {
+  document.getElementById('bb-study-prompt').classList.remove('hidden');
+}
+
+function hideStudyPrompt() {
+  document.getElementById('bb-study-prompt').classList.add('hidden');
+}
+
+function cancelStudyTap() {
+  awaitingStudyTap = false;
+  hideStudyPrompt();
+  if (studyTapResolve) { studyTapResolve(); studyTapResolve = null; }
+}
+
 // ─── Puzzle lifecycle ─────────────────────────────────────────────────────────
 
 function getPositionsPerDrill() {
@@ -349,15 +367,18 @@ async function loadPuzzle() {
   if (!puz) { setStatus('Regenerating…'); setTimeout(loadPuzzle, 100); return; }
   if (genId !== myId) return;
 
+  cancelStudyTap();
   currentPuzzle = puz;
   board.setPosition(puz.fenBefore, false);
-  setStatus("Watch black’s move…");
+  setStatus(‘’);
 
-  // Top up the bank during the flash window (non-blocking)
+  // Top up the bank while user studies (non-blocking)
   setTimeout(() => fillBank(), 0);
 
-  // Flash: 3–5 s random
-  await new Promise(r => setTimeout(r, randInt(3000, 5000)));
+  // Wait for user to tap the board
+  showStudyPrompt();
+  awaitingStudyTap = true;
+  await new Promise(r => { studyTapResolve = r; });
   if (genId !== myId) return;
 
   setStatus(`Black plays ${puz.blunderMove.san}`);
@@ -375,6 +396,10 @@ async function loadPuzzle() {
 // ─── Interaction ──────────────────────────────────────────────────────────────
 
 function handleBoardClick(e) {
+  if (awaitingStudyTap) {
+    cancelStudyTap();
+    return;
+  }
   if (!puzzleActive) return;
   const sq = sqFromClick(e);
   if (!sq) return;
@@ -453,6 +478,7 @@ function finishPuzzle(correct) {
 
 async function showSummary() {
   genId++; // cancel any in-flight loadPuzzle async sequence
+  cancelStudyTap();
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleActive = false;
   clearInterval(timerInterval); timerInterval = null;

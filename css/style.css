@@ -981,6 +981,21 @@ header h1 {
   padding: 0.3rem 1rem;
   margin-top: 0.1rem;
 }
+/* ── BB study prompt ── */
+@keyframes bb-study-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.25); }
+}
+#bb-study-prompt {
+  font-style: italic;
+  color: var(--accent, #90caf9);
+  text-align: center;
+  font-size: 0.9rem;
+  animation: bb-study-pulse 0.5s ease-in-out 4;
+  transform-origin: center;
+}
+#bb-study-prompt.hidden { display: none; }
+
 /* ── Mix drill ── */
 #mix-select-panel {
   display: flex;
