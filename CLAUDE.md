@@ -22,8 +22,10 @@ Get the commit count with: `git rev-list --count HEAD`
 Update both `<title>ChessSight vX.Y.Z</title>` and `<span class="version-label">vX.Y.Z</span>` in index.html.
 
 ## Commit & push discipline
-- Develop on branch `claude/fix-engine-counter-moves-2O7sZ`, but always also push to `main`
-  (GitHub Pages deploys from `main`).
+- **Commit and push directly to `main`.** Do not create or use feature branches.
+  GitHub Pages deploys from `main`; feature branches cause `.nojekyll` and other
+  root files to be wiped when the branch is pushed over main.
+- Push command: `git push origin main`
 - Use descriptive commit messages; include the session URL footer.
 
 ## Key libraries (all via CDN, no npm install)
