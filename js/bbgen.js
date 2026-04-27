@@ -244,6 +244,21 @@ function scoreBlunder(puz) {
   return score;
 }
 
+// Returns true if white has a mate-in-1 that does NOT capture the hanging square.
+// Such positions are confusing: the right move is checkmate, not grabbing the piece.
+function hasUnrelatedMateIn1(fenAfter, hangSq) {
+  let chess;
+  try { chess = new Chess(fenAfter); } catch { return false; }
+  for (const mv of chess.moves({ verbose: true })) {
+    if (mv.to === hangSq) continue; // capturing the hanging piece is fine
+    chess.move(mv);
+    const isMate = chess.isCheckmate();
+    chess.undo();
+    if (isMate) return true;
+  }
+  return false;
+}
+
 // ─── Individual generators ────────────────────────────────────────────────────
 
 function tryGenerateBlunder() {
@@ -273,7 +288,12 @@ function tryGenerateBlunder() {
     }
     if (!blunders.length) continue;
 
-    const chosen = pick(blunders);
+    const validBlunders = blunders.filter(
+      b => !hasUnrelatedMateIn1(b.fenAfter, b.newHangs[0].sq)
+    );
+    if (!validBlunders.length) continue;
+
+    const chosen = pick(validBlunders);
     return {
       fenBefore, fenAfter: chosen.fenAfter,
       blunderMove: { from: chosen.mv.from, to: chosen.mv.to, san: chosen.mv.san },
