@@ -210,6 +210,37 @@ modalAbout.addEventListener('click', (e) => {
   if (e.target === modalAbout) modalAbout.classList.add('hidden');
 });
 
+// --- Drill help modal ---
+const DRILL_HELP = {
+  checks: {
+    title: 'Checks Drill',
+    body: `<p>A position appears with pieces for both sides. Count every legal checking move available — first for White, then for Black.</p>
+<p>Enter your count using the number buttons that appear below the board. Discovered checks and double checks each count as one checking move. Only moves that put the opponent's king in check right now count — not moves that merely threaten a future check.</p>
+<p>This drill builds the habit of scanning for all checking threats in a position before committing to a move — an essential skill for spotting tactical opportunities.</p>`,
+  },
+};
+
+const modalHelp = document.getElementById('modal-help');
+
+document.querySelectorAll('.drill-info-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const info = DRILL_HELP[btn.dataset.help];
+    if (!info) return;
+    document.getElementById('help-modal-title').textContent = info.title;
+    document.getElementById('help-modal-body').innerHTML = info.body;
+    modalHelp.classList.remove('hidden');
+  });
+});
+
+document.getElementById('btn-help-close').addEventListener('click', () => {
+  modalHelp.classList.add('hidden');
+});
+
+modalHelp.addEventListener('click', e => {
+  if (e.target === modalHelp) modalHelp.classList.add('hidden');
+});
+
 // --- History modal (charts) ---
 const DRILL_LABELS = { checks: 'Checks', captures: 'Captures', loose: 'Loose Pieces', under: 'Underguarded', queen: 'Queen Attack', knight: 'Knight Route', hanggrab: 'Hang Grab', bb: 'Blunder Buster', 'dlm-rook': 'Spiral: Rook', 'dlm-bishop': 'Spiral: Bishop', 'dlm-knight': 'Spiral: Knight' };
 
