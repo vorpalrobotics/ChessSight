@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.35</title>
+  <title>ChessSight v0.2.36</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.35</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.36</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -108,16 +108,19 @@
         <span class="mode-desc">Count checking moves for each side</span>
       </button>
       <button class="mode-card" id="mode-captures">
+        <span class="drill-info-btn" data-help="captures"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">⚔</span>
         <span class="mode-name">Captures</span>
         <span class="mode-desc">Count capturing moves for each side</span>
       </button>
       <button class="mode-card" id="mode-loose">
+        <span class="drill-info-btn" data-help="loose"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">◎</span>
         <span class="mode-name">Loose Pieces</span>
         <span class="mode-desc">Click on undefended pieces for each side</span>
       </button>
       <button class="mode-card" id="mode-under">
+        <span class="drill-info-btn" data-help="under"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">⚠</span>
         <span class="mode-name">Underguarded</span>
         <span class="mode-desc">Click on underguarded pieces for each side</span>
@@ -130,41 +133,49 @@
       </button>
       -->
       <button class="mode-card" id="mode-knight">
+        <span class="drill-info-btn" data-help="knight"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">♞</span>
         <span class="mode-name">Knight Route</span>
         <span class="mode-desc">Find the shortest knight path to the target</span>
       </button>
       <button class="mode-card" id="mode-queen">
+        <span class="drill-info-btn" data-help="queen"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">♛</span>
         <span class="mode-name">Queen Attack</span>
         <span class="mode-desc">Fork, skewer, or pin a rook, bishop, or knight</span>
       </button>
       <button class="mode-card" id="mode-hanggrab">
+        <span class="drill-info-btn" data-help="hanggrab"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">🎯</span>
         <span class="mode-name">Hang Grab</span>
         <span class="mode-desc">Spot white's free captures — or PASS if there's nothing</span>
       </button>
       <button class="mode-card" id="mode-bbgen">
+        <span class="drill-info-btn" data-help="bb"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">💥</span>
         <span class="mode-name">Blunder Buster</span>
         <span class="mode-desc">Watch black blunder, then grab the hanging piece — or PASS if nothing's free</span>
       </button>
       <button class="mode-card" id="mode-mix">
+        <span class="drill-info-btn" data-help="mix"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">🔀</span>
         <span class="mode-name">Mix</span>
         <span class="mode-desc">Combine any drills into one randomised session</span>
       </button>
       <button class="mode-card" id="mode-memory">
+        <span class="drill-info-btn" data-help="memory"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">🧠</span>
         <span class="mode-name">Memory</span>
         <span class="mode-desc">Study a position, then reconstruct it from memory</span>
       </button>
       <button class="mode-card" id="mode-dlm">
+        <span class="drill-info-btn" data-help="dlm"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">👁</span>
         <span class="mode-name">Spiral Vision</span>
         <span class="mode-desc">Spot every queen fork, pin &amp; skewer across 63 positions</span>
       </button>
       <button class="mode-card" id="mode-discipline">
+        <span class="drill-info-btn" data-help="discipline"><i class="fa-solid fa-circle-info"></i></span>
         <span class="mode-icon">♔</span>
         <span class="mode-name">Move Discipline</span>
         <span class="mode-desc">Full game vs engine — count checks, captures &amp; loose pieces before every move</span>
