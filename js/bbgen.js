@@ -351,7 +351,7 @@ async function loadPuzzle() {
 
   currentPuzzle = puz;
   board.setPosition(puz.fenBefore, false);
-  setStatus(‘Watch black’s move…’);
+  setStatus("Watch black’s move…");
 
   // Top up the bank during the flash window (non-blocking)
   setTimeout(() => fillBank(), 0);
