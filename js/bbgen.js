@@ -8,6 +8,12 @@ const PIECES_URL  = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/
 const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
 const PASS_RATIO   = 0.20;
 const PIECE_NAMES  = { p: 'Pawn', n: 'Knight', b: 'Bishop', r: 'Rook', q: 'Queen' };
+const BANK_SIZE    = 10;
+
+// ─── Puzzle bank ──────────────────────────────────────────────────────────────
+// Each entry: { puzzle, score }. Persists across drill restarts so the bank
+// warms up once and stays ready.
+let blunderBank = [];
 
 let board            = null;
 let navigate         = null;
@@ -70,6 +76,9 @@ export function startBBGen() {
       style: { pieces: { file: PIECES_URL } },
     });
   }
+
+  // Warm the bank if empty (first launch or bank was drained)
+  if (blunderBank.length === 0) fillBank();
 
   loadPuzzle();
 }
@@ -173,9 +182,37 @@ function hangingBlack(chess) {
   return result;
 }
 
-function generatePuzzle() {
-  const wantPass = Math.random() < PASS_RATIO;
+// ─── Scoring ──────────────────────────────────────────────────────────────────
 
+function scoreBlunder(puz) {
+  let score = 0;
+  const hangSq   = puz.hangingSquares[0];
+  const movedTo  = puz.blunderMove.to;
+  const movedFrom = puz.blunderMove.from;
+
+  // Big bonus: hanging piece is NOT the moved piece — discovered attack or abandoned guard
+  if (hangSq !== movedTo) {
+    score += 10;
+
+    // Additional bonus: moved piece was defending hangSq (classic abandoned guard)
+    try {
+      const before = new Chess(puz.fenBefore);
+      if (before.attackers(hangSq, 'b').includes(movedFrom)) score += 5;
+    } catch { /* ignore */ }
+  }
+
+  // Value of the hanging piece — hanging a rook or queen is more dramatic
+  score += puz.hangingPiece.value;
+
+  // Small random jitter so equal-scoring puzzles vary
+  score += Math.random() * 2;
+
+  return score;
+}
+
+// ─── Individual generators ────────────────────────────────────────────────────
+
+function tryGenerateBlunder() {
   for (let attempt = 0; attempt < 400; attempt++) {
     const occ = randomOccupied();
     if (!occ) continue;
@@ -183,35 +220,21 @@ function generatePuzzle() {
     const fenBefore = buildFen(occ, 'b');
     let chess;
     try { chess = new Chess(fenBefore); } catch { continue; }
-    if (chess.isCheck()) continue;
-    if (whiteInCheck(chess)) continue;
+    if (chess.isCheck() || whiteInCheck(chess)) continue;
 
     const priorHang = new Set(hangingBlack(chess).map(h => h.sq));
     const moves = chess.moves({ verbose: true });
     if (!moves.length) continue;
 
-    if (wantPass) {
-      const passMoves = [];
-      for (const mv of moves) {
-        chess.move(mv);
-        if (hangingBlack(chess).length === 0) passMoves.push({ mv, fenAfter: chess.fen() });
-        chess.undo();
-      }
-      if (!passMoves.length) continue;
-      const chosen = pick(passMoves);
-      return {
-        fenBefore, fenAfter: chosen.fenAfter,
-        blunderMove: { from: chosen.mv.from, to: chosen.mv.to, san: chosen.mv.san },
-        hangingSquares: [], hangingPiece: null, isPass: true,
-      };
-    }
-
-    // Blunder: find a move that creates exactly one new hanging black piece
     const blunders = [];
     for (const mv of moves) {
       chess.move(mv);
-      const newHangs = hangingBlack(chess).filter(h => !priorHang.has(h.sq));
-      if (newHangs.length === 1) blunders.push({ mv, fenAfter: chess.fen(), newHangs });
+      const allHangs = hangingBlack(chess);
+      const newHangs = allHangs.filter(h => !priorHang.has(h.sq));
+      // Bug fix: require exactly one hang TOTAL (not just one new one)
+      if (allHangs.length === 1 && newHangs.length === 1) {
+        blunders.push({ mv, fenAfter: chess.fen(), newHangs });
+      }
       chess.undo();
     }
     if (!blunders.length) continue;
@@ -225,8 +248,70 @@ function generatePuzzle() {
       isPass: false,
     };
   }
-
   return null;
+}
+
+function tryGeneratePass() {
+  for (let attempt = 0; attempt < 400; attempt++) {
+    const occ = randomOccupied();
+    if (!occ) continue;
+
+    const fenBefore = buildFen(occ, 'b');
+    let chess;
+    try { chess = new Chess(fenBefore); } catch { continue; }
+    if (chess.isCheck() || whiteInCheck(chess)) continue;
+
+    const moves = chess.moves({ verbose: true });
+    if (!moves.length) continue;
+
+    const passMoves = [];
+    for (const mv of moves) {
+      chess.move(mv);
+      if (hangingBlack(chess).length === 0) passMoves.push({ mv, fenAfter: chess.fen() });
+      chess.undo();
+    }
+    if (!passMoves.length) continue;
+
+    const chosen = pick(passMoves);
+    return {
+      fenBefore, fenAfter: chosen.fenAfter,
+      blunderMove: { from: chosen.mv.from, to: chosen.mv.to, san: chosen.mv.san },
+      hangingSquares: [], hangingPiece: null, isPass: true,
+    };
+  }
+  return null;
+}
+
+// ─── Bank management ──────────────────────────────────────────────────────────
+
+function fillBank() {
+  while (blunderBank.length < BANK_SIZE) {
+    const puz = tryGenerateBlunder();
+    if (puz) blunderBank.push({ puzzle: puz, score: scoreBlunder(puz) });
+  }
+}
+
+function pickBestFromBank() {
+  if (!blunderBank.length) { fillBank(); }
+  let bestIdx = 0;
+  for (let i = 1; i < blunderBank.length; i++) {
+    if (blunderBank[i].score > blunderBank[bestIdx].score) bestIdx = i;
+  }
+  const { puzzle } = blunderBank[bestIdx];
+  blunderBank.splice(bestIdx, 1);
+  // Replenish one replacement synchronously (fast, ~1–5 ms)
+  const next = tryGenerateBlunder();
+  if (next) blunderBank.push({ puzzle: next, score: scoreBlunder(next) });
+  return puzzle;
+}
+
+// Main entry point for the drill and mix
+function generatePuzzle() {
+  if (Math.random() < PASS_RATIO) {
+    return tryGeneratePass() ?? pickBestFromBank(); // fallback if PASS generation fails
+  }
+  if (!blunderBank.length) fillBank();
+  return pickBestFromBank();
 }
 
 // ─── Puzzle lifecycle ─────────────────────────────────────────────────────────
@@ -266,7 +351,10 @@ async function loadPuzzle() {
 
   currentPuzzle = puz;
   board.setPosition(puz.fenBefore, false);
-  setStatus('Watch black’s move…');
+  setStatus(‘Watch black’s move…’);
+
+  // Top up the bank during the flash window (non-blocking)
+  setTimeout(() => fillBank(), 0);
 
   // Flash: 3–5 s random
   await new Promise(r => setTimeout(r, randInt(3000, 5000)));
