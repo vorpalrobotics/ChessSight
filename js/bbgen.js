@@ -123,7 +123,11 @@ function randomOccupied() {
   for (let i = 0, n = randInt(1, 3); i < n; i++) {
     for (let j = 0; j < 30; j++) {
       const sq = sqName(randInt(0, 7), randInt(0, 7));
-      if (!occ[sq]) { occ[sq] = pick(['N', 'B', 'R', 'Q']); break; }
+      if (!occ[sq]) {
+        const hasWQ = Object.values(occ).includes('Q');
+        occ[sq] = pick(hasWQ ? ['N', 'B', 'R'] : ['N', 'B', 'R', 'Q']);
+        break;
+      }
     }
   }
   for (let i = 0, n = randInt(1, 3); i < n; i++) {
@@ -135,7 +139,11 @@ function randomOccupied() {
   for (let i = 0, n = randInt(2, 4); i < n; i++) {
     for (let j = 0; j < 30; j++) {
       const sq = sqName(randInt(0, 7), randInt(0, 7));
-      if (!occ[sq]) { occ[sq] = pick(['n', 'b', 'r', 'q']); break; }
+      if (!occ[sq]) {
+        const hasBQ = Object.values(occ).includes('q');
+        occ[sq] = pick(hasBQ ? ['n', 'b', 'r'] : ['n', 'b', 'r', 'q']);
+        break;
+      }
     }
   }
   for (let i = 0, n = randInt(1, 3); i < n; i++) {

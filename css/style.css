@@ -991,7 +991,7 @@ header h1 {
   color: #ffffff;
   text-align: center;
   font-size: 1.2rem;
-  animation: bb-study-pulse 0.5s ease-in-out 4;
+  animation: bb-study-pulse 1.5s ease-in-out 1;
   transform-origin: center;
 }
 #bb-study-prompt.hidden { display: none; }
