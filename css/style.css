@@ -987,10 +987,10 @@ header h1 {
   50%       { transform: scale(1.25); }
 }
 #bb-study-prompt {
-  font-style: italic;
-  color: var(--accent, #90caf9);
+  font-weight: bold;
+  color: #ffffff;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   animation: bb-study-pulse 0.5s ease-in-out 4;
   transform-origin: center;
 }

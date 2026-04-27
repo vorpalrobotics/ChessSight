@@ -161,6 +161,16 @@ function whiteInCheck(chess) {
 
 function hangingBlack(chess) {
   const result = [];
+  // For capture simulation we need white-to-move; when called with black to move
+  // (priorHang check), build a temporary white-to-move copy.
+  let simChess = chess;
+  if (chess.turn() !== 'w') {
+    const parts = chess.fen().split(' ');
+    parts[1] = 'w';
+    try { simChess = new Chess(parts.join(' ')); } catch { simChess = null; }
+  }
+  const legalMoves = simChess ? simChess.moves({ verbose: true }) : [];
+
   for (let f = 0; f < 8; f++) {
     for (let r = 0; r < 8; r++) {
       const sq = sqName(f, r);
@@ -170,15 +180,29 @@ function hangingBlack(chess) {
       if (!wAtk.length) continue;
       const bDef = chess.attackers(sq, 'b');
       const val  = PIECE_VALUES[piece.type];
-      if (!bDef.length) {
-        result.push({ sq, type: piece.type, value: val });
-      } else {
-        const minAtk = Math.min(...wAtk.map(a => {
-          const p = chess.get(a);
-          return p ? PIECE_VALUES[p.type] : 100;
-        }));
-        if (minAtk < val) result.push({ sq, type: piece.type, value: val });
+
+      // Find min-value white attacker
+      let minAtkVal = Infinity, minAtkSq = null;
+      for (const aSq of wAtk) {
+        const p = chess.get(aSq);
+        const v = p ? PIECE_VALUES[p.type] : 100;
+        if (v < minAtkVal) { minAtkVal = v; minAtkSq = aSq; }
       }
+
+      if (bDef.length && minAtkVal >= val) continue;
+
+      // Simulate the capture to expose x-ray defenders (e.g. a queen hiding behind
+      // the capturing piece). If a recapturer appears and the exchange is break-even
+      // or losing for white, the piece is not truly hanging.
+      const capMove = legalMoves.find(m => m.from === minAtkSq && m.to === sq);
+      if (capMove && simChess) {
+        simChess.move(capMove);
+        const afterAtk = simChess.attackers(sq, 'b');
+        simChess.undo();
+        if (afterAtk.length && minAtkVal >= val) continue;
+      }
+
+      result.push({ sq, type: piece.type, value: val });
     }
   }
   return result;
