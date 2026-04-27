@@ -400,7 +400,7 @@ function handleBoardClick(e) {
     puzzleMisses++;
     firstTryThisPuzzle = false;
     flashSqRed(sq);
-    setStatus('That piece isn’t hanging');
+    setStatus("That piece isn’t hanging");
     document.getElementById('bb-misses').textContent = `Misses: ${sessionMisses + puzzleMisses}`;
   }
 }
@@ -415,7 +415,7 @@ function handlePass() {
     puzzleMisses++;
     firstTryThisPuzzle = false;
     drawSqOverlay(currentPuzzle.hangingSquares[0], 'hg-sq-reveal');
-    setStatus('There’s a hanging piece!');
+    setStatus("There’s a hanging piece!");
     document.getElementById('bb-misses').textContent = `Misses: ${sessionMisses + puzzleMisses}`;
   }
 }
