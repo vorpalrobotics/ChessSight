@@ -370,7 +370,7 @@ async function loadPuzzle() {
   cancelStudyTap();
   currentPuzzle = puz;
   board.setPosition(puz.fenBefore, false);
-  setStatus(‘’);
+  setStatus('');
 
   // Top up the bank while user studies (non-blocking)
   setTimeout(() => fillBank(), 0);
@@ -425,7 +425,7 @@ function handleBoardClick(e) {
     puzzleMisses++;
     firstTryThisPuzzle = false;
     flashSqRed(sq);
-    setStatus("That piece isn’t hanging");
+    setStatus("That piece isn't hanging");
     document.getElementById('bb-misses').textContent = `Misses: ${sessionMisses + puzzleMisses}`;
   }
 }
@@ -440,7 +440,7 @@ function handlePass() {
     puzzleMisses++;
     firstTryThisPuzzle = false;
     drawSqOverlay(currentPuzzle.hangingSquares[0], 'hg-sq-reveal');
-    setStatus("There’s a hanging piece!");
+    setStatus("There's a hanging piece!");
     document.getElementById('bb-misses').textContent = `Misses: ${sessionMisses + puzzleMisses}`;
   }
 }
