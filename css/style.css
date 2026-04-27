@@ -152,7 +152,7 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 300;
+  z-index: 2000;
 }
 
 .modal-box {
@@ -664,6 +664,13 @@ header h1 {
 }
 .drill-info-btn:hover {
   color: rgba(255,255,255,0.9);
+}
+/* Inline variant — inside drill-top-left, flows with the title text */
+.drill-top-left .drill-info-btn {
+  position: static;
+  font-size: 1rem;
+  vertical-align: middle;
+  margin-left: 0.3rem;
 }
 .mode-card:hover {
   border-color: var(--surface2);
