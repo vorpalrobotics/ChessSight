@@ -223,6 +223,9 @@ header h1 {
   font-size: 1.2rem;
   color: var(--accent);
 }
+.helpText {
+  margin-bottom: 0.5em;
+}
 
 .modal-close {
   position: absolute;
