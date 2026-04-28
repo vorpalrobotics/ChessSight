@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.42</title>
+  <title>ChessSight v0.2.43</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.42</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.43</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -79,7 +79,7 @@
   <div id="modal-settings" class="modal-backdrop hidden">
     <div class="modal-box">
       <button class="modal-close" id="btn-settings-close">&times;</button>
-      <h2>Settings</h2>
+      <h2>Settings <span class="drill-info-btn" data-help="settings"><i class="fa-solid fa-circle-info"></i></span></h2>
       <div class="settings-row">
         <label class="settings-label" for="select-positions-per-drill">Positions per drill</label>
         <select id="select-positions-per-drill" class="settings-select">
@@ -940,7 +940,7 @@
   <div id="modal-vimsy" class="modal-backdrop hidden">
     <div class="modal-box">
       <button class="modal-close" id="btn-vimsy-close">&times;</button>
-      <h2>Cloud Sync</h2>
+      <h2>Cloud Sync <span class="drill-info-btn" data-help="cloudsync"><i class="fa-solid fa-circle-info"></i></span></h2>
       <p class="vimsy-subtitle">Sync your ChessSight training to <strong>Vimsy</strong> as a mental activity.</p>
 
       <!-- Not connected -->
@@ -976,7 +976,7 @@
     <div class="modal-box modal-box-wide">
       <button class="modal-close" id="btn-history-modal-close">&times;</button>
       <div class="chart-header-row">
-        <h2>History</h2>
+        <h2>History <span class="drill-info-btn" data-help="history"><i class="fa-solid fa-circle-info"></i></span></h2>
         <div class="chart-range-buttons">
           <button class="range-btn active" data-range="all">All</button>
           <button class="range-btn" data-range="365">Year</button>

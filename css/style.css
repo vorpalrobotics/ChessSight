@@ -154,6 +154,8 @@ header h1 {
   justify-content: center;
   z-index: 2000;
 }
+/* Help modal sits above all other modals */
+#modal-help { z-index: 3000; }
 
 .modal-box {
   background: var(--surface);

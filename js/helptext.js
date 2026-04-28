@@ -89,4 +89,24 @@ export const DRILL_HELP = {
 <p class=helpText>If you tap END DRILL and a level 20 engine evaluates that the position is two pawns or more in the opponent's favor this will count as a loss. You may also tap RESIGN to explicitly resign the position.</p>
 <p class=helpText>Many blunders happen because players move without checking what threats exist (their own or their opponents). This drill makes thorough scanning automatic, so you never overlook a tactic again.</p>`,
   },
+
+  history: {
+    title: 'History',
+    body: `<p class=helpText>History shows charts of your drill performance over time. Each drill has two graphs: <strong>average time per puzzle</strong> (lower is better) and <strong>accuracy</strong> as a percentage of first-try correct answers (higher is better).</p>
+<p class=helpText>Each data point represents one day's session. Use this to track improvement over weeks and spot which drills need more attention.</p>
+<p class=helpText>The radar chart at the bottom gives a quick snapshot of your relative accuracy across all drills at once.</p>`,
+  },
+
+  settings: {
+    title: 'Settings',
+    body: `<p class=helpText><strong>Positions per drill</strong> sets how many puzzles are served before the session ends and you see the summary screen. Set it to Unlimited to keep drilling until you tap END DRILL manually.</p>
+<p class=helpText>Settings are saved locally in your browser and persist between sessions.</p>`,
+  },
+
+  cloudsync: {
+    title: 'Cloud Sync',
+    body: `<p class=helpText>Cloud Sync connects ChessSight to your Vimsy account so your drill history is backed up and available across devices. Sign in with your Google account to enable sync.</p>
+<p class=helpText>Once connected, tap <strong>Sync to Vimsy</strong> to upload today's results. The log below the button shows the status of recent sync attempts.</p>
+<p class=helpText>Your data is stored privately under your Google account and is not shared with other users.</p>`,
+  },
 };
