@@ -667,10 +667,10 @@ header h1 {
 }
 /* Lower contrast on mode cards — subtler on the home screen */
 .mode-card .drill-info-btn {
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.1);
 }
 .mode-card .drill-info-btn:hover {
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.45);
 }
 /* Inline variant — inside drill-top-left or a heading, flows with the title text */
 .drill-top-left .drill-info-btn,
