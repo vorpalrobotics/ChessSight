@@ -7,7 +7,8 @@ export const DRILL_HELP = {
     title: 'Checks Drill',
     body: `<p class=helpText>A position appears with pieces for both sides. Count every legal checking move available for both White and Black.</p>
 <p class=helpText>Enter your counts using the number buttons that appear below the board.</p>
-<p class=helpText>Note that for pawn promotions that also give check, each possible promotion that would give check counts as a separate move. For example if a pawn could promote to either a queen or bishop to give check that counts as two checks. (If a pawn could promote by either capturing or moving forward, and either a rook or queen would check in both those cases, that counts for four checks!). For discovered checks every way the piece could move would also count as a check, for example if a knight had 8 legal moves and by moving revealed a discovered check that would count for 8 checks.</p>
+<p class=helpText>Note that for pawn promotions that also give check, each possible promotion that would give check counts as a separate move. For example if a pawn could promote to either a queen or bishop to give check that counts as two checks. (If a pawn could promote by either capturing or moving forward, and either a rook or queen would check in both those cases, that counts for four checks!).</p>
+<p class=helpText>For discovered checks every way the piece could move would also count as a check, for example if a knight had 8 legal moves and by moving revealed a discovered check that would count for 8 checks.</p>
 <p class=helpText>This drill builds the habit of scanning for all checking threats in a position before committing to a move — an essential skill for spotting tactical opportunities.</p>`,
   },
 
@@ -28,7 +29,9 @@ export const DRILL_HELP = {
   under: {
     title: 'Underguarded Drill',
     body: `<p class=helpText>A position appears and you must click every <em>underguarded</em> piece for both White and Black.</p>
-<p class=helpText>A piece is underguarded when the number of pieces defending it is less than or equal to the number of pieces attacking it. Similar to loose pieces, underguarded pieces are vulnerable to being won by a sequence of exchanges. Note that a piece is underguarded even if capturing it would lose material power. For example, if a knight is defended only by a pawn and attacked only by a queen, you wouldn't normally want to capture that as the queen would be lost for a knight. However, the knight in this example is still considered an underguarded piece, because tactics are more likely to be available even in this situation.</p>
+<p class=helpText>A piece is underguarded when the number of pieces defending it is less than or equal to the number of pieces attacking it.</p>
+<p class=helpText>Similar to loose pieces, underguarded pieces are vulnerable to being won by a sequence of exchanges.</p>
+<p class=helpText>Note that a piece is underguarded even if capturing it would lose material. For example, if a knight is defended only by a pawn and attacked only by a queen, you wouldn't normally want to make that capture as the queen would be lost for a knight. However, the knight in this example is still considered an underguarded piece, because tactics are more likely to be available even in this situation.</p>
 <p class=helpText>This drill sharpens your eye for structural weaknesses that often go unnoticed — the foundation for spotting winning exchanges and combination setups.</p>`,
   },
 
@@ -83,7 +86,8 @@ export const DRILL_HELP = {
 
   discipline: {
     title: 'Move Discipline Drill',
-    body: `<p class=helpText>Play a full game against the computer engine, but with a structured thinking requirement before every move: count the checks, captures, and loose pieces available to both sides. This is time consuming but will help build habits that will become automatic and fast with practice.</p>
+    body: `<p class=helpText>Play a full game against the computer engine, but with a structured thinking requirement before every move: count the checks, captures, and loose pieces available to both sides.</p>
+    <p class=helpText>This is time consuming but will help build habits that will become automatic and fast with practice.</p>
 <p class=helpText>Before each move you must complete the three tactical scans. This enforces the habit of systematic board evaluation — the core of what grandmasters call the <em>thought process</em>.</p>
 <p class=helpText>For early moves you may tap the BOOK button to skip the analysis phases. Later in the game if the position becomes trivial, like a simple ladder mate, you can click the SKIP button.</p>
 <p class=helpText>If you tap END DRILL and a level 20 engine evaluates that the position is two pawns or more in the opponent's favor this will count as a loss. You may also tap RESIGN to explicitly resign the position.</p>
@@ -92,9 +96,10 @@ export const DRILL_HELP = {
 
   history: {
     title: 'History',
-    body: `<p class=helpText>History shows charts of your drill performance over time. Each drill has two graphs: <strong>average time per puzzle</strong> (lower is better) and <strong>accuracy</strong> as a percentage of first-try correct answers (higher is better).</p>
+    body: `<p class=helpText>History shows charts of your drill performance over time. The Graph tab shows two charts: <strong>average time per puzzle</strong> (lower is better) and <strong>accuracy</strong> as a percentage of first-try correct answers (higher is better).</p>
 <p class=helpText>Each data point represents one day's session. Use this to track improvement over weeks and spot which drills need more attention.</p>
-<p class=helpText>The radar chart at the bottom gives a quick snapshot of your relative accuracy across all drills at once.</p>`,
+<p class=helpText>The Radar tab gives a quick snapshot of your relative accuracy across all drills as an average over the time period you select.</p>
+<p class=helpText>The Goals tab allows you to set goals on your performance, and after each session will trigger a message if you met your goal.`,
   },
 
   settings: {
@@ -106,7 +111,7 @@ export const DRILL_HELP = {
   cloudsync: {
     title: 'Cloud Sync',
     body: `<p class=helpText>Cloud Sync connects ChessSight to your Vimsy account so your drill history is backed up and available across devices. Sign in with your Google account to enable sync.</p>
-<p class=helpText>Once connected, tap <strong>Sync to Vimsy</strong> to upload today's results. The log below the button shows the status of recent sync attempts.</p>
-<p class=helpText>Your data is stored privately under your Google account and is not shared with other users.</p>`,
+<p class=helpText>Once connected, you may tap <strong>Sync to Vimsy</strong> to upload today's results, however Chess Sight will upload automatically from time to time. The log below the button shows the status of recent sync attempts and can be helpful for debugging any syncing issues.</p>
+<p class=helpText>Your data is stored privately under your Google firebase account and is not shared with other users.</p>`,
   },
 };
