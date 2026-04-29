@@ -330,6 +330,10 @@ function handleBoardClick(e) {
   if (currentValid.includes(sq)) {
     foundSquares.add(sq);
     drawMark(sq, 'queen-sq-correct');
+    if (foundSquares.size === currentValid.length) {
+      puzzleActive = false; // lock out further clicks during the pause
+      setTimeout(finishPuzzle, 600);
+    }
   } else {
     misses++;
     document.getElementById('queen-misses').textContent = `Misses: ${misses}`;
