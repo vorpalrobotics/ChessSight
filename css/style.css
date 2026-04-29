@@ -1101,17 +1101,19 @@ h2 .drill-info-btn {
   color: var(--accent);
   text-transform: uppercase;
   display: inline-block;
-  transform-origin: left center;
+  transform-origin: left top;
+  position: relative;
 }
 
 .mix-drill-label.pop {
-  animation: mix-label-pop 1s ease-in-out;
+  animation: mix-label-pop 1.2s ease-in-out;
+  z-index: 20;
 }
 
 @keyframes mix-label-pop {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(3); }
-  100% { transform: scale(1); }
+  0%   { transform: translateY(0)     scale(1); }
+  40%  { transform: translateY(22vh)  scale(2.8); }
+  100% { transform: translateY(0)     scale(1); }
 }
 
 .disc-continue-msg {
