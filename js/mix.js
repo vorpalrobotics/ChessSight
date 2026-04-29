@@ -435,7 +435,7 @@ function endSession() {
   if (n > 0) {
     const totalCorrect = drillResults.reduce((s, r) => s + r.correct, 0);
     const totalMisses  = drillResults.reduce((s, r) => s + r.misses,  0);
-    const accuracy = Math.round(totalCorrect / n * 100);
+    const accuracy = Math.round(totalCorrect / Math.max(1, totalCorrect + totalMisses) * 100);
     const avgSecs  = Math.round(drillResults.reduce((s, r) => s + r.seconds, 0) / n);
     document.getElementById('stat-avg-time').textContent = formatTime(avgSecs);
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
