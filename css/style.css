@@ -228,6 +228,9 @@ header h1 {
 .helpText {
   margin-bottom: 0.5em;
 }
+#help-modal-body li {
+  margin-bottom: 0.4em;
+}
 .help-section-heading {
   margin-top: 1.2em;
   margin-bottom: 0.5em;
