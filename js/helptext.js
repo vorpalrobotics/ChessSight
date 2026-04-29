@@ -66,7 +66,8 @@ export const DRILL_HELP = {
   mix: {
     title: 'Mix Drill',
     body: `<p class=helpText>Mix combines several drills into a single randomised session. Use the checkboxes to choose which drill types to include, then start the session.</p>
-<p class=helpText>Puzzles from each selected drill appear in random order. This keeps you on your toes — you won't know whether the next puzzle asks you to spot a check, grab a hanging piece, or find a knight route until it appears. The title bar on the drill page grows and shrinks to remind you of what kind of drill you are solving.</p>`,
+<p class=helpText>Puzzles from each selected drill appear in random order. This keeps you on your toes — you won't know whether the next puzzle asks you to spot a check, grab a hanging piece, or find a knight route until it appears. The drill type is announced with a large animated label so you can't miss it.</p>
+<p class=helpText>The <strong>Positions in Mixed Drill</strong> field shows how many puzzles the session will run. It defaults automatically based on the <em>Positions per drill</em> and <em>Multiply positions for Mix Drill</em> settings, but you can change it before starting.</p>`,
   },
 
   memory: {
@@ -105,6 +106,7 @@ export const DRILL_HELP = {
   settings: {
     title: 'Settings',
     body: `<p class=helpText><strong>Positions per drill</strong> sets how many puzzles are served before the session ends and you see the summary screen. Set it to Unlimited to keep drilling until you tap END DRILL manually.</p>
+<p class=helpText><strong>Multiply positions for Mix Drill</strong> — when checked, the Mix drill automatically multiplies the Positions per drill value by the number of drill types you select. For example, if Positions per drill is 5 and you select 4 drill types, the Mix session will run for 20 puzzles. This way each drill type gets roughly equal representation. You can always override the final count on the Mix selection screen before starting.</p>
 <p class=helpText>Settings are saved locally in your browser and persist between sessions.</p>`,
   },
 

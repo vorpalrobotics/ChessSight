@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.55</title>
+  <title>ChessSight v0.2.56</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.55</span>
+      <h1>ChessSight</h1><span class="version-label">v0.2.56</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -89,6 +89,10 @@
           <option value="15">15</option>
           <option value="20">20</option>
         </select>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label" for="chk-mix-multiply">Multiply positions for Mix Drill</label>
+        <input type="checkbox" id="chk-mix-multiply" checked>
       </div>
     </div>
   </div>
@@ -498,6 +502,10 @@
         <label><input type="checkbox" value="hanggrab"> Hang Grab</label>
         <label><input type="checkbox" value="bb"> Blunder Buster</label>
         <label><input type="checkbox" value="knight"> Knight Route</label>
+      </div>
+      <div class="settings-row mix-positions-row">
+        <label class="settings-label" for="mix-positions-input">Positions in Mixed Drill</label>
+        <input type="number" id="mix-positions-input" class="settings-select" min="1" placeholder="Unlimited" style="width:5.5rem">
       </div>
       <button id="btn-mix-start" disabled>START MIX ▶</button>
     </div>

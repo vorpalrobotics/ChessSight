@@ -12,7 +12,7 @@ import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
-import { initMix, startMix } from './mix.js';
+import { initMix, startMix, syncMixPositions } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
 import { initBBGen, startBBGen } from './bbgen.js';
 import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoals, setGoal, getAllPersonalBests } from './storage.js';
@@ -193,6 +193,16 @@ const savedPositions = localStorage.getItem(POSITIONS_KEY);
 if (savedPositions) selectPositions.value = savedPositions;
 selectPositions.addEventListener('change', () => {
   localStorage.setItem(POSITIONS_KEY, selectPositions.value);
+  syncMixPositions();
+});
+
+// Persist "multiply positions for mix" to localStorage
+const chkMixMultiply = document.getElementById('chk-mix-multiply');
+const MIX_MULTIPLY_KEY = 'chesssight-mix-multiply';
+chkMixMultiply.checked = localStorage.getItem(MIX_MULTIPLY_KEY) !== 'false';
+chkMixMultiply.addEventListener('change', () => {
+  localStorage.setItem(MIX_MULTIPLY_KEY, chkMixMultiply.checked);
+  syncMixPositions();
 });
 
 // --- About modal ---

@@ -66,9 +66,23 @@ const drillResults = [];
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 function getPositionsPerDrill() {
-  const el = document.getElementById('select-positions-per-drill');
-  if (!el || el.value === 'unlimited') return null;
-  return parseInt(el.value, 10);
+  const el = document.getElementById('mix-positions-input');
+  if (!el || el.value === '') return null;
+  const n = parseInt(el.value, 10);
+  return (isNaN(n) || n <= 0) ? null : n;
+}
+
+export function syncMixPositions() {
+  const baseEl = document.getElementById('select-positions-per-drill');
+  const multiplyEl = document.getElementById('chk-mix-multiply');
+  const inp = document.getElementById('mix-positions-input');
+  if (!inp) return;
+  const baseVal = baseEl ? baseEl.value : 'unlimited';
+  if (baseVal === 'unlimited') { inp.value = ''; return; }
+  const base = parseInt(baseVal, 10);
+  const multiply = multiplyEl ? multiplyEl.checked : true;
+  const n = document.querySelectorAll('#mix-checkboxes input[type=checkbox]:checked').length;
+  inp.value = multiply ? base * Math.max(n, 1) : base;
 }
 
 export function initMix(navigateFn) {
@@ -77,6 +91,9 @@ export function initMix(navigateFn) {
   document.querySelectorAll('#mix-checkboxes input[type=checkbox]').forEach(cb =>
     cb.addEventListener('change', updateStartButton)
   );
+  // Re-sync positions whenever global settings change
+  document.getElementById('select-positions-per-drill')?.addEventListener('change', syncMixPositions);
+  document.getElementById('chk-mix-multiply')?.addEventListener('change', syncMixPositions);
   document.getElementById('btn-mix-start').addEventListener('click', startSession);
   document.getElementById('btn-mix-done').addEventListener('click', endSession);
   document.getElementById('btn-mix-done-click').addEventListener('click', handleClickDone);
@@ -101,6 +118,7 @@ function showSelectionPanel() {
 function updateStartButton() {
   const n = document.querySelectorAll('#mix-checkboxes input[type=checkbox]:checked').length;
   document.getElementById('btn-mix-start').disabled = n < 2;
+  syncMixPositions();
 }
 
 function startSession() {
