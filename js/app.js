@@ -214,13 +214,20 @@ modalAbout.addEventListener('click', (e) => {
 // --- Drill help modal ---
 const modalHelp = document.getElementById('modal-help');
 
+const NO_BUTTON_INFO = new Set(['discipline', 'history', 'settings', 'cloudsync']);
+
 document.querySelectorAll('.drill-info-btn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
     const info = DRILL_HELP[btn.dataset.help];
     if (!info) return;
     document.getElementById('help-modal-title').textContent = info.title;
-    document.getElementById('help-modal-body').innerHTML = info.body;
+    let html = info.body;
+    if (!NO_BUTTON_INFO.has(btn.dataset.help)) {
+      const bi = DRILL_HELP.drillButtonInfo;
+      if (bi) html += `<h3 class="help-section-heading">${bi.title}</h3>${bi.body}`;
+    }
+    document.getElementById('help-modal-body').innerHTML = html;
     modalHelp.classList.remove('hidden');
   });
 });

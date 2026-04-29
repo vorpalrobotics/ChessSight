@@ -228,6 +228,12 @@ header h1 {
 .helpText {
   margin-bottom: 0.5em;
 }
+.help-section-heading {
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  font-size: 1rem;
+  color: var(--accent);
+}
 
 .modal-close {
   position: absolute;
