@@ -114,4 +114,16 @@ export const DRILL_HELP = {
 <p class=helpText>Once connected, you may tap <strong>Sync to Vimsy</strong> to upload today's results, however Chess Sight will upload automatically from time to time. The log below the button shows the status of recent sync attempts and can be helpful for debugging any syncing issues.</p>
 <p class=helpText>Your data is stored privately under your Google firebase account and is not shared with other users.</p>`,
   },
+
+  drillButtonInfo: {
+    title: 'Other Drill Buttons',
+    body: `<p class=helpText>These buttons are common to drills:</p>
+    <ul> 
+    <li>⏸(pause): Allows you to pause the current position, in case you get interupted and want to stop the timer.</li>
+    <li>END DRILL: Ends the drill and shows the summary screen for any positions you have completed. The current position won't count. Use this if you are done with the session earlier than your "Positions per drill" setting.</li>
+    <li>← Back: The BACK button is like END DRILL but it immediately goes back to the main screen without showing a summary of any positions you have completed.</li>
+    <li>SHOW: Most drills have a SHOW button that will show you the solution in case you're stuck. However, any solution you have not found is marked as a miss for scoring purposes if you use the SHOW button.</li>`,
+  }
+    
+    
 };
