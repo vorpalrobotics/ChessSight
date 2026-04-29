@@ -236,6 +236,7 @@ export function initQueenAttack(navigateFn) {
   navigate = navigateFn;
   document.getElementById('btn-queen-done').addEventListener('click', showSummary);
   document.getElementById('btn-queen-complete').addEventListener('click', handleComplete);
+  document.getElementById('btn-queen-show').addEventListener('click', handleShow);
   document.getElementById('queen-board').addEventListener('click', handleBoardClick);
 }
 
@@ -336,10 +337,15 @@ function handleBoardClick(e) {
   }
 }
 
-// ─── COMPLETE button ──────────────────────────────────────────────────────────
+// ─── COMPLETE / SHOW buttons ──────────────────────────────────────────────────
 
 function handleComplete() {
   if (waitingToAdvance) { loadNextPuzzle(); return; }
+  if (!puzzleActive) return;
+  finishPuzzle();
+}
+
+function handleShow() {
   if (!puzzleActive) return;
   finishPuzzle();
 }
