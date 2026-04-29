@@ -428,6 +428,7 @@ async function loadPuzzle() {
   setTimeout(() => fillBank(), 0);
 
   // Wait for user to tap the board
+  document.getElementById('btn-bb-show').disabled = true;
   showStudyPrompt();
   awaitingStudyTap = true;
   await new Promise(r => { studyTapResolve = r; });
@@ -441,6 +442,7 @@ async function loadPuzzle() {
   if (genId !== myId) return;
 
   setStatus('');
+  document.getElementById('btn-bb-show').disabled = false;
   puzzleActive = true;
   startTimer();
 }
@@ -514,6 +516,7 @@ function handleShow() {
 
 function finishPuzzle(correct) {
   puzzleActive = false;
+  document.getElementById('btn-bb-show').disabled = true;
   const elapsed = stopTimer();
   sessionMisses += puzzleMisses;
   document.getElementById('bb-misses').textContent = `Misses: ${sessionMisses}`;
