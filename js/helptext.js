@@ -7,31 +7,33 @@ export const DRILL_HELP = {
     title: 'Checks Drill',
     body: `<p class=helpText>A position appears with pieces for both sides. Count every legal checking move available for both White and Black.</p>
 <p class=helpText>Enter your counts using the number buttons that appear below the board.</p>
-<p class=helpText>Note that for pawn promotions that also give check, each possible promotion that would give check counts as a separate move. For example if a pawn could promote to either a queen or bishop to give check that counts as two checks. (If a pawn could promote by either capturing or moving forward, and either a rook or queen would check in both those cases, that counts for four checks!).</p>
-<p class=helpText>For discovered checks every way the piece could move would also count as a check, for example if a knight had 8 legal moves and by moving revealed a discovered check that would count for 8 checks.</p>
+<p class=helpText>Note that for pawn promotions, if any possible promotion would give check that just counts once. For example if a pawn could promote to either a queen or bishop to give check that counts as one checks. (If a pawn could promote by either capturing or moving forward, and either a rook or queen would check in both those cases, that counts as two checks because there are two different promotion squares the pawn could move to).</p>
+<p class=helpText>For discovered checks every way the piece could move would also count as a separate check, for example if a knight had 8 legal moves and by moving revealed a discovered check that would count for 8 checks.</p>
 <p class=helpText>This drill builds the habit of scanning for all checking threats in a position before committing to a move — an essential skill for spotting tactical opportunities.</p>`,
   },
 
   captures: {
     title: 'Captures Drill',
-    body: `<p class=helpText>A position appears with pieces for both sides. Count every legal capturing move available for both White and Black</p>
-<p class=helpText>Enter your count using the number buttons. Every capture counts, including pawn captures, regardless of whether the capture is a good trade or a losing one. En passant captures count too when available. Note that if two different pieces can capture the same opponent's piece that counts as two captures.</p>
+    body: `<p class=helpText>A position appears with pieces for both sides. Count every legal capturing move available for both White and Black.</p>
+<p class=helpText>Enter your count using the number buttons. Once you enter both counts, the position is scored and auto-advances.</p>
+<p class=helpText>Every capture counts, including pawn captures, regardless of whether the capture is a good trade or a losing one. En passant captures count too when available. Note that if two different pieces can capture the same opponent's piece that counts as two captures.</p>
+<p class=helpText>If a piece is pinned against a King it cannot move, and therefore has no captures, so be careful about this situation.</p>
 <p class=helpText>Strong players always know how many captures are on the board before deciding on a move. This drill builds that automatic scanning habit.</p>`,
   },
 
   loose: {
     title: 'Loose Pieces Drill',
-    body: `<p class=helpText>A position appears and you must click every <em>loose</em> piece on the board for both White and Black.</p>
-<p class=helpText>A loose piece is one that has <strong>no defenders at all</strong>. It doesn't matter whether the piece is currently under attack — if nothing guards it, it's loose and a potential tactical target.</p>
+    body: `<p class=helpText>A position appears and you must click every <em>loose</em> piece on the board for both White and Black. Once all loose pieces are clicked, the puzzle is scored and auto-advances.</p>
+<p class=helpText>A loose piece is one that has <em>no defenders at all</em>. It doesn't matter whether the piece is currently under attack: if nothing guards it, it's loose and a potential target.</p>
 <p class=helpText>Loose pieces are tactical accidents waiting to happen. Noticing them is the first step to avoiding blunders and spotting your opponent's weaknesses.</p>`,
   },
 
   under: {
     title: 'Underguarded Drill',
-    body: `<p class=helpText>A position appears and you must click every <em>underguarded</em> piece for both White and Black.</p>
-<p class=helpText>A piece is underguarded when the number of pieces defending it is less than or equal to the number of pieces attacking it.</p>
-<p class=helpText>Similar to loose pieces, underguarded pieces are vulnerable to being won by a sequence of exchanges.</p>
-<p class=helpText>Note that a piece is underguarded even if capturing it would lose material. For example, if a knight is defended only by a pawn and attacked only by a queen, you wouldn't normally want to make that capture as the queen would be lost for a knight. However, the knight in this example is still considered an underguarded piece, because tactics are more likely to be available even in this situation.</p>
+    body: `<p class=helpText>A position appears and you must click every <em>underguarded</em> piece for both White and Black. Once all are identified, the position is scored and auto-advances to the next position.</p>
+<p class=helpText>A piece is underguarded when <em>the number of pieces defending it is less than or equal to the number of pieces attacking it</em>.</p>
+<p class=helpText>Similar to loose pieces, underguarded pieces are vulnerable to being won by a sequence of exchanges or other tactics.</p>
+<p class=helpText>Note that a piece is underguarded even if capturing it immediately would lose material. For example, if a Knight is defended only by a pawn and attacked only by a Queen, you wouldn't typically want to make that capture as the Queen would be lost for a Knight. However, the Knight in this example is still considered an underguarded piece, because tactics are more likely to be available in this situation.</p>
 <p class=helpText>This drill sharpens your eye for structural weaknesses that often go unnoticed — the foundation for spotting winning exchanges and combination setups.</p>`,
   },
 
@@ -39,19 +41,20 @@ export const DRILL_HELP = {
     title: 'Knight Route Drill',
     body: `<p class=helpText>A knight appears on the board along with a target square. Your job is to click the squares that form the <strong>shortest possible route</strong> for the knight to reach the target. There may also be pawns on the board, and you may not capture any enemy pawn or move to any square guarded by an enemy pawn.</p>
 <p class=helpText>Click each intermediate square in order. The drill checks whether your chosen path is optimal — not just any path, but a path that has the minimum number of moves necessary. Note that there may be more than one minimal path, you only need to find one of them to solve the position.</p>
+<p class=helpText>If your path becomes longer than the optimal path then clicked squares will not be green and each extra square beyond the optimal route is scored as an additional miss.</p>
 <p class=helpText>Knights are the trickiest piece to visualize. This drill trains you to instantly see knight distances and outpost routes, which is critical for endgames and piece coordination.</p>`,
   },
 
   queen: {
     title: 'Queen Attack Drill',
-    body: `<p>A queen and several enemy pieces are on the board. Find a single queen move that achieves a <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> against a rook, bishop, or knight.</p>
+    body: `<p>A queen and several enemy pieces are on the board. Find a single queen move that achieves a <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> against a rook, bishop, or knight. Once you have identified all such squares, the position is scored and auto-advances.</p>
 <p class=helpText>A fork attacks two pieces at once. A pin immobilizes a piece because moving it would expose a more valuable piece behind it. A skewer forces a valuable piece to move, exposing a lesser piece behind it to capture. Note that even pins or skewers where an enemy piece could move to guard the skewered piece will count in this drill, because in a real position this could still lead to winning tactics.</p>
 <p class=helpText>The queen is the most powerful tactical piece. This drill builds the pattern recognition to spot queen tactics instantly in real games.</p>`,
   },
 
   hanggrab: {
     title: 'Hang Grab Drill',
-    body: `<p class=helpText>A position appears with a White piece and several Black pieces. Some Black pieces may be <em>hanging</em> (completely undefended), meaning White can capture them for free.</p>
+    body: `<p class=helpText>A position appears with a White piece and several Black pieces. Some Black pieces may be <em>hanging</em> (completely undefended), meaning White can capture them for free. Once all hanging pieces are identified, the position is scored and auto-advances.</p>
 <p class=helpText>Click every hanging Black piece you can find. If nothing is free to capture, click the <strong>PASS</strong> button instead. Clicking a piece that isn't truly free counts as a miss.</p>
 <p class=helpText>Instantly recognizing undefended pieces — and resisting the urge to grab pieces that aren't actually free — is one of the most important practical skills in chess.</p>`,
   },
@@ -60,7 +63,7 @@ export const DRILL_HELP = {
     title: 'Blunder Buster Drill',
     body: `<p class=helpText>Study the position before Black moves, then tap the board when you're ready. Black will play a move — <em>usually</em> a blunder that leaves a piece hanging.</p>
 <p class=helpText>After the move animates, click the piece that Black left undefended. If nothing is actually free to grab, click the PASS button instead.</p>
-<p class=helpText>This drill trains the most important defensive skill in chess: spotting the piece your opponent just hung. Unlike the Hang Grab drill, this drill emphasizes noticing what changed due to an opponent's move.</p>`,
+<p class=helpText>This drill trains an important skill in chess (especially speed chess): instantly spotting the piece your opponent just hung. Unlike the Hang Grab drill, this drill emphasizes noticing what changed due to an opponent's move.</p>`,
   },
 
   mix: {
