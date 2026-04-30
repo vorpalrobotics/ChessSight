@@ -138,7 +138,7 @@ export const DRILL_HELP = {
 //
 // Step shape: { text, target?, arrowAlign? }
 //   target:     CSS selector to spotlight (null = centred dark overlay)
-//   arrowAlign: 'center-right' (62%) | 'right' (75%) | omit for centred
+//   arrowAlign: 'center-right' (62%) | 'right' (75%) | 'far-right' (85%) | omit for centred
 
 export const DRILL_WALKTHROUGH = {
 
@@ -152,12 +152,12 @@ export const DRILL_WALKTHROUGH = {
     {
       text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
       target: '#screen-{drill} .drill-pause-btn',
-      arrowAlign: 'center-right',
+      arrowAlign: 'right',
     },
     {
       text: 'Done? Tap <strong>END DRILL</strong> to finish this run. (Your run will also end when the "Positions per Drill" setting is reached.)',
       target: '#btn-{drill}-done',
-      arrowAlign: 'right',
+      arrowAlign: 'far-right',
     },
   ],
 

@@ -1193,7 +1193,7 @@ h2 .drill-info-btn {
   border: 8px solid transparent;
   border-top-color: #1e2a3a;
 }
-/* Right-of-centre arrow variants */
+/* Right-of-centre arrow variants (arrowAlign values: center-right=62%, right=75%, far-right=85%) */
 #wt-bubble[data-arrow=up][data-arrow-align=center-right]::before,
 #wt-bubble[data-arrow=up][data-arrow-align=center-right]::after,
 #wt-bubble[data-arrow=down][data-arrow-align=center-right]::before,
@@ -1205,6 +1205,12 @@ h2 .drill-info-btn {
 #wt-bubble[data-arrow=down][data-arrow-align=right]::before,
 #wt-bubble[data-arrow=down][data-arrow-align=right]::after {
   left: 75%;
+}
+#wt-bubble[data-arrow=up][data-arrow-align=far-right]::before,
+#wt-bubble[data-arrow=up][data-arrow-align=far-right]::after,
+#wt-bubble[data-arrow=down][data-arrow-align=far-right]::before,
+#wt-bubble[data-arrow=down][data-arrow-align=far-right]::after {
+  left: 85%;
 }
 
 .disc-continue-msg {
