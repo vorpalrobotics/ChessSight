@@ -183,6 +183,17 @@ export const DRILL_WALKTHROUGH = {
       target: '#screen-captures .drill-answer-panel',
     },
   ],
+
+  loose: [
+    {
+      text: 'A <strong>loose piece</strong> has zero defenders — it doesn\'t matter whether it\'s currently under attack. If nothing guards it, it\'s loose.',
+      target: null,
+    },
+    {
+      text: 'Tap directly on every loose piece you see, for <strong>both sides</strong>. The puzzle scores and advances once all loose pieces are found.',
+      target: null,
+    },
+  ],
 };
 
 // Returns the full step list for a drill: drill-specific steps followed by
