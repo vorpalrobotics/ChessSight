@@ -1212,6 +1212,11 @@ h2 .drill-info-btn {
   color: var(--text);
   border: 2px solid transparent;
   transition: background 0.1s, border-color 0.12s;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.digit-btn:focus, .digit-btn:focus-visible {
+  outline: none;
 }
 /* Hover/active: lighter blue — NOT red — so correct answers don't flash red */
 .digit-btn:hover:not(.correct):not(.incorrect),
