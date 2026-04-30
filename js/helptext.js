@@ -194,6 +194,17 @@ export const DRILL_WALKTHROUGH = {
       target: null,
     },
   ],
+
+  under: [
+    {
+      text: 'An <strong>underguarded piece</strong> has fewer defenders than attackers. Even one attacker with no defenders counts — it\'s a weakness waiting to be exploited.',
+      target: null,
+    },
+    {
+      text: 'Tap directly on every underguarded piece you see, for <strong>both sides</strong>. The puzzle scores and advances once all are found.',
+      target: null,
+    },
+  ],
 };
 
 // Returns the full step list for a drill: drill-specific steps followed by
