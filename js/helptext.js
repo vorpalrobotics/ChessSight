@@ -132,12 +132,36 @@ export const DRILL_HELP = {
 };
 
 // ─── Drill walkthrough steps ──────────────────────────────────────────────────
-// One entry per drill. Each value is an array of step objects:
-//   { text, target?, arrowAlign? }
-// target: CSS selector for the element to spotlight (null = centred overlay)
-// arrowAlign: 'center-right' (62%) | 'right' (75%) | omit for centred
+// DRILL_WALKTHROUGH holds drill-specific intro steps keyed by drill name.
+// common holds steps shared by nearly every drill; targets use {drill} as a
+// placeholder that buildWalkthrough() replaces with the actual drill key.
+//
+// Step shape: { text, target?, arrowAlign? }
+//   target:     CSS selector to spotlight (null = centred dark overlay)
+//   arrowAlign: 'center-right' (62%) | 'right' (75%) | omit for centred
 
 export const DRILL_WALKTHROUGH = {
+
+  // ── Shared steps appended to every drill walkthrough ─────────────────────
+  common: [
+    {
+      text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — anything you hadn\'t solved yet will be marked as a miss.',
+      target: '#btn-{drill}-show',
+      arrowAlign: 'right',
+    },
+    {
+      text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
+      target: '#screen-{drill} .drill-pause-btn',
+      arrowAlign: 'center-right',
+    },
+    {
+      text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
+      target: '#btn-{drill}-done',
+      arrowAlign: 'right',
+    },
+  ],
+
+  // ── Drill-specific intro steps ────────────────────────────────────────────
   checks: [
     {
       text: 'Count every legal checking move available for <strong>both White and Black</strong> — not just one side!',
@@ -147,20 +171,16 @@ export const DRILL_WALKTHROUGH = {
       text: 'Tap a number to enter White\'s check count, then Black\'s. The puzzle scores automatically once both counts are entered.',
       target: '#screen-checks .drill-answer-panel',
     },
-    {
-      text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — but any count you hadn\'t entered correctly yet will be marked as a miss.',
-      target: '#btn-checks-show',
-      arrowAlign: 'right',
-    },
-    {
-      text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
-      target: '#screen-checks .drill-pause-btn',
-      arrowAlign: 'center-right',
-    },
-    {
-      text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
-      target: '#btn-checks-done',
-      arrowAlign: 'right',
-    },
   ],
 };
+
+// Returns the full step list for a drill: drill-specific steps followed by
+// the common steps with {drill} placeholders resolved.
+export function buildWalkthrough(drillKey) {
+  const specific = DRILL_WALKTHROUGH[drillKey] ?? [];
+  const common   = DRILL_WALKTHROUGH.common.map(step => ({
+    ...step,
+    target: step.target?.replace('{drill}', drillKey) ?? null,
+  }));
+  return [...specific, ...common];
+}
