@@ -268,6 +268,12 @@ const DRILL_COLORS = {
   'dlm-knight': '#44ccff',
 };
 
+const DRILL_DASH = {
+  'dlm-rook':   [6, 3],
+  'dlm-bishop': [6, 3],
+  'dlm-knight': [6, 3],
+};
+
 const GOAL_DRILLS      = ['checks','captures','loose','under','queen','knight','hanggrab','bb','dlm-rook','dlm-bishop','dlm-knight'];
 const GOAL_LABELS_FULL = ['Checks','Captures','Loose','Underguarded','Queen Attack','Knight Route','Hang Grab','Blunder Buster','Spiral: Rook','Spiral: Bishop','Spiral: Knight'];
 const GOAL_LABELS_RADAR = ['Checks','Captures','Loose','Underguarded','Queen Atk','Knight','Hang Grab','Blunder','Sp:Rook','Sp:Bishop','Sp:Knight'];
@@ -491,6 +497,7 @@ async function renderCharts() {
       borderColor: DRILL_COLORS[drill],
       backgroundColor: DRILL_COLORS[drill] + '22',
       borderWidth: 2,
+      borderDash: DRILL_DASH[drill] || [],
       tension: 0.3,
       pointRadius: 4,
       pointHoverRadius: 6,
@@ -507,12 +514,12 @@ async function renderCharts() {
 
   // Build shared legend HTML
   const legend = document.getElementById('chart-legend');
-  legend.innerHTML = drills.map((d, i) =>
-    `<span class="legend-item" data-idx="${i}">
-       <span class="legend-dot" style="background:${DRILL_COLORS[d]}"></span>
-       <span class="legend-label">${DRILL_LABELS[d]}</span>
-     </span>`
-  ).join('');
+  legend.innerHTML = drills.map((d, i) => {
+    const indicator = DRILL_DASH[d]
+      ? `<span class="legend-dash" style="border-color:${DRILL_COLORS[d]}"></span>`
+      : `<span class="legend-dot" style="background:${DRILL_COLORS[d]}"></span>`;
+    return `<span class="legend-item" data-idx="${i}">${indicator}<span class="legend-label">${DRILL_LABELS[d]}</span></span>`;
+  }).join('');
 
   const gridColor = 'rgba(255,255,255,0.07)';
   const tickColor = '#888';

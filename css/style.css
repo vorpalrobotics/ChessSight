@@ -537,6 +537,13 @@ header h1 {
   border-radius: 50%;
   flex-shrink: 0;
 }
+.legend-dash {
+  width: 18px;
+  height: 0;
+  border-top: 2.5px dashed;
+  flex-shrink: 0;
+  align-self: center;
+}
 
 .chart-section {
   margin-bottom: 1.25rem;
