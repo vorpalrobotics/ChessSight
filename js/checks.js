@@ -5,6 +5,22 @@ import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreChecksDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+
+const CHECKS_WALKTHROUGH = [
+  {
+    text: 'Count every legal checking move available for <strong>both White and Black</strong> — not just one side!',
+    target: null,
+  },
+  {
+    text: 'Tap a number to enter White\'s check count, then Black\'s. The puzzle scores automatically once both counts are entered.',
+    target: '#screen-checks .drill-answer-panel',
+  },
+  {
+    text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — but any count you hadn\'t entered correctly yet will be marked as a miss.',
+    target: '#btn-checks-show',
+  },
+];
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -74,6 +90,8 @@ export async function startChecks() {
   setStatus('Loading session…');
   await fillQueue();
   await loadNextPuzzle();
+  // Small delay so the board is painted before we overlay the walkthrough
+  setTimeout(() => runWalkthrough('checks', CHECKS_WALKTHROUGH), 120);
 }
 
 async function fillQueue() {

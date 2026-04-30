@@ -1121,6 +1121,79 @@ h2 .drill-info-btn {
   100% { transform: translateY(0)     scale(1); }
 }
 
+/* ── Walkthrough bubbles ── */
+#wt-bubble {
+  background: #1e2a3a;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 0.85rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  pointer-events: auto;
+}
+#wt-bubble .wt-text {
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0 0 0.75rem;
+}
+#wt-bubble .wt-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#wt-bubble .wt-step {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+#wt-bubble .wt-btn {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.9rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#wt-bubble .wt-btn:hover { opacity: 0.85; }
+/* Arrow triangles */
+#wt-bubble[data-arrow=up]::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 9px solid transparent;
+  border-bottom-color: rgba(255,255,255,0.15);
+}
+#wt-bubble[data-arrow=up]::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-bottom-color: #1e2a3a;
+}
+#wt-bubble[data-arrow=down]::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 9px solid transparent;
+  border-top-color: rgba(255,255,255,0.15);
+}
+#wt-bubble[data-arrow=down]::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #1e2a3a;
+}
+
 .disc-continue-msg {
   font-weight: 700;
   fill: #111;
