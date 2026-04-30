@@ -457,9 +457,10 @@ function resetUI() {
   hideChecks();
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
-  document.querySelectorAll('#screen-checks .digit-btn').forEach(b =>
-    b.classList.remove('correct', 'incorrect', 'flashing')
-  );
+  document.querySelectorAll('#screen-checks .digit-btn').forEach(b => {
+    b.classList.remove('correct', 'incorrect', 'flashing');
+    b.blur();
+  });
   if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
 }
 
