@@ -1193,6 +1193,13 @@ h2 .drill-info-btn {
   border: 8px solid transparent;
   border-top-color: #1e2a3a;
 }
+/* Right-aligned arrow variant (arrowAlign: 'right') */
+#wt-bubble[data-arrow=up][data-arrow-align=right]::before,
+#wt-bubble[data-arrow=up][data-arrow-align=right]::after,
+#wt-bubble[data-arrow=down][data-arrow-align=right]::before,
+#wt-bubble[data-arrow=down][data-arrow-align=right]::after {
+  left: 75%;
+}
 
 .disc-continue-msg {
   font-weight: 700;

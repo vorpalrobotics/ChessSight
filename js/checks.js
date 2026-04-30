@@ -19,6 +19,7 @@ const CHECKS_WALKTHROUGH = [
   {
     text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — but any count you hadn\'t entered correctly yet will be marked as a miss.',
     target: '#btn-checks-show',
+    arrowAlign: 'right',
   },
 ];
 
@@ -89,9 +90,12 @@ export async function startChecks() {
   resetDrill();
   setStatus('Loading session…');
   await fillQueue();
-  await loadNextPuzzle();
-  // Small delay so the board is painted before we overlay the walkthrough
-  setTimeout(() => runWalkthrough('checks', CHECKS_WALKTHROUGH), 120);
+  await loadNextPuzzle();   // starts timer internally
+  stopTimer();
+  await runWalkthrough('checks', CHECKS_WALKTHROUGH);
+  seconds = 0;
+  document.getElementById('checks-timer').textContent = '0:00';
+  startTimer();
 }
 
 async function fillQueue() {

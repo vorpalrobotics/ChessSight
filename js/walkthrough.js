@@ -1,12 +1,15 @@
 // ─── Walkthrough system ───────────────────────────────────────────────────────
-// Usage: runWalkthrough('checks', [ {text, target?}, ... ])
-// Stores completion in localStorage so it only runs once per drill.
+// Usage: await runWalkthrough('checks', [ {text, target?, arrowAlign?}, ... ])
+// Returns a Promise that resolves when the walkthrough finishes (or immediately
+// with false if it has already been seen).
 
 const PREFIX = 'chesssight-wt-';
 
 export function runWalkthrough(drillKey, steps) {
-  if (localStorage.getItem(PREFIX + drillKey)) return;
-  showStep(drillKey, steps, 0);
+  return new Promise(resolve => {
+    if (localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; }
+    showStep(drillKey, steps, 0, resolve);
+  });
 }
 
 export function clearWalkthroughState(drillKey) {
@@ -29,15 +32,16 @@ function dismiss() {
   document.getElementById('wt-bubble')?.remove();
 }
 
-function showStep(drillKey, steps, idx) {
+function showStep(drillKey, steps, idx, resolve) {
   dismiss();
 
   if (idx >= steps.length) {
     localStorage.setItem(PREFIX + drillKey, '1');
+    resolve(true);
     return;
   }
 
-  const { text, target } = steps[idx];
+  const { text, target, arrowAlign } = steps[idx];
   const targetEl = target ? document.querySelector(target) : null;
 
   // ── Overlay ──────────────────────────────────────────────────────────────
@@ -48,7 +52,7 @@ function showStep(drillKey, steps, idx) {
     targetEl ? 'background:transparent' : 'background:rgba(0,0,0,0.72)',
   ].join(';');
   // Click on backdrop skips to next step
-  overlay.addEventListener('click', () => showStep(drillKey, steps, idx + 1));
+  overlay.addEventListener('click', () => showStep(drillKey, steps, idx + 1, resolve));
   document.body.appendChild(overlay);
 
   // ── Spotlight on target ───────────────────────────────────────────────────
@@ -75,15 +79,15 @@ function showStep(drillKey, steps, idx) {
     </div>`;
   document.body.appendChild(bubble);
 
-  positionBubble(bubble, targetEl);
+  positionBubble(bubble, targetEl, arrowAlign);
 
   bubble.querySelector('.wt-btn').addEventListener('click', e => {
     e.stopPropagation();
-    showStep(drillKey, steps, idx + 1);
+    showStep(drillKey, steps, idx + 1, resolve);
   });
 }
 
-function positionBubble(bubble, targetEl) {
+function positionBubble(bubble, targetEl, arrowAlign) {
   // Bubble is fixed-width, horizontally centred
   bubble.style.position  = 'fixed';
   bubble.style.zIndex    = '5001';
@@ -95,11 +99,14 @@ function positionBubble(bubble, targetEl) {
     bubble.style.top       = '50%';
     bubble.style.transform = 'translate(-50%, -50%)';
     bubble.removeAttribute('data-arrow');
+    bubble.removeAttribute('data-arrow-align');
     return;
   }
 
   const rect = targetEl.getBoundingClientRect();
   const vh   = window.innerHeight;
+
+  bubble.dataset.arrowAlign = arrowAlign || '';
 
   if (rect.bottom < vh * 0.55) {
     // Target in upper half → bubble below, arrow points up
