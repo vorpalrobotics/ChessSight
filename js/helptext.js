@@ -155,7 +155,7 @@ export const DRILL_WALKTHROUGH = {
       arrowAlign: 'center-right',
     },
     {
-      text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
+      text: 'Done? Tap <strong>END DRILL</strong> to finish this run. (Your run will also end when the "Positions per Drill" setting is reached.)',
       target: '#btn-{drill}-done',
       arrowAlign: 'right',
     },
@@ -168,7 +168,7 @@ export const DRILL_WALKTHROUGH = {
       target: null,
     },
     {
-      text: 'Tap a number to enter White\'s check count, then Black\'s. The puzzle scores automatically once both counts are entered.',
+      text: 'Tap a number to enter White\'s check count as well as Black\'s. The puzzle scores automatically once both counts are entered.',
       target: '#screen-checks .drill-answer-panel',
     },
   ],
