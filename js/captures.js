@@ -5,6 +5,8 @@ import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -73,7 +75,12 @@ export async function startCaptures() {
   resetDrill();
   setStatus('Loading session…');
   await fillQueue();
-  await loadNextPuzzle();
+  await loadNextPuzzle();   // starts timer internally
+  stopTimer();
+  await runWalkthrough('captures', buildWalkthrough('captures'));
+  seconds = 0;
+  document.getElementById('captures-timer').textContent = '0:00';
+  startTimer();
 }
 
 async function fillQueue() {

@@ -172,6 +172,17 @@ export const DRILL_WALKTHROUGH = {
       target: '#screen-checks .drill-answer-panel',
     },
   ],
+
+  captures: [
+    {
+      text: 'Count every legal capturing move available for <strong>both White and Black</strong> — not just one side!',
+      target: null,
+    },
+    {
+      text: 'Tap a number to enter White\'s capture count as well as Black\'s. The puzzle scores automatically once both counts are entered.',
+      target: '#screen-captures .drill-answer-panel',
+    },
+  ],
 };
 
 // Returns the full step list for a drill: drill-specific steps followed by
