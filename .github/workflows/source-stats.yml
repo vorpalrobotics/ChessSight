@@ -1,0 +1,34 @@
+name: Source Stats
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count lines
+        run: |
+          {
+            echo "# Source Stats"
+            echo ""
+            echo "Generated: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo ""
+            echo '```'
+            wc -l js/*.js css/*.css index.html
+            echo '```'
+          } > sourceStats.md
+
+      - name: Commit stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sourceStats.md
+          git diff --staged --quiet || git commit -m "Update source stats [skip ci]"
+          git push
