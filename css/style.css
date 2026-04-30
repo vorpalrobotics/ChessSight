@@ -1193,7 +1193,13 @@ h2 .drill-info-btn {
   border: 8px solid transparent;
   border-top-color: #1e2a3a;
 }
-/* Right-aligned arrow variant (arrowAlign: 'right') */
+/* Right-of-centre arrow variants */
+#wt-bubble[data-arrow=up][data-arrow-align=center-right]::before,
+#wt-bubble[data-arrow=up][data-arrow-align=center-right]::after,
+#wt-bubble[data-arrow=down][data-arrow-align=center-right]::before,
+#wt-bubble[data-arrow=down][data-arrow-align=center-right]::after {
+  left: 62%;
+}
 #wt-bubble[data-arrow=up][data-arrow-align=right]::before,
 #wt-bubble[data-arrow=up][data-arrow-align=right]::after,
 #wt-bubble[data-arrow=down][data-arrow-align=right]::before,

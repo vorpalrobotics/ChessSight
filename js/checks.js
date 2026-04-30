@@ -21,6 +21,16 @@ const CHECKS_WALKTHROUGH = [
     target: '#btn-checks-show',
     arrowAlign: 'right',
   },
+  {
+    text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
+    target: '#screen-checks .drill-pause-btn',
+    arrowAlign: 'center-right',
+  },
+  {
+    text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
+    target: '#btn-checks-done',
+    arrowAlign: 'right',
+  },
 ];
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';

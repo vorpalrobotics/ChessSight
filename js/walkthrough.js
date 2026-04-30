@@ -2,19 +2,32 @@
 // Usage: await runWalkthrough('checks', [ {text, target?, arrowAlign?}, ... ])
 // Returns a Promise that resolves when the walkthrough finishes (or immediately
 // with false if it has already been seen).
+//
+// Console helper: forceWalkthrough(true/false) — forces walkthrough to always
+// show (or restores normal one-shot behaviour) across page reloads.
 
 const PREFIX = 'chesssight-wt-';
+const FORCE_KEY = PREFIX + '__force__';
 
 export function runWalkthrough(drillKey, steps) {
   return new Promise(resolve => {
-    if (false && localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; } // DEBUG: always show
-    showStep(drillKey, steps, 0, resolve);
+    const forced = !!localStorage.getItem(FORCE_KEY);
+    if (!forced && localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; }
+    showStep(drillKey, steps, 0, resolve, forced);
   });
 }
 
 export function clearWalkthroughState(drillKey) {
   localStorage.removeItem(PREFIX + drillKey);
 }
+
+// Call from browser console to toggle always-show mode for testing.
+export function forceWalkthrough(force = true) {
+  if (force) localStorage.setItem(FORCE_KEY, '1');
+  else localStorage.removeItem(FORCE_KEY);
+  console.log(`[walkthrough] force=${force}`);
+}
+if (typeof window !== 'undefined') window.forceWalkthrough = forceWalkthrough;
 
 function dismiss() {
   // Restore target element
@@ -32,11 +45,11 @@ function dismiss() {
   document.getElementById('wt-bubble')?.remove();
 }
 
-function showStep(drillKey, steps, idx, resolve) {
+function showStep(drillKey, steps, idx, resolve, forced) {
   dismiss();
 
   if (idx >= steps.length) {
-    // localStorage.setItem(PREFIX + drillKey, '1'); // DEBUG: don't save seen state
+    if (!forced) localStorage.setItem(PREFIX + drillKey, '1');
     resolve(true);
     return;
   }
@@ -52,7 +65,7 @@ function showStep(drillKey, steps, idx, resolve) {
     targetEl ? 'background:transparent' : 'background:rgba(0,0,0,0.72)',
   ].join(';');
   // Click on backdrop skips to next step
-  overlay.addEventListener('click', () => showStep(drillKey, steps, idx + 1, resolve));
+  overlay.addEventListener('click', () => showStep(drillKey, steps, idx + 1, resolve, forced));
   document.body.appendChild(overlay);
 
   // ── Spotlight on target ───────────────────────────────────────────────────
@@ -83,7 +96,7 @@ function showStep(drillKey, steps, idx, resolve) {
 
   bubble.querySelector('.wt-btn').addEventListener('click', e => {
     e.stopPropagation();
-    showStep(drillKey, steps, idx + 1, resolve);
+    showStep(drillKey, steps, idx + 1, resolve, forced);
   });
 }
 
