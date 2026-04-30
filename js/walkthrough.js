@@ -7,7 +7,7 @@ const PREFIX = 'chesssight-wt-';
 
 export function runWalkthrough(drillKey, steps) {
   return new Promise(resolve => {
-    if (localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; }
+    if (false && localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; } // DEBUG: always show
     showStep(drillKey, steps, 0, resolve);
   });
 }
@@ -36,7 +36,7 @@ function showStep(drillKey, steps, idx, resolve) {
   dismiss();
 
   if (idx >= steps.length) {
-    localStorage.setItem(PREFIX + drillKey, '1');
+    // localStorage.setItem(PREFIX + drillKey, '1'); // DEBUG: don't save seen state
     resolve(true);
     return;
   }
