@@ -15,14 +15,19 @@ jobs:
 
       - name: Count lines
         run: |
+          js=$(cat js/*.js | wc -l)
+          html=$(cat index.html | wc -l)
+          css=$(cat css/*.css | wc -l)
+          total=$((js + html + css))
           {
             echo "# Source Stats"
             echo ""
             echo "Generated: $(date -u '+%Y-%m-%d %H:%M UTC')"
             echo ""
-            echo '```'
-            wc -l js/*.js css/*.css index.html
-            echo '```'
+            echo "js:    $js"
+            echo "html:  $html"
+            echo "css:   $css"
+            echo "total: $total"
           } > sourceStats.md
 
       - name: Commit stats
