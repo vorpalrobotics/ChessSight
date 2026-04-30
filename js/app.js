@@ -563,6 +563,7 @@ async function renderCharts() {
   });
 
   // Wire legend click → toggle both charts
+  const CHART_HIDDEN_KEY = 'chesssight-chart-hidden';
   legend.querySelectorAll('.legend-item').forEach(item => {
     item.addEventListener('click', () => {
       const i = parseInt(item.dataset.idx, 10);
@@ -572,8 +573,26 @@ async function renderCharts() {
       chartTime.update();
       chartAcc.update();
       item.classList.toggle('legend-item-hidden', visible);
+      // Persist hidden state keyed by drill name
+      const state = {};
+      drills.forEach((d, idx) => { state[d] = !chartTime.isDatasetVisible(idx); });
+      localStorage.setItem(CHART_HIDDEN_KEY, JSON.stringify(state));
     });
   });
+
+  // Restore saved visibility state
+  const savedHidden = JSON.parse(localStorage.getItem(CHART_HIDDEN_KEY) || '{}');
+  const legendItems = legend.querySelectorAll('.legend-item');
+  let needsUpdate = false;
+  drills.forEach((d, i) => {
+    if (savedHidden[d]) {
+      chartTime.setDatasetVisibility(i, false);
+      chartAcc.setDatasetVisibility(i, false);
+      legendItems[i]?.classList.add('legend-item-hidden');
+      needsUpdate = true;
+    }
+  });
+  if (needsUpdate) { chartTime.update(); chartAcc.update(); }
 
   // ── Radar charts ──────────────────────────────────────────────────────────
   const radarAcc = [], radarTime = [];
