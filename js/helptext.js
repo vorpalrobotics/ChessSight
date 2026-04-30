@@ -80,7 +80,7 @@ export const DRILL_HELP = {
   dlm: {
     title: 'Spiral Vision Drill',
     body: `<p class=helpText>Inspired by Michael de La Maza's book <em>Rapid Chess Improvement</em>, this drill presents 63 board positions one at a time. For each position, find every <strong>queen fork</strong>, <strong>pin</strong>, and <strong>skewer</strong> that White's queen can deliver.</p>
-<p class=helpText>Click each target square where the queen could be placed to execute a tactic. If no such move exists, click <strong>No Solution</strong>. Work through all 63 positions as quickly and accurately as possible.</p>
+<p class=helpText>Click each target square where the queen could be placed to execute a tactic. If no such move exists, click <strong>PASS</strong>. Work through all 63 positions as quickly and accurately as possible.</p>
 <p class=helpText>Repeated cycles of these positions build deep, automatic pattern recognition for the most common queen tactics — the same patterns that appear over and over in real games at every level.</p>
 <p class=helpText>(Note: this drill is slightly different from the La Maza version because it also asks you to find pins in addition to forks and skewers. La Maza recommended doing his version of this drill every day for 14 consencutive days.)`,
   },
