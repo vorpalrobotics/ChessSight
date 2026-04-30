@@ -123,12 +123,44 @@ export const DRILL_HELP = {
   drillButtonInfo: {
     title: 'Other Drill Buttons',
     body: `<p class=helpText>These buttons are common to drills:</p>
-    <ul> 
+    <ul>
     <li>⏸(pause): Allows you to pause the current position, in case you get interupted and want to stop the timer.</li>
     <li>END DRILL: Ends the drill and shows the summary screen for any positions you have completed. The current position won't count. Use this if you are done with the session earlier than your "Positions per drill" setting.</li>
     <li>← Back: The BACK button is like END DRILL but it immediately goes back to the main screen without showing a summary of any positions you have completed.</li>
     <li>SHOW: Most drills have a SHOW button that will show you the solution in case you're stuck. However, any solution you have not found is marked as a miss for scoring purposes if you use the SHOW button.</li>`,
   }
-    
-    
+};
+
+// ─── Drill walkthrough steps ──────────────────────────────────────────────────
+// One entry per drill. Each value is an array of step objects:
+//   { text, target?, arrowAlign? }
+// target: CSS selector for the element to spotlight (null = centred overlay)
+// arrowAlign: 'center-right' (62%) | 'right' (75%) | omit for centred
+
+export const DRILL_WALKTHROUGH = {
+  checks: [
+    {
+      text: 'Count every legal checking move available for <strong>both White and Black</strong> — not just one side!',
+      target: null,
+    },
+    {
+      text: 'Tap a number to enter White\'s check count, then Black\'s. The puzzle scores automatically once both counts are entered.',
+      target: '#screen-checks .drill-answer-panel',
+    },
+    {
+      text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — but any count you hadn\'t entered correctly yet will be marked as a miss.',
+      target: '#btn-checks-show',
+      arrowAlign: 'right',
+    },
+    {
+      text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
+      target: '#screen-checks .drill-pause-btn',
+      arrowAlign: 'center-right',
+    },
+    {
+      text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
+      target: '#btn-checks-done',
+      arrowAlign: 'right',
+    },
+  ],
 };

@@ -6,32 +6,7 @@ import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, u
 import { scoreChecksDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 import { runWalkthrough } from './walkthrough.js';
-
-const CHECKS_WALKTHROUGH = [
-  {
-    text: 'Count every legal checking move available for <strong>both White and Black</strong> — not just one side!',
-    target: null,
-  },
-  {
-    text: 'Tap a number to enter White\'s check count, then Black\'s. The puzzle scores automatically once both counts are entered.',
-    target: '#screen-checks .drill-answer-panel',
-  },
-  {
-    text: 'Stuck? Tap <strong>SHOW</strong> to reveal the answer — but any count you hadn\'t entered correctly yet will be marked as a miss.',
-    target: '#btn-checks-show',
-    arrowAlign: 'right',
-  },
-  {
-    text: 'Phone ringing? Press the <strong>⏸</strong> button to stop the clock until you\'re free.',
-    target: '#screen-checks .drill-pause-btn',
-    arrowAlign: 'center-right',
-  },
-  {
-    text: 'Done? Tap <strong>END DRILL</strong> to finish this run.',
-    target: '#btn-checks-done',
-    arrowAlign: 'right',
-  },
-];
+import { DRILL_WALKTHROUGH } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -102,7 +77,7 @@ export async function startChecks() {
   await fillQueue();
   await loadNextPuzzle();   // starts timer internally
   stopTimer();
-  await runWalkthrough('checks', CHECKS_WALKTHROUGH);
+  await runWalkthrough('checks', DRILL_WALKTHROUGH.checks);
   seconds = 0;
   document.getElementById('checks-timer').textContent = '0:00';
   startTimer();
