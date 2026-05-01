@@ -1261,6 +1261,33 @@ h2 .drill-info-btn {
   height: 100%;
 }
 
+/* ── Progress bar ── */
+.drill-progress-wrap {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--board-size) + 4px);
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.drill-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.drill-progress-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  line-height: 1;
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* ── Answer panel ── */
 .drill-answer-panel {
   display: flex;

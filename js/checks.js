@@ -109,7 +109,7 @@ async function loadNextPuzzle() {
   stopTimer();
   resetUI();
   puzzleCount++;
-  document.getElementById('checks-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
@@ -373,6 +373,31 @@ function getPositionsPerDrill() {
   return parseInt(el.value, 10);
 }
 
+function updateProgress() {
+  const fill  = document.getElementById('checks-progress-fill');
+  const label = document.getElementById('checks-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
+
 // --- Session stats (shown above the board during subsequent puzzles) ---
 
 function updateSessionStats() {
@@ -457,6 +482,10 @@ function resetDrill() {
   document.getElementById('checks-session-time').textContent = '';
   document.getElementById('checks-session-acc').textContent = '';
   document.getElementById('checks-session-stats').classList.add('hidden');
+  const fill = document.getElementById('checks-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('checks-progress-label');
+  if (label) label.textContent = '';
 }
 
 function resetUI() {

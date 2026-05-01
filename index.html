@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.41</title>
+  <title>ChessSight v0.3.43</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.3.41</span>
+      <h1>ChessSight</h1><span class="version-label">v0.3.43</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -193,13 +193,17 @@
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Count Checks <span class="drill-info-btn" data-help="checks"><i class="fa-solid fa-circle-info"></i></span></h2>
-        <span id="checks-puzzle-num">#1</span>
         <span id="checks-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-checks-done">END DRILL</button>
       </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="checks-progress-fill"></div>
+      <span class="drill-progress-label" id="checks-progress-label"></span>
     </div>
 
     <div class="drill-board-wrap">
