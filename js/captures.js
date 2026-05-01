@@ -109,7 +109,7 @@ async function loadNextPuzzle() {
   stopTimer();
   resetUI();
   puzzleCount++;
-  document.getElementById('captures-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
@@ -382,6 +382,31 @@ function getPositionsPerDrill() {
   return parseInt(el.value, 10);
 }
 
+function updateProgress() {
+  const fill  = document.getElementById('captures-progress-fill');
+  const label = document.getElementById('captures-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
+
 function updateSessionStats() {
   const count = drillResults.length;
   if (count === 0) return;
@@ -464,6 +489,10 @@ function resetDrill() {
   document.getElementById('captures-session-time').textContent = '';
   document.getElementById('captures-session-acc').textContent = '';
   document.getElementById('captures-session-stats').classList.add('hidden');
+  const fill = document.getElementById('captures-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('captures-progress-label');
+  if (label) label.textContent = '';
 }
 
 function resetUI() {
