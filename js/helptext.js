@@ -221,6 +221,18 @@ export const DRILL_WALKTHROUGH = {
     },
   ],
 
+  dlm: [
+    {
+      text: 'The black king is fixed at D5 and the other piece spirals through all 63 squares. For each position, click every square where a queen placed there would <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> the two pieces. The queen must be safe — it can\'t be immediately captured.',
+      target: null,
+    },
+    {
+      text: 'If no such square exists for the current position, tap <strong>PASS</strong>. The puzzle auto-advances once all valid squares are found.',
+      target: '#btn-dlm-no-solution',
+      arrowAlign: 'right',
+    },
+  ],
+
   queen: [
     {
       text: 'Find every square the queen can move to in order to deliver a <strong>fork</strong> (attacks both the king and the other piece), <strong>pin</strong> (the piece can\'t move without exposing the king behind it), or <strong>skewer</strong> (checks the king, forcing it to move and expose the piece behind it). Click each target square on the board — the puzzle auto-advances once all are found.',

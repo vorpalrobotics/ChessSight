@@ -2,6 +2,8 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { upsertDrillDay, getGoals } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -184,9 +186,9 @@ export function initDeLaMaza(navigateFn, onPerfectFn) {
     navigate('screen-select');
   });
   document.getElementById('dlm-board').addEventListener('click', handleBoardClick);
-  document.getElementById('btn-dlm-rook').addEventListener('click', () => choosePiece('r'));
-  document.getElementById('btn-dlm-bishop').addEventListener('click', () => choosePiece('b'));
-  document.getElementById('btn-dlm-knight').addEventListener('click', () => choosePiece('n'));
+  document.getElementById('btn-dlm-rook').addEventListener('click', async () => choosePiece('r'));
+  document.getElementById('btn-dlm-bishop').addEventListener('click', async () => choosePiece('b'));
+  document.getElementById('btn-dlm-knight').addEventListener('click', async () => choosePiece('n'));
 }
 
 export function startDeLaMaza() {
@@ -201,11 +203,12 @@ export function startDeLaMaza() {
 
 // ─── Piece selection ──────────────────────────────────────────────────────────
 
-function choosePiece(type) {
+async function choosePiece(type) {
   chosenPiece = type;
   document.getElementById('dlm-piece-select').classList.add('hidden');
   document.getElementById('dlm-end-screen').classList.add('hidden');
   document.getElementById('dlm-drill-area').classList.remove('hidden');
+  await runWalkthrough('dlm', buildWalkthrough('dlm'));
   beginSession();
 }
 
