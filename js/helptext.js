@@ -205,6 +205,21 @@ export const DRILL_WALKTHROUGH = {
       target: null,
     },
   ],
+
+  knight: [
+    {
+      text: 'A knight needs to reach the highlighted target square. Find the <strong>shortest possible route</strong> — the fewest moves to get there. There may be more than one shortest path; you just need to find one.',
+      target: null,
+    },
+    {
+      text: 'Tap each square the knight passes through, in order. Squares light up <strong>green</strong> as long as your route stays optimal. If the highlights stop, you\'ve gone longer than the shortest path.',
+      target: null,
+    },
+    {
+      text: 'If enemy pawns are on the board, you can\'t land on any square they guard — and you can\'t capture them either. Route around them.',
+      target: null,
+    },
+  ],
 };
 
 // Returns the full step list for a drill: drill-specific steps followed by

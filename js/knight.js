@@ -3,6 +3,8 @@ import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreKnightDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -191,11 +193,16 @@ export function initKnightRoute(navigateFn) {
   document.getElementById('knight-board').addEventListener('click', handleBoardClick);
 }
 
-export function startKnightRoute() {
+export async function startKnightRoute() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   fillQueue();
-  loadNextPuzzle();
+  loadNextPuzzle();   // synchronous; starts timer internally
+  stopTimer();
+  await runWalkthrough('knight', buildWalkthrough('knight'));
+  seconds = 0;
+  document.getElementById('knight-timer').textContent = '0:00';
+  startTimer();
 }
 
 function fillQueue() {
