@@ -108,9 +108,9 @@ document.getElementById('mode-queen').addEventListener('click', () => {
   startQueenAttack();
 });
 
-document.getElementById('mode-knight').addEventListener('click', () => {
+document.getElementById('mode-knight').addEventListener('click', async () => {
   showScreen('screen-knight');
-  startKnightRoute();
+  await startKnightRoute();
 });
 
 document.getElementById('mode-hanggrab').addEventListener('click', () => {
