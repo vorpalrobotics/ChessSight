@@ -512,7 +512,7 @@ function resetUI() {
   clearMarks();
   document.getElementById('queen-timer').textContent    = '0:00';
   document.getElementById('queen-misses').textContent   = 'Misses: 0';
-  document.getElementById('btn-queen-complete').textContent = 'DONE';
+  document.getElementById('btn-queen-complete').textContent = 'PASS';
   setStatus('');
 }
 

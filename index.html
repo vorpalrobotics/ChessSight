@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.2.99</title>
+  <title>ChessSight v0.3.1</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.2.99</span>
+      <h1>ChessSight</h1><span class="version-label">v0.3.1</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -404,7 +404,7 @@
     <div class="drill-current-stats">
       <span id="queen-timer">0:00</span>
       <span id="queen-misses">Misses: 0</span>
-      <button id="btn-queen-complete">DONE</button>
+      <button id="btn-queen-complete">PASS</button>
       <button id="btn-queen-show">SHOW</button>
     </div>
 
@@ -414,7 +414,7 @@
       <span id="queen-session-time" class="session-stat"></span>
       <span id="queen-session-acc" class="session-stat"></span>
     </div>
-    <p class="drill-rule">A black king and one random black piece (rook, bishop, or knight) are placed on the board with a white queen that doesn't yet attack either. Click every square where the queen can move to fork (attacks both pieces), skewer (checks king, exposing the piece behind it), or pin the piece to the king. The square must be reachable by the queen, not adjacent to the king, and not immediately recapturable by the black piece. Click DONE when you believe you have found all such squares — any you missed will flash.</p>
+    <p class="drill-rule">A black king and one random black piece (rook, bishop, or knight) are placed on the board with a white queen that doesn't yet attack either. Click every square where the queen can move to fork (attacks both pieces), skewer (checks king, exposing the piece behind it), or pin the piece to the king. The square must be reachable by the queen, not adjacent to the king, and not immediately recapturable by the black piece. Once all valid squares are found the puzzle auto-advances. Click PASS when you believe you have found all such squares — any you missed will flash.</p>
   </div>
 
   <!-- ── Screen 8: Knight Route drill ── -->
