@@ -254,9 +254,9 @@ export function initMemory(navigateFn) {
 
 export async function startMemory() {
   registerPause(pauseDrill, resumeDrill);
+  await runWalkthrough('memory', buildWalkthrough('memory'));
   await loadSprite();
   resetDrill();
-  await runWalkthrough('memory', buildWalkthrough('memory'));
   await loadNextPuzzle();
 }
 
