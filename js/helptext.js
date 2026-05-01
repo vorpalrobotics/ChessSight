@@ -223,12 +223,13 @@ export const DRILL_WALKTHROUGH = {
 
   queen: [
     {
-      text: 'Find every square the queen can move to in order to deliver a <strong>fork</strong> (attacks both the king and the other piece), <strong>pin</strong> (the piece can\'t move without exposing the king behind it), or <strong>skewer</strong> (checks the king, forcing it to move and expose the piece behind it).',
+      text: 'Find every square the queen can move to in order to deliver a <strong>fork</strong> (attacks both the king and the other piece), <strong>pin</strong> (the piece can\'t move without exposing the king behind it), or <strong>skewer</strong> (checks the king, forcing it to move and expose the piece behind it). Click each target square on the board — the puzzle auto-advances once all are found.',
       target: null,
     },
     {
-      text: 'Click each target square on the board. The puzzle auto-advances once all valid squares are found. If you think there are no solutions tap <strong>PASS</strong>.',
-      target: '#queen-board',
+      text: 'If you think there are no solutions, tap <strong>PASS</strong>.',
+      target: '#btn-queen-complete',
+      arrowAlign: 'right',
     },
   ],
 };
