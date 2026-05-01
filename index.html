@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.49</title>
+  <title>ChessSight v0.3.51</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.3.49</span>
+      <h1>ChessSight</h1><span class="version-label">v0.3.51</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -289,13 +289,17 @@
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Loose Pieces <span class="drill-info-btn" data-help="loose"><i class="fa-solid fa-circle-info"></i></span></h2>
-        <span id="loose-puzzle-num">#1</span>
         <span id="loose-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-loose-done">END DRILL</button>
       </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="loose-progress-fill"></div>
+      <span class="drill-progress-label" id="loose-progress-label"></span>
     </div>
 
     <div class="drill-board-wrap">
@@ -322,13 +326,17 @@
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Underguarded <span class="drill-info-btn" data-help="under"><i class="fa-solid fa-circle-info"></i></span></h2>
-        <span id="under-puzzle-num">#1</span>
         <span id="under-diff" class="drill-difficulty"></span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-under-done">END DRILL</button>
       </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="under-progress-fill"></div>
+      <span class="drill-progress-label" id="under-progress-label"></span>
     </div>
 
     <div class="drill-board-wrap">

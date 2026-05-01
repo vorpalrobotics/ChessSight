@@ -107,7 +107,7 @@ async function loadNextPuzzle() {
   stopTimer();
   resetUI();
   puzzleCount++;
-  document.getElementById('under-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
@@ -137,7 +137,7 @@ async function loadNextPuzzle() {
   // Skip positions with no underguarded pieces (can't be solved by clicking)
   if (currentUnderSqs.size === 0) {
     puzzleCount--;
-    document.getElementById('under-puzzle-num').textContent = `#${puzzleCount}`;
+    updateProgress();
     autoAdvanceTimer = setTimeout(loadNextPuzzle, 300);
     return;
   }
@@ -343,6 +343,31 @@ function clearAllMarks() {
   if (boardEl) boardEl.querySelectorAll('[data-under-sq]').forEach(el => el.remove());
 }
 
+function updateProgress() {
+  const fill  = document.getElementById('under-progress-fill');
+  const label = document.getElementById('under-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
+
 // --- Session stats ---
 
 function updateSessionStats() {
@@ -415,6 +440,10 @@ function resetDrill() {
   document.getElementById('under-session-time').textContent = '';
   document.getElementById('under-session-acc').textContent  = '';
   document.getElementById('under-session-stats').classList.add('hidden');
+  const fill = document.getElementById('under-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('under-progress-label');
+  if (label) label.textContent = '';
 }
 
 function resetUI() {
