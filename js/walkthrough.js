@@ -11,7 +11,7 @@ const FORCE_KEY = PREFIX + '__force__';
 
 export function runWalkthrough(drillKey, steps) {
   return new Promise(resolve => {
-    const forced = true || !!localStorage.getItem(FORCE_KEY); // DEBUG: always show
+    const forced = !!localStorage.getItem(FORCE_KEY);
     if (!forced && localStorage.getItem(PREFIX + drillKey)) { resolve(false); return; }
     showStep(drillKey, steps, 0, resolve, forced);
   });

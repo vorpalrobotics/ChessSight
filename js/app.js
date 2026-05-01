@@ -19,6 +19,7 @@ import { getAllRecords, getDisciplineGames, exportAllData, importAllData, getGoa
 import { togglePause, clearPause } from './pause.js';
 import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal } from './vimsy.js';
 import { DRILL_HELP } from './helptext.js';
+import { forceWalkthrough } from './walkthrough.js';
 
 // --- Screen management ---
 const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bbgen', 'screen-summary', 'screen-engine'];
@@ -732,8 +733,13 @@ const modalDebug = document.getElementById('modal-debug');
 
 document.getElementById('btn-debug').addEventListener('click', async () => {
   hamburgerDropdown.classList.add('hidden');
+  document.getElementById('chk-force-walkthrough').checked = !!localStorage.getItem('chesssight-wt-__force__');
   await renderDataTable();
   modalDebug.classList.remove('hidden');
+});
+
+document.getElementById('chk-force-walkthrough').addEventListener('change', e => {
+  forceWalkthrough(e.target.checked);
 });
 
 document.getElementById('btn-debug-modal-close').addEventListener('click', () => {
