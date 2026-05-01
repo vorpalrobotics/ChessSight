@@ -1316,8 +1316,8 @@ h2 .drill-info-btn {
   outline: none;
 }
 /* Hover/active: lighter blue — NOT red — so correct answers don't flash red */
-.digit-btn:hover:not(.correct):not(.incorrect),
-.digit-btn:active:not(.correct):not(.incorrect) {
+.digit-btn:hover:not(.correct):not(.incorrect):not(.idle),
+.digit-btn:active:not(.correct):not(.incorrect):not(.idle) {
   background: #1a5ca8;
   border-color: #3a80d0;
 }

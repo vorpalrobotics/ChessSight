@@ -342,6 +342,7 @@ function handleDigitClick(color, value) {
   );
   if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
 
+  btn.classList.remove('idle');
   const correct = isWhite ? answerW : answerB;
   if (value === 7 ? correct >= 7 : value === correct) {
     btn.classList.add('correct');
@@ -474,6 +475,7 @@ function resetUI() {
   document.getElementById('captures-misses').textContent = 'Misses: 0';
   document.querySelectorAll('#screen-captures .digit-btn').forEach(b => {
     b.classList.remove('correct', 'incorrect', 'flashing');
+    b.classList.add('idle');
     b.blur();
   });
   if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
