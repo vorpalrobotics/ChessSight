@@ -22,7 +22,7 @@ import { DRILL_HELP } from './helptext.js';
 import { forceWalkthrough } from './walkthrough.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bbgen', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bb', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -139,9 +139,9 @@ document.getElementById('mode-memory').addEventListener('click', () => {
   startMemory();
 });
 
-document.getElementById('mode-bbgen').addEventListener('click', () => {
-  showScreen('screen-bbgen');
-  startBBGen();
+document.getElementById('mode-bbgen').addEventListener('click', async () => {
+  showScreen('screen-bb');
+  await startBBGen();
 });
 
 document.getElementById('btn-menu').addEventListener('click', () => {

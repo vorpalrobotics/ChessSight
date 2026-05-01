@@ -232,6 +232,22 @@ export const DRILL_WALKTHROUGH = {
     },
   ],
 
+  bb: [
+    {
+      text: 'Study the position carefully, then tap the board when you\'re ready. Black will play a move — <em>usually</em> a blunder that leaves a piece hanging.',
+      target: null,
+    },
+    {
+      text: 'After Black\'s move animates, click the piece that was left undefended. This trains you to instantly spot what changed.',
+      target: null,
+    },
+    {
+      text: 'If nothing is actually free to grab after Black\'s move, tap <strong>PASS</strong> instead.',
+      target: '#btn-bb-pass',
+      arrowAlign: 'right',
+    },
+  ],
+
   hanggrab: [
     {
       text: 'A <strong>hanging piece</strong> has no defenders at all — White can capture it for free.',

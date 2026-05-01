@@ -3,6 +3,8 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL  = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const PIECE_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
@@ -59,7 +61,7 @@ export function initBBGen(navigateFn) {
   document.getElementById('bb-board').addEventListener('click', handleBoardClick);
 }
 
-export function startBBGen() {
+export async function startBBGen() {
   registerPause(pauseDrill, resumeDrill);
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount   = 0;
@@ -82,6 +84,7 @@ export function startBBGen() {
   // Warm the bank if empty (first launch or bank was drained)
   if (blunderBank.length === 0) fillBank();
 
+  await runWalkthrough('bb', buildWalkthrough('bb'));
   loadPuzzle();
 }
 
@@ -538,7 +541,7 @@ async function showSummary() {
   puzzleActive = false;
   clearInterval(timerInterval); timerInterval = null;
 
-  document.getElementById('btn-summary-again').onclick = () => navigate('screen-bbgen');
+  document.getElementById('btn-summary-again').onclick = () => navigate('screen-bb');
 
   const n = drillResults.length;
   document.getElementById('stat-count').textContent = n;
