@@ -223,6 +223,14 @@ export const DRILL_WALKTHROUGH = {
 
   memory: [
     {
+      text: '<strong>Time Limit</strong> controls how long the position is shown before the board clears. <em>Click to solve</em> keeps it visible until you tap READY.',
+      target: '#select-memory-time-limit',
+    },
+    {
+      text: '<strong>Pieces</strong> sets the minimum number of pieces per puzzle. The drill advances the level automatically as you succeed.',
+      target: '#select-memory-min-pieces',
+    },
+    {
       text: 'A position appears on the board for a few seconds — memorize it! Tap <strong>READY</strong> to move on early if you\'ve got it.',
       target: null,
     },
