@@ -55,7 +55,9 @@ function showStep(drillKey, steps, idx, resolve, forced) {
   }
 
   const { text, target, arrowAlign } = steps[idx];
-  const targetEl = target ? document.querySelector(target) : null;
+  const rawTarget = target ? document.querySelector(target) : null;
+  // Fall back to centered if target is hidden (zero dimensions)
+  const targetEl = rawTarget && rawTarget.getBoundingClientRect().width > 0 ? rawTarget : null;
 
   // ── Overlay ──────────────────────────────────────────────────────────────
   const overlay = document.createElement('div');
