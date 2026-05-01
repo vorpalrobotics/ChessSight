@@ -103,9 +103,9 @@ document.getElementById('mode-under').addEventListener('click', async () => {
 
 // document.getElementById('mode-threats') — disabled
 
-document.getElementById('mode-queen').addEventListener('click', () => {
+document.getElementById('mode-queen').addEventListener('click', async () => {
   showScreen('screen-queen');
-  startQueenAttack();
+  await startQueenAttack();
 });
 
 document.getElementById('mode-knight').addEventListener('click', async () => {
