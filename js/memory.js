@@ -2,6 +2,8 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -254,6 +256,7 @@ export async function startMemory() {
   registerPause(pauseDrill, resumeDrill);
   await loadSprite();
   resetDrill();
+  await runWalkthrough('memory', buildWalkthrough('memory'));
   await loadNextPuzzle();
 }
 

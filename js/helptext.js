@@ -221,6 +221,17 @@ export const DRILL_WALKTHROUGH = {
     },
   ],
 
+  memory: [
+    {
+      text: 'A position appears on the board for a few seconds — memorize it! Tap <strong>READY</strong> to move on early if you\'ve got it.',
+      target: null,
+    },
+    {
+      text: 'After the board clears, select a piece from the panel that appears, then tap the square to place it. Reconstruct as much as you remember.',
+      target: null,
+    },
+  ],
+
   dlm: [
     {
       text: 'The black king is fixed at D5 and the other piece spirals through all 63 squares. For each position, click every square where a queen placed there would <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> the two pieces. The queen must be safe — it can\'t be immediately captured.',

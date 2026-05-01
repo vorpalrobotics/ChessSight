@@ -134,9 +134,9 @@ document.getElementById('mode-discipline').addEventListener('click', () => {
   startDiscipline();
 });
 
-document.getElementById('mode-memory').addEventListener('click', () => {
+document.getElementById('mode-memory').addEventListener('click', async () => {
   showScreen('screen-memory');
-  startMemory();
+  await startMemory();
 });
 
 document.getElementById('mode-bbgen').addEventListener('click', async () => {
