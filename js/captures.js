@@ -353,6 +353,7 @@ function handleDigitClick(color, value) {
     misses++;
     document.getElementById('captures-misses').textContent = `Misses: ${misses}`;
   }
+  btn.blur();
 }
 
 function puzzleComplete() {

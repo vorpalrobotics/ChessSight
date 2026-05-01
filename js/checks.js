@@ -344,6 +344,7 @@ function handleDigitClick(color, value) {
     misses++;
     document.getElementById('checks-misses').textContent = `Misses: ${misses}`;
   }
+  btn.blur();
 }
 
 function puzzleComplete() {
