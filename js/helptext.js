@@ -228,8 +228,7 @@ export const DRILL_WALKTHROUGH = {
     },
     {
       text: 'If you think there are no solutions, tap <strong>PASS</strong>.',
-      target: '#btn-queen-complete',
-      arrowAlign: 'right',
+      target: null,
     },
   ],
 };
