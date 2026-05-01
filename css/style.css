@@ -1002,25 +1002,6 @@ h2 .drill-info-btn {
   pointer-events: none;
 }
 
-.hg-pass-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.5rem;
-}
-
-.hg-pass-btn {
-  padding: 0.45rem 1.4rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  background: transparent;
-  border: 1px solid var(--text-muted);
-  border-radius: 6px;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.hg-pass-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--text); }
 
 .hg-status {
   text-align: center;
@@ -1675,7 +1656,7 @@ button {
   transition: background 0.15s;
 }
 
-button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.disc-exit-btn):not(.hg-pass-btn):not(.mode-card) {
+button:hover:not(:disabled):not(.digit-btn):not(.disc-digit-btn):not(.disc-exit-btn):not(.mode-card) {
   background: var(--accent);
 }
 
