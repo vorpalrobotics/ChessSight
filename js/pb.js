@@ -12,7 +12,7 @@ import { getPersonalBest, setPersonalBest, getGoals } from './storage.js';
  * @param {number} seconds    total elapsed seconds
  */
 export async function checkAndUpdatePB(drill, positions, correct, misses, seconds) {
-  if (positions <= 0 || seconds <= 0) return false;
+  if (positions < 5 || seconds <= 0) return false;
   const total = correct + misses;
   const accuracy = total > 0 ? correct / total : 0;
   const score = accuracy * positions / seconds;
