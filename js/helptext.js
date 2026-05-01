@@ -221,6 +221,29 @@ export const DRILL_WALKTHROUGH = {
     },
   ],
 
+  discipline: [
+    {
+      text: 'Now it\'s time to put it all together. Select an engine level and piece color, then start a game.',
+      target: '#disc-skill-slider',
+    },
+    {
+      text: 'Before each move, count checks, captures, and loose pieces for each side — just like the individual drills. Then consider threats and candidate moves before moving.',
+      target: null,
+    },
+    {
+      text: 'In the first 5 moves you can tap <strong>BOOK</strong> to skip the pre-move analysis for opening theory moves.',
+      target: null,
+    },
+    {
+      text: 'Later, if the position becomes trivial — like a simple ladder mate — you can tap <strong>SKIP</strong> to bypass the analysis phases.',
+      target: null,
+    },
+    {
+      text: 'But this drill is designed to make you <strong>slow down</strong> and develop good habits that will become fast and automatic with practice.',
+      target: null,
+    },
+  ],
+
   memory: [
     {
       text: '<strong>Time Limit</strong> controls how long the position is shown before the board clears. <em>Click to solve</em> keeps it visible until you tap READY.',

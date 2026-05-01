@@ -129,9 +129,9 @@ document.getElementById('mode-dlm').addEventListener('click', () => {
   startDeLaMaza();
 });
 
-document.getElementById('mode-discipline').addEventListener('click', () => {
+document.getElementById('mode-discipline').addEventListener('click', async () => {
   showScreen('screen-discipline');
-  startDiscipline();
+  await startDiscipline();
 });
 
 document.getElementById('mode-memory').addEventListener('click', async () => {

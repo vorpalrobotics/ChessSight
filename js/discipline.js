@@ -5,6 +5,8 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { addDisciplineGame } from './storage.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { DRILL_WALKTHROUGH } from './helptext.js';
 
 const PIECES_URL  = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const MARKERS_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.svg';
@@ -203,11 +205,12 @@ export function initDiscipline(navigateFn, onWinFn) {
   buildDigitRow('disc-captures-b-digits', 'pb');
 }
 
-export function startDiscipline() {
+export async function startDiscipline() {
   cleanupDrill();
   document.getElementById('disc-game-area').classList.add('hidden');
   document.getElementById('disc-game-over').classList.add('hidden');
   document.getElementById('disc-setup').classList.remove('hidden');
+  await runWalkthrough('discipline', DRILL_WALKTHROUGH['discipline'] ?? []);
 }
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
