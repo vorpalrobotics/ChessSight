@@ -2,6 +2,8 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 
@@ -236,13 +238,13 @@ function getPositionsPerDrill() {
 
 export function initHangGrab(navigateFn) {
   navigate = navigateFn;
-  document.getElementById('btn-hg-done').addEventListener('click', showSummary);
+  document.getElementById('btn-hanggrab-done').addEventListener('click', showSummary);
   document.getElementById('btn-hg-pass').addEventListener('click', handlePass);
-  document.getElementById('btn-hg-show').addEventListener('click', handleShow);
+  document.getElementById('btn-hanggrab-show').addEventListener('click', handleShow);
   document.getElementById('hg-board').addEventListener('click', handleBoardClick);
 }
 
-export function startHangGrab() {
+export async function startHangGrab() {
   registerPause(pauseDrill, resumeDrill);
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   puzzleCount = 0;
@@ -261,6 +263,7 @@ export function startHangGrab() {
     });
   }
 
+  await runWalkthrough('hanggrab', buildWalkthrough('hanggrab'));
   loadPuzzle();
 }
 

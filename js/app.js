@@ -114,9 +114,9 @@ document.getElementById('mode-knight').addEventListener('click', async () => {
   await startKnightRoute();
 });
 
-document.getElementById('mode-hanggrab').addEventListener('click', () => {
+document.getElementById('mode-hanggrab').addEventListener('click', async () => {
   showScreen('screen-hanggrab');
-  startHangGrab();
+  await startHangGrab();
 });
 
 document.getElementById('mode-mix').addEventListener('click', () => {

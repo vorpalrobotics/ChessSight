@@ -231,6 +231,22 @@ export const DRILL_WALKTHROUGH = {
       target: null,
     },
   ],
+
+  hanggrab: [
+    {
+      text: 'A <strong>hanging piece</strong> has no defenders at all — White can capture it for free.',
+      target: null,
+    },
+    {
+      text: 'Tap every hanging Black piece you can find. The puzzle scores and advances once all are found.',
+      target: null,
+    },
+    {
+      text: 'If nothing is free to capture, tap <strong>PASS</strong> instead.',
+      target: '#btn-hg-pass',
+      arrowAlign: 'right',
+    },
+  ],
 };
 
 // Returns the full step list for a drill: drill-specific steps followed by
