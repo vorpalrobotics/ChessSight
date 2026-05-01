@@ -89,7 +89,10 @@ function showStep(drillKey, steps, idx, resolve, forced) {
   bubble.innerHTML = `
     <p class="wt-text">${text}</p>
     <div class="wt-footer">
-      <span class="wt-step">${idx + 1} / ${steps.length}</span>
+      <div class="wt-footer-left">
+        <span class="wt-step">${idx + 1} / ${steps.length}</span>
+        ${!isLast ? '<button class="wt-skip">skip all</button>' : ''}
+      </div>
       <button class="wt-btn">${isLast ? 'Got it ✓' : 'Got it →'}</button>
     </div>`;
   document.body.appendChild(bubble);
@@ -99,6 +102,10 @@ function showStep(drillKey, steps, idx, resolve, forced) {
   bubble.querySelector('.wt-btn').addEventListener('click', e => {
     e.stopPropagation();
     showStep(drillKey, steps, idx + 1, resolve, forced);
+  });
+  bubble.querySelector('.wt-skip')?.addEventListener('click', e => {
+    e.stopPropagation();
+    showStep(drillKey, steps, steps.length, resolve, forced);
   });
 }
 

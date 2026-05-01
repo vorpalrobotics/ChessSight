@@ -1141,10 +1141,26 @@ h2 .drill-info-btn {
   align-items: center;
   justify-content: space-between;
 }
+#wt-bubble .wt-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 #wt-bubble .wt-step {
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+#wt-bubble .wt-skip {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.65;
+}
+#wt-bubble .wt-skip:hover { opacity: 1; }
 #wt-bubble .wt-btn {
   font-size: 0.85rem;
   font-weight: 700;
