@@ -206,6 +206,14 @@ chkMixMultiply.addEventListener('change', () => {
   syncMixPositions();
 });
 
+// Persist "show estimated difficulty" to localStorage
+const chkShowDifficulty = document.getElementById('chk-show-difficulty');
+const SHOW_DIFFICULTY_KEY = 'chesssight-show-difficulty';
+chkShowDifficulty.checked = localStorage.getItem(SHOW_DIFFICULTY_KEY) === 'true';
+chkShowDifficulty.addEventListener('change', () => {
+  localStorage.setItem(SHOW_DIFFICULTY_KEY, chkShowDifficulty.checked);
+});
+
 // --- About modal ---
 const modalAbout = document.getElementById('modal-about');
 

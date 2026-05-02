@@ -464,6 +464,11 @@ function createDigitButtons() {
 function showDifficulty(id, score) {
   const el = document.getElementById(id);
   if (!el) return;
+  if (localStorage.getItem('chesssight-show-difficulty') !== 'true') {
+    el.textContent = '';
+    el.className = 'drill-difficulty';
+    return;
+  }
   const { text, cls } = diffLabel(score);
   el.textContent = text;
   el.className = `drill-difficulty ${cls}`;
