@@ -62,7 +62,7 @@ header h1 {
 #btn-pause,
 .drill-pause-btn {
   background: transparent;
-  border: 1px solid var(--surface2);
+  border: none;
   color: var(--text-muted);
   font-size: 1rem;
   padding: 0.35rem 0.7rem;
