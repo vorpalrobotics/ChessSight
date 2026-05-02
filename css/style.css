@@ -49,7 +49,7 @@ header h1 {
 
 #btn-menu {
   background: transparent;
-  border: 1px solid var(--surface2);
+  border: none;
   color: var(--text-muted);
   font-size: 0.85rem;
   padding: 0.4rem 0.9rem;
