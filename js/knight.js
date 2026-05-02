@@ -570,7 +570,7 @@ function updateProgress() {
     text = `${n} / ∞`;
   } else {
     pct = Math.min(Math.round(n / limit * 100), 100);
-    text = `${n} / ${limit}`;
+    text = pct >= 100 ? `${n}` : `${n} / ${limit}`;
   }
   fill.style.width = `${pct}%`;
   label.textContent = text;
