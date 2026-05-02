@@ -44,8 +44,6 @@ header h1 {
   font-size: 0.62rem;
   color: var(--text-muted);
   font-family: monospace;
-  align-self: flex-end;
-  padding-bottom: 0.2rem;
   letter-spacing: 0.03em;
 }
 
