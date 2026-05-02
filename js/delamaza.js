@@ -247,7 +247,7 @@ function updateProgress() {
   const n = spiralIndex + 1;
   const pct = Math.min(Math.round(n / 63 * 100), 100);
   fill.style.width = `${pct}%`;
-  label.textContent = `${n} / 63`;
+  label.textContent = pct >= 100 ? `${n}` : `${n} / 63`;
   label.style.left  = `calc(${pct}% + 4px)`;
   label.style.right = 'auto';
 }
