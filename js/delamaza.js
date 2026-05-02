@@ -247,14 +247,9 @@ function updateProgress() {
   const n = spiralIndex + 1;
   const pct = Math.min(Math.round(n / 63 * 100), 100);
   fill.style.width = `${pct}%`;
-  label.textContent = `${n}`;
-  if (pct > 88) {
-    label.style.left  = 'auto';
-    label.style.right = '2px';
-  } else {
-    label.style.left  = `calc(${pct}% + 4px)`;
-    label.style.right = 'auto';
-  }
+  label.textContent = `${n} / 63`;
+  label.style.left  = `calc(${pct}% + 4px)`;
+  label.style.right = 'auto';
 }
 
 function stopSession() {

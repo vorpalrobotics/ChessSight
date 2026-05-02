@@ -465,17 +465,12 @@ function updateProgress() {
     text = `${n} / ∞`;
   } else {
     pct = Math.min(Math.round(n / limit * 100), 100);
-    text = `${n}`;
+    text = `${n} / ${limit}`;
   }
   fill.style.width = `${pct}%`;
   label.textContent = text;
-  if (pct > 88) {
-    label.style.left  = 'auto';
-    label.style.right = '2px';
-  } else {
-    label.style.left  = `calc(${pct}% + 4px)`;
-    label.style.right = 'auto';
-  }
+  label.style.left  = `calc(${pct}% + 4px)`;
+  label.style.right = 'auto';
 }
 
 function updateSessionStats() {
