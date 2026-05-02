@@ -179,6 +179,7 @@ export function initDeLaMaza(navigateFn, onPerfectFn) {
   document.getElementById('btn-dlm-choose').addEventListener('click', () => {
     document.getElementById('dlm-end-screen').classList.add('hidden');
     document.getElementById('dlm-drill-area').classList.add('hidden');
+    document.getElementById('dlm-progress-wrap').classList.add('hidden');
     document.getElementById('dlm-piece-select').classList.remove('hidden');
   });
   document.getElementById('btn-dlm-end-menu').addEventListener('click', () => {
@@ -195,8 +196,8 @@ export function startDeLaMaza() {
   stopSession();
   document.getElementById('dlm-end-screen').classList.add('hidden');
   document.getElementById('dlm-drill-area').classList.add('hidden');
+  document.getElementById('dlm-progress-wrap').classList.add('hidden');
   document.getElementById('dlm-piece-select').classList.remove('hidden');
-  document.getElementById('dlm-progress').textContent = '— / 63';
   document.getElementById('dlm-timer').textContent = '0:00';
   document.getElementById('dlm-misses').textContent = 'Misses: 0';
 }
@@ -208,6 +209,7 @@ async function choosePiece(type) {
   document.getElementById('dlm-piece-select').classList.add('hidden');
   document.getElementById('dlm-end-screen').classList.add('hidden');
   document.getElementById('dlm-drill-area').classList.remove('hidden');
+  document.getElementById('dlm-progress-wrap').classList.remove('hidden');
   await runWalkthrough('dlm', buildWalkthrough('dlm'));
   beginSession();
 }
@@ -220,6 +222,7 @@ function beginSession() {
   sessionMisses = 0;
   document.getElementById('dlm-end-screen').classList.add('hidden');
   document.getElementById('dlm-drill-area').classList.remove('hidden');
+  document.getElementById('dlm-progress-wrap').classList.remove('hidden');
   document.getElementById('dlm-misses').textContent = 'Misses: 0';
   sessionStart = Date.now();
   sessionTimerInterval = setInterval(updateTimerDisplay, 1000);
@@ -235,6 +238,23 @@ function pauseSession() {
 function resumeSession() {
   sessionStart += Date.now() - pauseStart;
   sessionTimerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+function updateProgress() {
+  const fill  = document.getElementById('dlm-progress-fill');
+  const label = document.getElementById('dlm-progress-label');
+  if (!fill || !label) return;
+  const n = spiralIndex + 1;
+  const pct = Math.min(Math.round(n / 63 * 100), 100);
+  fill.style.width = `${pct}%`;
+  label.textContent = `${n}`;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
 }
 
 function stopSession() {
@@ -254,7 +274,7 @@ function loadPosition() {
   puzzleActive = true;
   document.getElementById('btn-dlm-no-solution').disabled = false;
 
-  document.getElementById('dlm-progress').textContent = `${spiralIndex + 1} / 63`;
+  updateProgress();
 
   const fen = buildFen(KING_SQ, pieceSq, chosenPiece);
   if (!board) {
@@ -302,6 +322,7 @@ async function endSession() {
   if (isPB) await showPBCelebration();
 
   document.getElementById('dlm-drill-area').classList.add('hidden');
+  document.getElementById('dlm-progress-wrap').classList.add('hidden');
   document.getElementById('dlm-end-time').textContent = formatTime(elapsed);
   document.getElementById('dlm-end-per-pos').textContent = `${(elapsed / 63).toFixed(1)}s`;
   const goalEl = document.getElementById('dlm-end-time-goal');

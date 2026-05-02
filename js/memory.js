@@ -294,7 +294,7 @@ async function loadNextPuzzle() {
 
   resetUI();
   puzzleCount++;
-  document.getElementById('memory-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
   updateLevelDisplay();
 
   if (drillLevel > 6) setStatus('Loading…');
@@ -753,6 +753,31 @@ function buildPartialFen(placed) {
 
 // --- Session stats ---
 
+function updateProgress() {
+  const fill  = document.getElementById('memory-progress-fill');
+  const label = document.getElementById('memory-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
+
 function updateSessionStats() {
   const count = drillResults.length;
   if (count === 0) return;
@@ -812,6 +837,10 @@ function resetDrill() {
   document.getElementById('memory-session-time').textContent = '';
   document.getElementById('memory-session-acc').textContent  = '';
   document.getElementById('memory-session-stats').classList.add('hidden');
+  const fill = document.getElementById('memory-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('memory-progress-label');
+  if (label) label.textContent = '';
 }
 
 function resetUI() {
