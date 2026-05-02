@@ -70,6 +70,10 @@ export async function startBBGen() {
   document.getElementById('bb-session-time').textContent = '';
   document.getElementById('bb-session-acc').textContent  = '';
   document.getElementById('bb-session-stats').classList.add('hidden');
+  const fill = document.getElementById('bb-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('bb-progress-label');
+  if (label) label.textContent = '';
   document.getElementById('bb-misses').textContent = 'Misses: 0';
   document.getElementById('bb-timer').textContent  = '0.0s';
 
@@ -406,7 +410,7 @@ async function loadPuzzle() {
   setStatus('');
 
   puzzleCount++;
-  document.getElementById('bb-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
   document.getElementById('bb-timer').textContent = '0.0s';
   puzzleMisses       = 0;
   firstTryThisPuzzle = true;
@@ -598,6 +602,31 @@ function stopTimer() {
 }
 
 // ─── Session stats ────────────────────────────────────────────────────────────
+
+function updateProgress() {
+  const fill  = document.getElementById('bb-progress-fill');
+  const label = document.getElementById('bb-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
 
 function updateSessionStats() {
   const n = drillResults.length;

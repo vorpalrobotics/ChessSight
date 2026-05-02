@@ -253,6 +253,10 @@ export async function startHangGrab() {
   document.getElementById('hg-session-time').textContent = '';
   document.getElementById('hg-session-acc').textContent  = '';
   document.getElementById('hg-session-stats').classList.add('hidden');
+  const fill = document.getElementById('hg-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('hg-progress-label');
+  if (label) label.textContent = '';
   document.getElementById('hg-misses').textContent = 'Misses: 0';
 
   if (!board) {
@@ -281,7 +285,7 @@ function loadPuzzle() {
   setStatus('');
 
   puzzleCount++;
-  document.getElementById('hg-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
 
   currentPos = generatePosition();
   validTargets = computeValidTargets(currentPos);
@@ -448,6 +452,31 @@ function stopTimer() {
 }
 
 // ─── Session stats ────────────────────────────────────────────────────────────
+
+function updateProgress() {
+  const fill  = document.getElementById('hg-progress-fill');
+  const label = document.getElementById('hg-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
 
 function updateSessionStats() {
   const n = drillResults.length;

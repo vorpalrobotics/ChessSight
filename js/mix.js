@@ -131,6 +131,10 @@ function startSession() {
   document.getElementById('mix-session-time').textContent = '';
   document.getElementById('mix-session-acc').textContent  = '';
   document.getElementById('mix-misses').textContent = 'Misses: 0';
+  const fill = document.getElementById('mix-progress-fill');
+  if (fill) fill.style.width = '0%';
+  const label = document.getElementById('mix-progress-label');
+  if (label) label.textContent = '';
 
   document.getElementById('mix-select-panel').classList.add('hidden');
   document.getElementById('mix-puzzle-panel').classList.remove('hidden');
@@ -163,7 +167,7 @@ async function loadNextPuzzle() {
   correctB = false;
 
   puzzleCount++;
-  document.getElementById('mix-puzzle-num').textContent = `#${puzzleCount}`;
+  updateProgress();
 
   // Randomly pick from selected drills
   currentDrill = selectedDrills[Math.floor(Math.random() * selectedDrills.length)];
@@ -447,6 +451,31 @@ function endSession() {
 }
 
 // ─── Session stats (shown in drill-top during session) ────────────────────────
+
+function updateProgress() {
+  const fill  = document.getElementById('mix-progress-fill');
+  const label = document.getElementById('mix-progress-label');
+  if (!fill || !label) return;
+  const limit = getPositionsPerDrill();
+  const n = puzzleCount;
+  let pct, text;
+  if (limit === null) {
+    pct = 10;
+    text = `${n} / ∞`;
+  } else {
+    pct = Math.min(Math.round(n / limit * 100), 100);
+    text = `${n}`;
+  }
+  fill.style.width = `${pct}%`;
+  label.textContent = text;
+  if (pct > 88) {
+    label.style.left  = 'auto';
+    label.style.right = '2px';
+  } else {
+    label.style.left  = `calc(${pct}% + 4px)`;
+    label.style.right = 'auto';
+  }
+}
 
 function updateSessionStats() {
   const n = drillResults.length;

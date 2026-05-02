@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.53</title>
+  <title>ChessSight v0.3.55</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -16,7 +16,7 @@
   <header>
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
-      <h1>ChessSight</h1><span class="version-label">v0.3.53</span>
+      <h1>ChessSight</h1><span class="version-label">v0.3.55</span>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
       <button id="btn-menu" class="hidden">&#8592; Back</button>
@@ -479,12 +479,16 @@
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Hang Grab <span class="drill-info-btn" data-help="hanggrab"><i class="fa-solid fa-circle-info"></i></span></h2>
-        <span id="hg-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-hanggrab-done">END DRILL</button>
       </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="hg-progress-fill"></div>
+      <span class="drill-progress-label" id="hg-progress-label"></span>
     </div>
 
     <div class="drill-board-wrap">
@@ -536,7 +540,6 @@
       <div class="drill-top">
         <div class="drill-top-left">
           <span id="mix-drill-label" class="mix-drill-label">MIX</span>
-          <span id="mix-puzzle-num">#1</span>
           <span class="drill-info-btn" data-help="mix"><i class="fa-solid fa-circle-info"></i></span>
           <span id="mix-diff" class="drill-difficulty"></span>
         </div>
@@ -546,6 +549,11 @@
           <button class="drill-pause-btn">⏸</button>
           <button id="btn-mix-done">END DRILL</button>
         </div>
+      </div>
+
+      <div class="drill-progress-wrap">
+        <div class="drill-progress-fill" id="mix-progress-fill"></div>
+        <span class="drill-progress-label" id="mix-progress-label"></span>
       </div>
 
       <div class="drill-board-wrap">
@@ -1092,12 +1100,16 @@
     <div class="drill-top">
       <div class="drill-top-left">
         <h2>Blunder Buster <span class="drill-info-btn" data-help="bb"><i class="fa-solid fa-circle-info"></i></span></h2>
-        <span id="bb-puzzle-num">#1</span>
       </div>
       <div class="drill-top-right">
         <button class="drill-pause-btn">⏸</button>
         <button id="btn-bb-done">END DRILL</button>
       </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="bb-progress-fill"></div>
+      <span class="drill-progress-label" id="bb-progress-label"></span>
     </div>
 
     <div class="drill-board-wrap">
