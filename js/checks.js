@@ -43,6 +43,7 @@ let waitingForContinue = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 let puzzleQueue = [];
+let queueVersion = 0;
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
 
@@ -84,9 +85,11 @@ export async function startChecks() {
 }
 
 async function fillQueue() {
+  const myVersion = queueVersion;
   const results = await Promise.allSettled(
     Array.from({ length: 5 }, () => fetchWithDifficulty())
   );
+  if (myVersion !== queueVersion) return;
   const valid = results.filter(r => r.status === 'fulfilled').map(r => r.value);
   valid.sort((a, b) => a.difficulty - b.difficulty);
   puzzleQueue.push(...valid);
@@ -438,8 +441,7 @@ async function showSummary() {
 
 async function restartDrill() {
   navigate('screen-checks');
-  resetDrill();
-  await loadNextPuzzle();
+  await startChecks();
 }
 
 // --- UI helpers ---
@@ -471,6 +473,7 @@ function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   waitingForContinue = false;
+  queueVersion++;
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
