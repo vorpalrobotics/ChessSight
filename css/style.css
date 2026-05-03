@@ -253,6 +253,27 @@ header h1 {
 }
 
 /* ── Settings modal ── */
+.settings-done-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
+}
+
+.settings-done-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-done-btn:hover {
+  opacity: 0.85;
+}
+
 .settings-row {
   display: flex;
   align-items: center;
