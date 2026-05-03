@@ -197,7 +197,7 @@ export const DRILL_WALKTHROUGH = {
 
   under: [
     {
-      text: 'An <strong>underguarded piece</strong> has fewer defenders than attackers. Even one attacker with no defenders counts — it\'s a weakness waiting to be exploited.',
+      text: 'An <strong>underguarded piece</strong> has attackers greater than or equal to defenders. (Kings excluded.)',
       target: null,
     },
     {
@@ -208,11 +208,11 @@ export const DRILL_WALKTHROUGH = {
 
   knight: [
     {
-      text: 'A knight needs to reach the highlighted target square. Find the <strong>shortest possible route</strong> — the fewest moves to get there. There may be more than one shortest path; you just need to find one.',
+      text: 'Find a path for the White Knight to the marked target square. Find the <strong>shortest possible route</strong> — the fewest moves to get there. There may be more than one shortest path; you just need to find one.',
       target: null,
     },
     {
-      text: 'Tap each square the knight passes through, in order. Squares light up <strong>green</strong> as long as your route stays optimal. If the highlights stop, you\'ve gone longer than the shortest path.',
+      text: 'Tap each square the knight passes through, in order. Squares light up <strong>green</strong> as long as your route stays optimal. If the highlights turn yellow, you\'ve gone longer than the shortest path and will lose points.',
       target: null,
     },
     {
@@ -246,26 +246,30 @@ export const DRILL_WALKTHROUGH = {
 
   memory: [
     {
+      text: 'You will be shown an position and asked to memorize it. Chess memory is a key skill.',
+      target: null,
+    },
+    {
       text: '<strong>Time Limit</strong> controls how long the position is shown before the board clears. <em>Click to solve</em> keeps it visible until you tap READY.',
       target: '#select-memory-time-limit',
     },
     {
-      text: '<strong>Pieces</strong> sets the minimum number of pieces per puzzle. The drill advances the level automatically as you succeed.',
+      text: '<strong>Pieces</strong> sets the minimum number of pieces per puzzle. The drill advances the number of pieces automatically as you succeed.',
       target: '#select-memory-min-pieces',
     },
     {
-      text: 'A position appears on the board for a few seconds — memorize it! Tap <strong>READY</strong> to move on early if you\'ve got it.',
+      text: 'Tap <strong>READY</strong> to move on early if you\'ve got it.',
       target: null,
     },
     {
-      text: 'After the board clears, select a piece from the panel that appears, then tap the square to place it. Reconstruct as much as you remember.',
+      text: 'After the board clears, select a piece from the panel that appears, then tap the square to place it (you can also drag and drop pieces if you prefer). Reconstruct as much as you remember.',
       target: null,
     },
   ],
 
   dlm: [
     {
-      text: 'The black king is fixed at D5 and the other piece spirals through all 63 squares. For each position, click every square where a queen placed there would <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> the two pieces. The queen must be safe — it can\'t be immediately captured.',
+      text: 'The black king is fixed at D5 and the other piece spirals through all 63 squares. For each position, click every square where a Queen would <strong>fork</strong>, <strong>pin</strong>, or <strong>skewer</strong> the two pieces. The Queen must be safe — it can\'t be immediately captured.',
       target: null,
     },
     {
@@ -277,7 +281,7 @@ export const DRILL_WALKTHROUGH = {
 
   queen: [
     {
-      text: 'Find every square the queen can move to in order to deliver a <strong>fork</strong> (attacks both the king and the other piece), <strong>pin</strong> (the piece can\'t move without exposing the king behind it), or <strong>skewer</strong> (checks the king, forcing it to move and expose the piece behind it). Click each target square on the board — the puzzle auto-advances once all are found.',
+      text: 'Find every square where a Queen would deliver a <strong>fork</strong> (attacks both the king and the other piece), <strong>pin</strong> (the piece can\'t move without exposing the king behind it), or <strong>skewer</strong> (checks the king, forcing it to move and expose the piece behind it). Click each target square on the board — the puzzle auto-advances once all are found.',
       target: null,
     },
     {
