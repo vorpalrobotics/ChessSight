@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.88</title>
+  <title>ChessSight v0.3.89</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -17,7 +17,7 @@
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;">
-        <h1>ChessSight</h1><span class="version-label">v0.3.88</span>
+        <h1>ChessSight</h1><span class="version-label">v0.3.89</span>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -1104,8 +1104,8 @@
       <button class="modal-close" id="btn-debug-modal-close">&times;</button>
       <h2>Saved Drill Data</h2>
       <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;font-size:0.9rem;">
-        <input type="checkbox" id="chk-force-walkthrough">
-        Force walkthroughs (always show, don't mark as seen)
+        Walkthrough Reset:
+        <button id="btn-reset-walkthroughs" style="font-size:0.8rem;padding:0.2rem 0.7rem;">RESET</button>
       </label>
       <div id="data-table-wrap"></div>
     </div>
