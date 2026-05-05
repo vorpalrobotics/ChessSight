@@ -919,6 +919,18 @@ h2 .drill-info-btn {
   opacity: 0.9;
 }
 
+/* Last-move arrow for Pawn Push drill — neutral gray, thinner */
+.cm-chessboard .arrow-last-move .arrow-head {
+  fill: #666;
+  fill-rule: nonzero;
+}
+.cm-chessboard .arrow-last-move .arrow-line {
+  stroke: #666;
+  stroke-linecap: round;
+  stroke-width: 3px !important;
+  opacity: 0.6;
+}
+
 /* Review best-move arrow — thicker green, semi-transparent */
 .cm-chessboard .arrow-review-best {
   opacity: 0.7;

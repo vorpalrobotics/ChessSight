@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.89</title>
+  <title>ChessSight v0.3.91</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -17,7 +17,7 @@
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;">
-        <h1>ChessSight</h1><span class="version-label">v0.3.89</span>
+        <h1>ChessSight</h1><span class="version-label">v0.3.91</span>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -124,6 +124,12 @@
         <span class="mode-icon">⚔</span>
         <span class="mode-name">Captures</span>
         <span class="mode-desc">Count capturing moves for each side</span>
+      </button>
+      <button class="mode-card" id="mode-pawns">
+        <span class="drill-info-btn" data-help="pawns"><i class="fa-solid fa-circle-info"></i></span>
+        <span class="mode-icon">♙</span>
+        <span class="mode-name">Pawn Push</span>
+        <span class="mode-desc">Count pawn moves for each side</span>
       </button>
       <button class="mode-card" id="mode-loose">
         <span class="drill-info-btn" data-help="loose"><i class="fa-solid fa-circle-info"></i></span>
@@ -290,6 +296,54 @@
       <span id="captures-session-acc" class="session-stat"></span>
     </div>
     <p class="drill-rule">Count all moves that take an enemy piece, including en passant. Pawn promotions by capture to the same square count as one capture — the promotion piece choice does not matter.</p>
+  </div>
+
+  <!-- ── Screen 3b: Pawn Push drill ── -->
+  <div id="screen-pawns" class="screen hidden">
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <h2>Pawn Push <span class="drill-info-btn" data-help="pawns"><i class="fa-solid fa-circle-info"></i></span></h2>
+        <span id="pawns-diff" class="drill-difficulty"></span>
+      </div>
+      <div class="drill-top-right">
+        <button class="drill-pause-btn">⏸</button>
+        <button id="btn-pawns-done">END DRILL</button>
+      </div>
+    </div>
+
+    <div class="drill-progress-wrap">
+      <div class="drill-progress-fill" id="pawns-progress-fill"></div>
+      <span class="drill-progress-label" id="pawns-progress-label"></span>
+    </div>
+
+    <div class="drill-board-wrap">
+      <div id="pawns-board"></div>
+    </div>
+
+    <div class="drill-answer-panel">
+      <div class="answer-row">
+        <span class="answer-label">W</span>
+        <div class="digit-buttons" id="pawns-digits-white"></div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B</span>
+        <div class="digit-buttons" id="pawns-digits-black"></div>
+      </div>
+    </div>
+
+    <div class="drill-current-stats">
+      <span id="pawns-timer">0:00</span>
+      <span id="pawns-misses">Misses: 0</span>
+      <button id="btn-pawns-show">SHOW</button>
+    </div>
+
+    <div id="pawns-status"></div>
+    <div id="pawns-session-stats" class="drill-session-stats hidden">
+      <span class="session-label">Session:</span>
+      <span id="pawns-session-time" class="session-stat"></span>
+      <span id="pawns-session-acc" class="session-stat"></span>
+    </div>
+    <p class="drill-rule">Count all legal pawn moves for each side: single pushes, double pushes from the starting rank, and pawn captures (including en passant). The gray arrow shows the last move played; if a pawn double-push just occurred, en passant may be possible.</p>
   </div>
 
   <!-- ── Screen 4: Loose Pieces drill ── -->

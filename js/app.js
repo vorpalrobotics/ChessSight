@@ -4,6 +4,7 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { Engine } from './engine.js';
 import { initChecks, startChecks } from './checks.js';
 import { initCaptures, startCaptures } from './captures.js';
+import { initPawns, startPawns } from './pawns.js';
 import { initLoose, startLoose } from './loose.js';
 import { initUnder, startUnder } from './under.js';
 // import { initThreats, startThreats } from './threats.js';  // disabled — drill needs rethink
@@ -21,7 +22,7 @@ import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal }
 import { DRILL_HELP } from './helptext.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bb', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-pawns', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bb', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -89,6 +90,11 @@ document.getElementById('mode-checks').addEventListener('click', async () => {
 document.getElementById('mode-captures').addEventListener('click', async () => {
   showScreen('screen-captures');
   await startCaptures();
+});
+
+document.getElementById('mode-pawns').addEventListener('click', async () => {
+  showScreen('screen-pawns');
+  await startPawns();
 });
 
 document.getElementById('mode-loose').addEventListener('click', async () => {
@@ -1162,6 +1168,7 @@ export async function startEngineMode() {
 // --- Boot ---
 initChecks(showScreen);
 initCaptures(showScreen);
+initPawns(showScreen);
 initLoose(showScreen);
 initUnder(showScreen);
 // initThreats(showScreen);  // disabled
