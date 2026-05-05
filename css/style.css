@@ -754,7 +754,7 @@ h2 .drill-info-btn {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-discipline, #screen-dlm, #screen-mix, #screen-bb {
+#screen-checks, #screen-captures, #screen-pawns, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-discipline, #screen-dlm, #screen-mix, #screen-bb {
   display: flex;
   flex-direction: column;
   align-items: center;
