@@ -143,7 +143,9 @@ async function loadNextPuzzle() {
 async function fetchValidFen() {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      return await fetchLichessPuzzle();
+      const result = await fetchLichessPuzzle();
+      if (hasPawns(result.fen)) return result;
+      console.log('Skipping pawnless position');
     } catch (err) {
       console.warn('Lichess unavailable, using fallback:', err.message);
       break;
@@ -151,6 +153,10 @@ async function fetchValidFen() {
   }
   const fen = FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)];
   return { fen, puzzleId: '', lastMove: null };
+}
+
+function hasPawns(fen) {
+  return /[pP]/.test(fen.split(' ')[0]);
 }
 
 async function fetchLichessPuzzle() {
