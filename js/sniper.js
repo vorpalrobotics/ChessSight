@@ -21,19 +21,18 @@ function sqColor(sq) { return (fileOf(sq) + rankOf(sq)) % 2; }
 
 const BISHOP_DIRS = [[1,1],[1,-1],[-1,1],[-1,-1]];
 
-// Returns squares of black pieces a bishop at bsq can capture, with diagonal
-// distance >= minDist (default 2 — no adjacent captures in this drill).
-function bishopCaptures(bsq, occupied, blackSqs, minDist = 2) {
+// Returns squares of black pieces a bishop at bsq can capture along a clear diagonal.
+function bishopCaptures(bsq, occupied, blackSqs) {
   const targets = [];
   for (const [df, dr] of BISHOP_DIRS) {
-    let f = fileOf(bsq) + df, r = rankOf(bsq) + dr, dist = 1;
+    let f = fileOf(bsq) + df, r = rankOf(bsq) + dr;
     while (f >= 0 && f < 8 && r >= 0 && r < 8) {
       const sq = sqName(f, r);
       if (occupied.has(sq)) {
-        if (blackSqs.has(sq) && dist >= minDist) targets.push(sq);
+        if (blackSqs.has(sq)) targets.push(sq);
         break;
       }
-      f += df; r += dr; dist++;
+      f += df; r += dr;
     }
   }
   return targets;
@@ -201,10 +200,30 @@ const BANK_SIZE = 10;
 const PASS_RATE = 0.15;
 let sniperBank = []; // { pos, score }[]
 
-// Score = average diagonal shot distance across all (bishop → target) pairs.
-// Small jitter breaks ties and adds variety.
+// Multiplier < 1.0 for unrealistic piece counts (≥2 queens, ≥3 of a minor/major, >8 pawns).
+function anomalyPenalty(pieces) {
+  const wCount = {}, bCount = {};
+  for (const [, p] of Object.entries(pieces)) {
+    const isWhite = p === p.toUpperCase();
+    const type = p.toLowerCase();
+    if (isWhite) wCount[type] = (wCount[type] || 0) + 1;
+    else         bCount[type] = (bCount[type] || 0) + 1;
+  }
+  let m = 1.0;
+  for (const c of [wCount, bCount]) {
+    if ((c.q || 0) >= 2) m *= 0.2;
+    if ((c.b || 0) >= 3) m *= 0.4;
+    if ((c.n || 0) >= 3) m *= 0.4;
+    if ((c.r || 0) >= 3) m *= 0.4;
+    if ((c.p || 0) >  8) m *= 0.1;
+  }
+  return m;
+}
+
+// Score = average diagonal shot distance across all (bishop → target) pairs,
+// penalised for anomalous piece counts. Small jitter breaks ties and adds variety.
 function scorePosition(pos) {
-  const { bishops, targets, occupied, blackSqs } = pos;
+  const { bishops, targets, occupied, blackSqs, pieces } = pos;
   if (targets.size === 0) return 0;
   let total = 0, count = 0;
   for (const bsq of bishops) {
@@ -213,7 +232,8 @@ function scorePosition(pos) {
       count++;
     }
   }
-  return count > 0 ? total / count + Math.random() * 0.4 : 0;
+  const avgDist = count > 0 ? total / count : 0;
+  return avgDist * anomalyPenalty(pieces) + Math.random() * 0.4;
 }
 
 // Generate one scored non-PASS position, or null if failed.
