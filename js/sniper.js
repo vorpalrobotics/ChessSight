@@ -21,21 +21,33 @@ function sqColor(sq) { return (fileOf(sq) + rankOf(sq)) % 2; }
 
 const BISHOP_DIRS = [[1,1],[1,-1],[-1,1],[-1,-1]];
 
-// Returns squares of black pieces reachable by a bishop at bsq (path unblocked)
-function bishopCaptures(bsq, occupied, blackSqs) {
+// Returns squares of black pieces a bishop at bsq can capture, with diagonal
+// distance >= minDist (default 2 — no adjacent captures in this drill).
+function bishopCaptures(bsq, occupied, blackSqs, minDist = 2) {
   const targets = [];
   for (const [df, dr] of BISHOP_DIRS) {
-    let f = fileOf(bsq) + df, r = rankOf(bsq) + dr;
+    let f = fileOf(bsq) + df, r = rankOf(bsq) + dr, dist = 1;
     while (f >= 0 && f < 8 && r >= 0 && r < 8) {
       const sq = sqName(f, r);
       if (occupied.has(sq)) {
-        if (blackSqs.has(sq)) targets.push(sq);
+        if (blackSqs.has(sq) && dist >= minDist) targets.push(sq);
         break;
       }
-      f += df; r += dr;
+      f += df; r += dr; dist++;
     }
   }
   return targets;
+}
+
+// Returns true if every diagonal from bsq is either off-board or immediately
+// blocked by a white piece — bishop can never escape its square.
+function isBishopTrapped(bsq, whiteSqs) {
+  for (const [df, dr] of BISHOP_DIRS) {
+    const f = fileOf(bsq) + df, r = rankOf(bsq) + dr;
+    if (f < 0 || f > 7 || r < 0 || r > 7) continue; // off-board edge
+    if (!whiteSqs.has(sqName(f, r))) return false;    // empty or black piece
+  }
+  return true;
 }
 
 // ─── Random helpers ────────────────────────────────────────────────────────────
@@ -43,7 +55,6 @@ function bishopCaptures(bsq, occupied, blackSqs) {
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randInt(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
 
-// Box-Muller normal sample
 function randNormal(mean, std) {
   const u = Math.random() || 1e-10, v = Math.random();
   return mean + std * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
@@ -53,8 +64,6 @@ function randNormal(mean, std) {
 
 const CORNERS = [{f:0,r:0}, {f:7,r:0}, {f:0,r:7}, {f:7,r:7}];
 
-// Pick a bishop square: Gaussian distance from a random corner (σ=1.5).
-// avoidParity: if 0 or 1, reject squares of that color (for opposite-bishop constraint).
 function pickBishopSquare(occupied, avoidParity = -1) {
   for (let attempt = 0; attempt < 40; attempt++) {
     const corner = pick(CORNERS);
@@ -70,7 +79,7 @@ function pickBishopSquare(occupied, avoidParity = -1) {
   return null;
 }
 
-// Weighted pick preferring squares near the given center squares (σ≈1.5 squares)
+// Weighted pick: prefers squares near the given center squares (σ≈1.5)
 function pickNear(avail, centers) {
   if (!avail.length) return null;
   if (!centers.length) return pick(avail);
@@ -79,7 +88,7 @@ function pickNear(avail, centers) {
       const df = fileOf(sq) - fileOf(c), dr = rankOf(sq) - rankOf(c);
       return Math.sqrt(df * df + dr * dr);
     }));
-    return Math.exp(-minDist * minDist / 4.5); // σ=1.5
+    return Math.exp(-minDist * minDist / 4.5);
   });
   const total = scores.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -92,13 +101,14 @@ function pickNear(avail, centers) {
 
 // ─── Position generation ───────────────────────────────────────────────────────
 
-const BLACK_POOL  = ['p','p','p','p','n','n','b','r','q'];
+const BLACK_POOL   = ['p','p','p','p','n','n','b','r','q'];
 const W_NOISE_POOL = ['N','R','Q'];
 
 function generatePosition() {
-  for (let attempt = 0; attempt < 60; attempt++) {
-    const occupied = new Set();
-    const pieces   = {};   // sq → piece char (uppercase=white, lowercase=black)
+  for (let attempt = 0; attempt < 80; attempt++) {
+    const occupied  = new Set();
+    const whiteSqs  = new Set(); // white pieces only (for trapped-bishop check)
+    const pieces    = {};
 
     // 1. Place 1 bishop (65%) or 2 on opposite color squares (35%)
     const numBishops = Math.random() < 0.35 ? 2 : 1;
@@ -107,14 +117,14 @@ function generatePosition() {
     const b1 = pickBishopSquare(occupied);
     if (!b1) continue;
     bishops.push(b1);
-    occupied.add(b1);
+    occupied.add(b1); whiteSqs.add(b1);
     pieces[b1] = 'B';
 
     if (numBishops === 2) {
-      const b2 = pickBishopSquare(occupied, sqColor(b1)); // force opposite parity
+      const b2 = pickBishopSquare(occupied, sqColor(b1));
       if (b2) {
         bishops.push(b2);
-        occupied.add(b2);
+        occupied.add(b2); whiteSqs.add(b2);
         pieces[b2] = 'B';
       }
     }
@@ -125,22 +135,24 @@ function generatePosition() {
       const avail = ALL_SQS.filter(sq => rankOf(sq) >= 1 && rankOf(sq) <= 5 && !occupied.has(sq));
       const sq = pickNear(avail, bishops);
       if (!sq) break;
-      occupied.add(sq);
+      occupied.add(sq); whiteSqs.add(sq);
       pieces[sq] = 'P';
     }
 
-    // 3. White noise pieces (0–2), not bishops or pawns
+    // 3. White noise pieces (0–2)
     const numWN = randInt(0, 2);
     for (let i = 0; i < numWN; i++) {
       const avail = ALL_SQS.filter(sq => !occupied.has(sq));
       if (!avail.length) break;
       const sq = pick(avail);
-      occupied.add(sq);
+      occupied.add(sq); whiteSqs.add(sq);
       pieces[sq] = pick(W_NOISE_POOL);
     }
 
-    // 4. Black pieces (targets + visual noise)
-    //    Pawns on ranks 3–7 (index 2–6); other pieces anywhere
+    // Reject if any bishop is completely trapped by white pieces
+    if (bishops.some(bsq => isBishopTrapped(bsq, whiteSqs))) continue;
+
+    // 4. Black pieces — pawns on ranks 3–7 (index 2–6), others anywhere
     const numBlack = randInt(4, 9);
     const blackSqs = new Set();
     for (let i = 0; i < numBlack; i++) {
@@ -155,17 +167,17 @@ function generatePosition() {
       pieces[sq] = type;
     }
 
-    if (blackSqs.size < 3) continue; // need enough visual noise
+    if (blackSqs.size < 3) continue;
 
-    // 5. Compute sniper targets
+    // 5. Compute targets (minimum shot distance = 2)
     const targets = new Set();
     for (const bsq of bishops)
       for (const tsq of bishopCaptures(bsq, occupied, blackSqs))
         targets.add(tsq);
 
-    return { bishops, pieces, blackSqs, targets, occupied };
+    return { bishops, pieces, blackSqs, targets, occupied, whiteSqs };
   }
-  return null; // shouldn't happen
+  return null;
 }
 
 function buildFen({ pieces }) {
@@ -181,6 +193,95 @@ function buildFen({ pieces }) {
     rows.push(row);
   }
   return rows.join('/') + ' w - - 0 1';
+}
+
+// ─── Scoring & bank management ────────────────────────────────────────────────
+
+const BANK_SIZE = 10;
+const PASS_RATE = 0.15;
+let sniperBank = []; // { pos, score }[]
+
+// Score = average diagonal shot distance across all (bishop → target) pairs.
+// Small jitter breaks ties and adds variety.
+function scorePosition(pos) {
+  const { bishops, targets, occupied, blackSqs } = pos;
+  if (targets.size === 0) return 0;
+  let total = 0, count = 0;
+  for (const bsq of bishops) {
+    for (const tsq of bishopCaptures(bsq, occupied, blackSqs)) {
+      total += Math.abs(fileOf(bsq) - fileOf(tsq));
+      count++;
+    }
+  }
+  return count > 0 ? total / count + Math.random() * 0.4 : 0;
+}
+
+// Generate one scored non-PASS position, or null if failed.
+function generateScoredPosition() {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const pos = generatePosition();
+    if (!pos || pos.targets.size === 0) continue;
+    return { pos, score: scorePosition(pos) };
+  }
+  return null;
+}
+
+// Generate a PASS position (no bishop targets within minimum distance).
+function generatePassPosition() {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const pos = generatePosition();
+    if (pos && pos.targets.size === 0) return pos;
+  }
+  return null;
+}
+
+function fillBank() {
+  let attempts = 0;
+  while (sniperBank.length < BANK_SIZE && attempts < 200) {
+    attempts++;
+    const entry = generateScoredPosition();
+    if (entry) sniperBank.push(entry);
+  }
+}
+
+// Pick the best position from the bank, drop the worst, top off to BANK_SIZE.
+function pickBestFromBank() {
+  if (!sniperBank.length) fillBank();
+
+  // Find and remove best
+  let bestIdx = 0;
+  for (let i = 1; i < sniperBank.length; i++)
+    if (sniperBank[i].score > sniperBank[bestIdx].score) bestIdx = i;
+  const best = sniperBank[bestIdx].pos;
+  sniperBank.splice(bestIdx, 1);
+
+  // Remove worst from the remaining entries
+  if (sniperBank.length > 0) {
+    let worstIdx = 0;
+    for (let i = 1; i < sniperBank.length; i++)
+      if (sniperBank[i].score < sniperBank[worstIdx].score) worstIdx = i;
+    sniperBank.splice(worstIdx, 1);
+  }
+
+  // Top off to BANK_SIZE (synchronous generation is fast — no Lichess calls)
+  let topping = 0;
+  while (sniperBank.length < BANK_SIZE && topping < 40) {
+    topping++;
+    const entry = generateScoredPosition();
+    if (entry) sniperBank.push(entry);
+  }
+
+  return best;
+}
+
+function getNextPuzzle() {
+  if (Math.random() < PASS_RATE) {
+    const passPos = generatePassPosition();
+    if (passPos) return passPos;
+    // fall through to bank if PASS generation fails
+  }
+  if (!sniperBank.length) fillBank();
+  return pickBestFromBank();
 }
 
 // ─── Module state ─────────────────────────────────────────────────────────────
@@ -233,6 +334,9 @@ export async function startSniper() {
     });
   }
 
+  // Warm the bank if cold
+  if (sniperBank.length < BANK_SIZE) fillBank();
+
   await runWalkthrough('sniper', buildWalkthrough('sniper'));
   loadPuzzle();
 }
@@ -252,10 +356,10 @@ function loadPuzzle() {
   puzzleCount++;
   updateProgress();
 
-  currentPos    = generatePosition() ?? generatePosition(); // fallback retry
-  foundSqs      = new Set();
-  puzzleMisses  = 0;
-  firstTry      = true;
+  currentPos   = getNextPuzzle() ?? generatePosition();
+  foundSqs     = new Set();
+  puzzleMisses = 0;
+  firstTry     = true;
 
   board.setPosition(buildFen(currentPos), false);
   startTimer();
@@ -265,13 +369,7 @@ function loadPuzzle() {
 function handleBoardClick(e) {
   if (!puzzleActive) return;
   const sq = sqFromClick(e);
-  if (!sq) return;
-
-  // Ignore white pieces
-  if (!currentPos.blackSqs.has(sq)) return;
-
-  // Ignore already-found squares
-  if (foundSqs.has(sq)) return;
+  if (!sq || !currentPos.blackSqs.has(sq) || foundSqs.has(sq)) return;
 
   if (currentPos.targets.has(sq)) {
     drawSqOverlay(sq, 'sn-sq-correct');
