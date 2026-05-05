@@ -21,6 +21,15 @@ export const DRILL_HELP = {
 <p class=helpText>Strong players always know how many captures are on the board before deciding on a move. This drill builds that automatic scanning habit.</p>`,
   },
 
+  pawns: {
+    title: 'Pawn Push Drill',
+    body: `<p class=helpText>A position appears and you count every legal pawn move available for both White and Black: single pushes, double pushes from the starting rank, and diagonal captures (including en passant when available).</p>
+<p class=helpText>Enter your counts using the number buttons for White and Black. The puzzle scores automatically once both are correct.</p>
+<p class=helpText>A faint gray arrow shows the last move played in the game. If that move was a pawn advancing two squares, en passant may be possible — count it if so.</p>
+<p class=helpText>Pinned pawns cannot move, so don't count them. Promotions from the same square count as a single pawn move regardless of which piece is chosen.</p>
+<p class=helpText>Counting pawn mobility is a core positional skill. Passed pawns, pawn breaks, and pawn chains are easier to evaluate once you instinctively know how many pawn moves each side has.</p>`,
+  },
+
   loose: {
     title: 'Loose Pieces Drill',
     body: `<p class=helpText>A position appears and you must click every <em>loose</em> piece on the board for both White and Black. Once all loose pieces are clicked, the puzzle is scored and auto-advances.</p>
@@ -181,6 +190,21 @@ export const DRILL_WALKTHROUGH = {
     {
       text: 'Tap a number to enter White\'s capture count as well as Black\'s. The puzzle scores automatically once both counts are entered.',
       target: '#screen-captures .drill-answer-panel',
+    },
+  ],
+
+  pawns: [
+    {
+      text: 'Count every legal pawn move for <strong>both White and Black</strong>: single pushes, double pushes from the starting rank, and pawn captures including en passant.',
+      target: null,
+    },
+    {
+      text: 'A faint gray arrow shows the last move played. If it was a pawn double-push, en passant might be possible — include it in your count if so.',
+      target: null,
+    },
+    {
+      text: 'Tap a number for White\'s pawn move count and then Black\'s. The puzzle scores automatically once both are correct.',
+      target: '#screen-pawns .drill-answer-panel',
     },
   ],
 

@@ -5,6 +5,8 @@ import { upsertDrillDay } from './storage.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
+import { runWalkthrough } from './walkthrough.js';
+import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL    = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
 const ARROWS_SVG_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/arrows/arrows.svg';
@@ -62,6 +64,7 @@ export async function startPawns() {
   await fillQueue();
   await loadNextPuzzle();
   stopTimer();
+  await runWalkthrough('pawns', buildWalkthrough('pawns'));
   seconds = 0;
   document.getElementById('pawns-timer').textContent = '0:00';
   startTimer();
