@@ -26,7 +26,7 @@ export const DRILL_HELP = {
     body: `<p class=helpText>A position appears and you count every legal pawn move available for both White and Black: single pushes, double pushes from the starting rank, and diagonal captures (including en passant when available).</p>
 <p class=helpText>Enter your counts using the number buttons for White and Black. The puzzle scores automatically once both are correct.</p>
 <p class=helpText>A faint gray arrow shows the last move played in the game. If that move was a pawn advancing two squares, en passant may be possible — count it if so.</p>
-<p class=helpText>Pinned pawns cannot move, so don't count them. Promotions from the same square count as a single pawn move regardless of which piece is chosen.</p>
+<p class=helpText>Pinned pawns cannot move, so don't count them. When a pawn promotes, all four promotion choices (queen, rook, bishop, knight) from the same destination square count as <em>one</em> move — only the destination square matters, not the piece chosen. However, if a pawn can reach the back rank two ways — by pushing straight and by capturing diagonally — those count as two separate moves since they land on different squares.</p>
 <p class=helpText>Counting pawn mobility is a core positional skill. Passed pawns, pawn breaks, and pawn chains are easier to evaluate once you instinctively know how many pawn moves each side has.</p>`,
   },
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.3.97</title>
+  <title>ChessSight v0.3.99</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -17,7 +17,7 @@
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;">
-        <h1>ChessSight</h1><span class="version-label">v0.3.97</span>
+        <h1>ChessSight</h1><span class="version-label">v0.3.99</span>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -343,7 +343,7 @@
       <span id="pawns-session-time" class="session-stat"></span>
       <span id="pawns-session-acc" class="session-stat"></span>
     </div>
-    <p class="drill-rule">Count all legal pawn moves for each side: single pushes, double pushes from the starting rank, and pawn captures (including en passant). The gray arrow shows the last move played; if a pawn double-push just occurred, en passant may be possible.</p>
+    <p class="drill-rule">Count all legal pawn moves for each side: single pushes, double pushes from the starting rank, and pawn captures (including en passant). All four promotion choices from the same square count as one move; a pawn that can promote both by pushing and by capturing counts as two moves (different destination squares). The gray arrow shows the last move played; if a pawn double-push just occurred, en passant may be possible.</p>
   </div>
 
   <!-- ── Screen 4: Loose Pieces drill ── -->
