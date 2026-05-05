@@ -61,6 +61,14 @@ export const DRILL_HELP = {
 <p class=helpText>The queen is the most powerful tactical piece. This drill builds the pattern recognition to spot queen tactics instantly in real games.</p>`,
   },
 
+  sniper: {
+    title: 'Sniper Drill',
+    body: `<p class=helpText>One or two white bishops are hidden somewhere on the board, often near a corner or tucked into a pawn cluster. Black pieces are scattered across the board as potential targets and visual noise.</p>
+<p class=helpText>Click every black piece that a white bishop can capture along a clear diagonal — regardless of whether the capture is a good trade. The goal is pure pattern recognition: instantly see the bishop's line of fire through the clutter.</p>
+<p class=helpText>If no bishop can reach any black piece, click <strong>PASS</strong>. A wrong click (a piece the bishop can't actually reach) counts as a miss.</p>
+<p class=helpText>Bishops are long-range snipers whose power is often hidden by pawn structure. This drill trains your eye to always feel the diagonals, even when the bishop is buried deep in its nest.</p>`,
+  },
+
   hanggrab: {
     title: 'Hang Grab Drill',
     body: `<p class=helpText>A position appears with a White piece and several Black pieces. Some Black pieces may be <em>hanging</em> (completely undefended), meaning White can capture them for free. Once all hanging pieces are identified, the position is scored and auto-advances.</p>
@@ -326,6 +334,18 @@ export const DRILL_WALKTHROUGH = {
     {
       text: 'If nothing is actually free to grab after Black\'s move, tap <strong>PASS</strong> instead.',
       target: '#btn-bb-pass',
+      arrowAlign: 'right',
+    },
+  ],
+
+  sniper: [
+    {
+      text: 'One or two white bishops are hiding on the board — often near a corner, surrounded by pawns. Find every black piece they can shoot along a clear diagonal.',
+      target: null,
+    },
+    {
+      text: 'Click each black piece a bishop can reach. Defense doesn\'t matter — any piece on a clear diagonal is a target. If no bishop can fire at anything, tap <strong>PASS</strong>.',
+      target: '#btn-sn-pass',
       arrowAlign: 'right',
     },
   ],

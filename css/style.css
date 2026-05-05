@@ -754,7 +754,7 @@ h2 .drill-info-btn {
 }
 
 /* ── Drill screens ── */
-#screen-checks, #screen-captures, #screen-pawns, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-discipline, #screen-dlm, #screen-mix, #screen-bb {
+#screen-checks, #screen-captures, #screen-pawns, #screen-loose, #screen-under, #screen-threats, #screen-queen, #screen-knight, #screen-hanggrab, #screen-sniper, #screen-discipline, #screen-dlm, #screen-mix, #screen-bb {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1008,6 +1008,27 @@ h2 .drill-info-btn {
 }
 
 /* ── Hang Grab drill ── */
+/* ── Sniper drill overlays ── */
+.sn-sq-flash {
+  fill: rgba(220, 50, 50, 0.15);
+  stroke: #dc3232;
+  stroke-width: 2px;
+  pointer-events: none;
+  animation: flash-red 0.6s ease-out forwards;
+}
+.sn-sq-correct {
+  fill: rgba(39, 174, 96, 0.7);
+  stroke: #27ae60;
+  stroke-width: 2px;
+  pointer-events: none;
+}
+.sn-sq-reveal {
+  fill: rgba(39, 174, 96, 0.45);
+  stroke: #27ae60;
+  stroke-width: 2px;
+  pointer-events: none;
+}
+
 .hg-sq-flash {
   stroke: #dc3232;
   stroke-width: 2px;

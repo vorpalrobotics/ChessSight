@@ -13,6 +13,7 @@ import { initKnightRoute, startKnightRoute } from './knight.js';
 import { initDeLaMaza, startDeLaMaza } from './delamaza.js';
 import { initDiscipline, startDiscipline } from './discipline.js';
 import { initHangGrab, startHangGrab } from './hanggrab.js';
+import { initSniper, startSniper } from './sniper.js';
 import { initMix, startMix, syncMixPositions } from './mix.js';
 import { initMemory, startMemory } from './memory.js';
 import { initBBGen, startBBGen } from './bbgen.js';
@@ -22,7 +23,7 @@ import { initVimsy, connectVimsy, disconnectVimsy, syncToday, renderVimsyModal }
 import { DRILL_HELP } from './helptext.js';
 
 // --- Screen management ---
-const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-pawns', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bb', 'screen-summary', 'screen-engine'];
+const SCREEN_IDS = ['screen-select', 'screen-checks', 'screen-captures', 'screen-pawns', 'screen-loose', 'screen-under', 'screen-queen', 'screen-knight', 'screen-hanggrab', 'screen-sniper', 'screen-mix', 'screen-dlm', 'screen-discipline', 'screen-memory', 'screen-bb', 'screen-summary', 'screen-engine'];
 
 const pauseOverlay = document.getElementById('pause-overlay');
 
@@ -122,6 +123,11 @@ document.getElementById('mode-knight').addEventListener('click', async () => {
 document.getElementById('mode-hanggrab').addEventListener('click', async () => {
   showScreen('screen-hanggrab');
   await startHangGrab();
+});
+
+document.getElementById('mode-sniper').addEventListener('click', async () => {
+  showScreen('screen-sniper');
+  await startSniper();
 });
 
 document.getElementById('mode-mix').addEventListener('click', () => {
@@ -1175,6 +1181,7 @@ initUnder(showScreen);
 initQueenAttack(showScreen);
 initKnightRoute(showScreen);
 initHangGrab(showScreen);
+initSniper(showScreen);
 initMix(showScreen);
 initDeLaMaza(showScreen, launchChessConfetti);
 initDiscipline(showScreen, launchChessConfetti);
