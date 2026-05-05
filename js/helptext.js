@@ -63,10 +63,10 @@ export const DRILL_HELP = {
 
   sniper: {
     title: 'Sniper Drill',
-    body: `<p class=helpText>One or two white bishops are hidden somewhere on the board, often near a corner or tucked into a pawn cluster. Black pieces are scattered across the board as potential targets and visual noise.</p>
-<p class=helpText>Click every black piece that a white bishop can capture along a clear diagonal — regardless of whether the capture is a good trade. The goal is pure pattern recognition: instantly see the bishop's line of fire through the clutter.</p>
+    body: `<p class=helpText>One or two white bishops are nestled somewhere on the board, often near a corner or tucked into a pawn cluster. Black pieces are scattered across the board as potential targets and visual noise.</p>
+<p class=helpText>Click every black piece that any white bishop can capture — regardless of whether the capture is a good trade or the best move. The goal is pure pattern recognition: instantly see the bishop's line of fire through the clutter.</p>
 <p class=helpText>If no bishop can reach any black piece, click <strong>PASS</strong>. A wrong click (a piece the bishop can't actually reach) counts as a miss.</p>
-<p class=helpText>Bishops are long-range snipers whose power is often hidden by pawn structure. This drill trains your eye to always feel the diagonals, even when the bishop is buried deep in its nest.</p>`,
+<p class=helpText>Bishops are long-range snipers whose power is often hidden by pawn structure. This drill trains your eye to always feel the diagonals, even when the sniper bishop is buried deep in its nest.</p>`,
   },
 
   hanggrab: {
@@ -340,11 +340,11 @@ export const DRILL_WALKTHROUGH = {
 
   sniper: [
     {
-      text: 'One or two white bishops are hiding on the board — often near a corner, surrounded by pawns. Find every black piece they can shoot along a clear diagonal.',
+      text: 'One or two white bishops are hiding on the board, ready to strike. Tap on every black piece they can capture.',
       target: null,
     },
     {
-      text: 'Click each black piece a bishop can reach. Defense doesn\'t matter — any piece on a clear diagonal is a target. If no bishop can fire at anything, tap <strong>PASS</strong>.',
+      text: 'Defense doesn\'t matter, nor whether those captures are "good" moves. If no white bishop can snipe at anything, tap <strong>PASS</strong>.',
       target: '#btn-sn-pass',
       arrowAlign: 'right',
     },
