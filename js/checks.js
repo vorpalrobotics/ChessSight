@@ -44,6 +44,7 @@ const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
 let puzzleQueue = [];
 let queueVersion = 0;
+let seenIds = new Set();   // puzzle IDs shown this session — prevents within-session repeats
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
 
@@ -146,10 +147,14 @@ async function loadNextPuzzle() {
 
 // Retry up to 5 times to find a position where neither side starts in check.
 async function fetchValidFen() {
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 8; attempt++) {
     try {
       const { fen, puzzleId } = await fetchLichessPuzzle();
-      if (!sideToMoveInCheck(fen)) return { fen, puzzleId };
+      if (puzzleId && seenIds.has(puzzleId)) continue;
+      if (!sideToMoveInCheck(fen)) {
+        if (puzzleId) seenIds.add(puzzleId);
+        return { fen, puzzleId };
+      }
       console.log('Skipping position where side-to-move is in check');
     } catch (err) {
       console.warn('Lichess unavailable, using fallback:', err.message);
@@ -479,6 +484,7 @@ function resetDrill() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   waitingForContinue = false;
   queueVersion++;
+  seenIds = new Set();
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];

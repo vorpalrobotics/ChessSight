@@ -44,6 +44,7 @@ const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
 let queueVersion = 0;
+let seenIds = new Set();
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
 
@@ -141,10 +142,14 @@ async function loadNextPuzzle() {
 }
 
 async function fetchValidFen() {
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 8; attempt++) {
     try {
       const result = await fetchLichessPuzzle();
-      if (hasPawns(result.fen)) return result;
+      if (result.puzzleId && seenIds.has(result.puzzleId)) continue;
+      if (hasPawns(result.fen)) {
+        if (result.puzzleId) seenIds.add(result.puzzleId);
+        return result;
+      }
       console.log('Skipping pawnless position');
     } catch (err) {
       console.warn('Lichess unavailable, using fallback:', err.message);
@@ -483,6 +488,7 @@ function resetDrill() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   waitingForContinue = false;
   queueVersion++;
+  seenIds = new Set();
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
