@@ -246,6 +246,7 @@ const ACC_WARNINGS_KEY = 'chesssight-accuracy-warnings';
 chkAccuracyWarnings.checked = localStorage.getItem(ACC_WARNINGS_KEY) !== 'false';
 chkAccuracyWarnings.addEventListener('change', () => {
   localStorage.setItem(ACC_WARNINGS_KEY, chkAccuracyWarnings.checked);
+  if (chkAccuracyWarnings.checked) localStorage.removeItem('chesssight-acc-warning-date');
 });
 
 // Accuracy warning modal
