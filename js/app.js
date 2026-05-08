@@ -72,6 +72,7 @@ function showScreen(id) {
     if (count >= 5 && document.getElementById('stat-accuracy').textContent === '100%') {
       launchChessConfetti();
     }
+    checkAccuracyWarning();
   }
 }
 
@@ -84,26 +85,31 @@ document.addEventListener('click', e => {
 pauseOverlay.addEventListener('click', doPauseToggle);
 
 document.getElementById('mode-checks').addEventListener('click', async () => {
+  lastDrill = 'checks';
   showScreen('screen-checks');
   await startChecks();
 });
 
 document.getElementById('mode-captures').addEventListener('click', async () => {
+  lastDrill = 'captures';
   showScreen('screen-captures');
   await startCaptures();
 });
 
 document.getElementById('mode-pawns').addEventListener('click', async () => {
+  lastDrill = 'pawns';
   showScreen('screen-pawns');
   await startPawns();
 });
 
 document.getElementById('mode-loose').addEventListener('click', async () => {
+  lastDrill = 'loose';
   showScreen('screen-loose');
   await startLoose();
 });
 
 document.getElementById('mode-under').addEventListener('click', async () => {
+  lastDrill = 'under';
   showScreen('screen-under');
   await startUnder();
 });
@@ -111,46 +117,55 @@ document.getElementById('mode-under').addEventListener('click', async () => {
 // document.getElementById('mode-threats') — disabled
 
 document.getElementById('mode-queen').addEventListener('click', async () => {
+  lastDrill = 'queen';
   showScreen('screen-queen');
   await startQueenAttack();
 });
 
 document.getElementById('mode-knight').addEventListener('click', async () => {
+  lastDrill = 'knight';
   showScreen('screen-knight');
   await startKnightRoute();
 });
 
 document.getElementById('mode-hanggrab').addEventListener('click', async () => {
+  lastDrill = 'hanggrab';
   showScreen('screen-hanggrab');
   await startHangGrab();
 });
 
 document.getElementById('mode-sniper').addEventListener('click', async () => {
+  lastDrill = 'sniper';
   showScreen('screen-sniper');
   await startSniper();
 });
 
 document.getElementById('mode-mix').addEventListener('click', () => {
+  lastDrill = null;
   showScreen('screen-mix');
   startMix();
 });
 
 document.getElementById('mode-dlm').addEventListener('click', () => {
+  lastDrill = null;
   showScreen('screen-dlm');
   startDeLaMaza();
 });
 
 document.getElementById('mode-discipline').addEventListener('click', async () => {
+  lastDrill = null;
   showScreen('screen-discipline');
   await startDiscipline();
 });
 
 document.getElementById('mode-memory').addEventListener('click', async () => {
+  lastDrill = null;
   showScreen('screen-memory');
   await startMemory();
 });
 
 document.getElementById('mode-bbgen').addEventListener('click', async () => {
+  lastDrill = 'bb';
   showScreen('screen-bb');
   await startBBGen();
 });
@@ -224,6 +239,45 @@ chkShowDifficulty.checked = localStorage.getItem(SHOW_DIFFICULTY_KEY) === 'true'
 chkShowDifficulty.addEventListener('change', () => {
   localStorage.setItem(SHOW_DIFFICULTY_KEY, chkShowDifficulty.checked);
 });
+
+// Persist "accuracy warnings" to localStorage
+const chkAccuracyWarnings = document.getElementById('chk-accuracy-warnings');
+const ACC_WARNINGS_KEY = 'chesssight-accuracy-warnings';
+chkAccuracyWarnings.checked = localStorage.getItem(ACC_WARNINGS_KEY) !== 'false';
+chkAccuracyWarnings.addEventListener('change', () => {
+  localStorage.setItem(ACC_WARNINGS_KEY, chkAccuracyWarnings.checked);
+});
+
+// Accuracy warning modal
+const modalAccWarning = document.getElementById('modal-acc-warning');
+
+document.getElementById('btn-acc-warning-ok').addEventListener('click', () => {
+  localStorage.setItem('chesssight-acc-warning-date', new Date().toLocaleDateString('sv'));
+  modalAccWarning.classList.add('hidden');
+});
+
+document.getElementById('btn-acc-warning-dismiss').addEventListener('click', () => {
+  chkAccuracyWarnings.checked = false;
+  localStorage.setItem(ACC_WARNINGS_KEY, 'false');
+  modalAccWarning.classList.add('hidden');
+});
+
+async function checkAccuracyWarning() {
+  if (localStorage.getItem(ACC_WARNINGS_KEY) === 'false') return;
+  const today = new Date().toLocaleDateString('sv');
+  if (localStorage.getItem('chesssight-acc-warning-date') === today) return;
+  const count = parseInt(document.getElementById('stat-count').textContent, 10);
+  if (count < 5) return;
+  const acc = parseInt(document.getElementById('stat-accuracy').textContent, 10);
+  if (isNaN(acc) || acc <= 0) return;
+  if (!lastDrill || !GOAL_DRILLS.includes(lastDrill)) return;
+  const goals = await getGoals();
+  const goal = goals[lastDrill] || DEFAULT_GOAL;
+  if (acc < goal.acc) modalAccWarning.classList.remove('hidden');
+}
+
+// Tracks which drill was most recently started (for accuracy goal lookup).
+let lastDrill = null;
 
 // --- About modal ---
 const modalAbout = document.getElementById('modal-about');

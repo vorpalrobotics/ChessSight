@@ -274,6 +274,27 @@ header h1 {
   opacity: 0.85;
 }
 
+.acc-warning-text {
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+.acc-warning-dismiss-wrap {
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.acc-warning-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
 .settings-row {
   display: flex;
   align-items: center;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.4.7</title>
+  <title>ChessSight v0.4.8</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -17,7 +17,7 @@
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;">
-        <h1>ChessSight</h1><span class="version-label">v0.4.7</span>
+        <h1>ChessSight</h1><span class="version-label">v0.4.8</span>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -99,9 +99,25 @@
         <label class="settings-label" for="chk-show-difficulty">Show estimated difficulty</label>
         <input type="checkbox" id="chk-show-difficulty">
       </div>
+      <div class="settings-row">
+        <label class="settings-label" for="chk-accuracy-warnings">Accuracy warnings</label>
+        <input type="checkbox" id="chk-accuracy-warnings" checked>
+      </div>
       <div class="settings-done-row">
         <button id="btn-settings-close" class="settings-done-btn">Done</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Accuracy warning modal ── -->
+  <div id="modal-acc-warning" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <h2>Accuracy Tip</h2>
+      <p class="acc-warning-text">Accuracy matters more than speed right now. Get accuracy high first — then work on speed.</p>
+      <div class="settings-done-row">
+        <button id="btn-acc-warning-ok" class="settings-done-btn">Got It</button>
+      </div>
+      <p class="acc-warning-dismiss-wrap"><button id="btn-acc-warning-dismiss" class="acc-warning-dismiss">don't show again</button></p>
     </div>
   </div>
 
