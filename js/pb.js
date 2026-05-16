@@ -64,8 +64,14 @@ export function setSummaryResultMsg(isPB, accMet, timeMet, hasGoal) {
     el.className = 'summary-result-msg summary-result-warn';
     el.textContent = 'Slow down, accuracy is more important than speed.';
   } else {
-    el.className = 'summary-result-msg';
-    el.textContent = '';
+    const acc = parseInt(document.getElementById('stat-accuracy')?.textContent, 10);
+    if (!isNaN(acc) && acc < 80) {
+      el.className = 'summary-result-msg summary-result-warn';
+      el.textContent = 'Slow down, accuracy is more important than speed.';
+    } else {
+      el.className = 'summary-result-msg';
+      el.textContent = '';
+    }
   }
 }
 
