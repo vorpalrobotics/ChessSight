@@ -2,7 +2,7 @@ import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/
 import { Arrows } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/extensions/arrows/Arrows.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
 import { upsertDrillDay } from './storage.js';
-import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals } from './pb.js';
+import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals, setSummaryResultMsg } from './pb.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
 import { runWalkthrough } from './walkthrough.js';
@@ -440,13 +440,15 @@ async function showSummary() {
     const accuracy = Math.round(totalCorrect / (totalCorrect + totalMisses) * 100);
     document.getElementById('stat-avg-time').textContent = formatTime(Math.round(totalSeconds / count));
     document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
-    const { accMet, timeMet } = await checkGoals('captures', count, totalCorrect, totalMisses, totalSeconds);
+    const { accMet, timeMet, hasGoal } = await checkGoals('captures', count, totalCorrect, totalMisses, totalSeconds);
     if (accMet || timeMet) await showGoalCelebration(accMet, timeMet, accuracy, totalSeconds / count);
     const isPB = await checkAndUpdatePB('captures', count, totalCorrect, totalMisses, totalSeconds);
     if (isPB) await showPBCelebration();
+    setSummaryResultMsg(isPB, accMet, timeMet, hasGoal);
   } else {
     document.getElementById('stat-avg-time').textContent = '—';
     document.getElementById('stat-accuracy').textContent = '—';
+    setSummaryResultMsg(false, false, false, false);
   }
   navigate('screen-summary');
 }

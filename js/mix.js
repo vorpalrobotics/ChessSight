@@ -447,6 +447,8 @@ function endSession() {
     document.getElementById('stat-avg-time').textContent = '—';
     document.getElementById('stat-accuracy').textContent = '—';
   }
+  const msgEl = document.getElementById('summary-result-msg');
+  if (msgEl) msgEl.textContent = '';
   navigate('screen-summary');
 }
 

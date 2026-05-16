@@ -33,14 +33,40 @@ export async function checkAndUpdatePB(drill, positions, correct, misses, second
 export async function checkGoals(drill, positions, correct, misses, seconds) {
   const goals = await getGoals();
   const g = goals[drill];
-  if (!g) return { accMet: false, timeMet: false };
+  if (!g) return { accMet: false, timeMet: false, hasGoal: false };
   const total = correct + misses;
   const accuracy = total > 0 ? Math.round(correct / total * 100) : 0;
   const avgTime = positions > 0 ? seconds / positions : Infinity;
   return {
     accMet:  accuracy >= g.acc,
     timeMet: avgTime  <= g.time,
+    hasGoal: true,
   };
+}
+
+/**
+ * Set the result message shown below the Accuracy row on the summary screen.
+ * Pass all-false to clear the message (no-goal drills, zero-puzzle sessions).
+ */
+export function setSummaryResultMsg(isPB, accMet, timeMet, hasGoal) {
+  const el = document.getElementById('summary-result-msg');
+  if (!el) return;
+  if (isPB) {
+    el.className = 'summary-result-msg summary-result-pb';
+    el.textContent = 'Personal Best';
+  } else if (accMet && timeMet) {
+    el.className = 'summary-result-msg summary-result-goals';
+    el.innerHTML = 'Met All Goals <span class="summary-result-check">✓</span>';
+  } else if (accMet) {
+    el.className = 'summary-result-msg summary-result-acc';
+    el.textContent = 'Accuracy Goal Met.';
+  } else if (hasGoal) {
+    el.className = 'summary-result-msg summary-result-warn';
+    el.textContent = 'Slow down, accuracy is more important than speed.';
+  } else {
+    el.className = 'summary-result-msg';
+    el.textContent = '';
+  }
 }
 
 /**

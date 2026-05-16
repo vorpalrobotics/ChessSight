@@ -1581,6 +1581,19 @@ h2 .drill-info-btn {
   color: var(--text-muted);
 }
 
+.summary-result-msg {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.4rem 0 0;
+  min-height: 1.2em;
+}
+.summary-result-pb   { color: #fbbf24; }
+.summary-result-goals { color: #4ade80; }
+.summary-result-acc  { color: var(--text-muted); }
+.summary-result-warn { color: #fb923c; }
+.summary-result-check { color: #4ade80; }
+
 #summary-actions {
   display: flex;
   gap: 0.75rem;
