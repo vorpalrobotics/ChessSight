@@ -43,6 +43,7 @@ let autoAdvanceTimer = null;
 export function initLoose(navigateFn) {
   navigate = navigateFn;
   document.getElementById('btn-loose-done').addEventListener('click', showSummary);
+  document.getElementById('btn-loose-pass').addEventListener('click', handlePass);
   document.getElementById('btn-loose-show').addEventListener('click', handleShow);
   document.getElementById('loose-board').addEventListener('click', handleBoardClick);
 }
@@ -137,15 +138,6 @@ async function loadNextPuzzle() {
 
   updateSessionStats();
   setStatus('');
-
-  // Skip positions with no loose pieces (can't be solved by clicking)
-  if (currentLooseSqs.size === 0) {
-    puzzleCount--;
-    updateProgress();
-    autoAdvanceTimer = setTimeout(loadNextPuzzle, 300);
-    return;
-  }
-
   puzzleActive = true;
   startTimer();
 }
@@ -239,6 +231,19 @@ function handleBoardClick(e) {
     misses++;
     document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
     flashSq(sq);
+    if (currentLooseSqs.size === 0) setStatus('No loose pieces — try PASS');
+  }
+}
+
+function handlePass() {
+  if (!puzzleActive) return;
+  if (currentLooseSqs.size === 0) {
+    setStatus('✓ No loose pieces!');
+    finishPuzzle(true);
+  } else {
+    misses++;
+    document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
+    setStatus('There are loose pieces — find them!');
   }
 }
 
@@ -252,22 +257,27 @@ function finishPuzzle(allFound) {
   stopTimer();
 
   if (!allFound) {
-    // Reveal any missed loose squares
-    for (const sq of currentLooseSqs) {
-      if (!foundSqs.has(sq)) {
-        misses++;
-        drawSqMark(sq, 'loose-sq-missed');
+    if (currentLooseSqs.size === 0) {
+      misses++;
+      setStatus('No loose pieces — PASS was correct');
+    } else {
+      for (const sq of currentLooseSqs) {
+        if (!foundSqs.has(sq)) {
+          misses++;
+          drawSqMark(sq, 'loose-sq-missed');
+        }
       }
     }
     document.getElementById('loose-misses').textContent = `Misses: ${misses}`;
-  } else {
+  } else if (currentLooseSqs.size > 0) {
     // Pulse all found squares green like the discipline drill
     const boardEl = document.getElementById('loose-board');
     if (boardEl) boardEl.querySelectorAll('.loose-sq-found').forEach(el => el.classList.add('pulsing'));
   }
 
-  drillResults.push({ seconds, correct: foundSqs.size, misses });
-  upsertDrillDay('loose', { seconds, correct: foundSqs.size, misses, puzzleId: currentPuzzleId });
+  const correct = currentLooseSqs.size === 0 ? (allFound ? 1 : 0) : foundSqs.size;
+  drillResults.push({ seconds, correct, misses });
+  upsertDrillDay('loose', { seconds, correct, misses, puzzleId: currentPuzzleId });
   updateSessionStats();
 
   const limit = getPositionsPerDrill();

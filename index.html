@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChessSight v0.5.3</title>
+  <title>ChessSight v0.5.4</title>
   <link rel="icon" href="ChessSight-logo.ico">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/chessboard.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/extensions/markers/markers.css">
@@ -17,7 +17,7 @@
     <div style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;" id="btn-home">
       <img src="ChessSight-logo-250.png" alt="ChessSight logo" style="height:2.2rem;width:auto;">
       <div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;">
-        <h1>ChessSight</h1><span class="version-label">v0.5.3</span>
+        <h1>ChessSight</h1><span class="version-label">v0.5.4</span>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -393,6 +393,7 @@
     <div class="drill-current-stats">
       <span id="loose-timer">0:00</span>
       <span id="loose-misses">Misses: 0</span>
+      <button id="btn-loose-pass">PASS</button>
       <button id="btn-loose-show">SHOW</button>
     </div>
 
@@ -402,7 +403,7 @@
       <span id="loose-session-time" class="session-stat"></span>
       <span id="loose-session-acc" class="session-stat"></span>
     </div>
-    <p class="drill-rule">A piece is loose when it has zero friendly defenders. Kings are excluded. Click every loose piece — both colors. The puzzle completes automatically when all loose pieces are found. Click SHOW to reveal the answer.</p>
+    <p class="drill-rule">A piece is loose when it has zero friendly defenders. Kings are excluded. Click every loose piece — both colors. The puzzle completes automatically when all loose pieces are found. If there are no loose pieces, press PASS. Click SHOW to reveal the answer.</p>
   </div>
 
   <!-- ── Screen 5: Underguarded drill ── -->
