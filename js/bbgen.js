@@ -160,6 +160,10 @@ function randomOccupied() {
     }
   }
 
+  const counts = {};
+  for (const p of Object.values(occ)) counts[p] = (counts[p] || 0) + 1;
+  if (['N', 'B', 'R', 'n', 'b', 'r'].some(p => (counts[p] || 0) > 2)) return null;
+
   return occ;
 }
 
@@ -285,6 +289,7 @@ function tryGenerateBlunder() {
     const blunders = [];
     for (const mv of moves) {
       chess.move(mv);
+      if (chess.isCheck()) { chess.undo(); continue; }
       const allHangs = hangingBlack(chess);
       const newHangs = allHangs.filter(h => !priorHang.has(h.sq));
       // Bug fix: require exactly one hang TOTAL (not just one new one)
@@ -328,7 +333,7 @@ function tryGeneratePass() {
     const passMoves = [];
     for (const mv of moves) {
       chess.move(mv);
-      if (hangingBlack(chess).length === 0) passMoves.push({ mv, fenAfter: chess.fen() });
+      if (!chess.isCheck() && hangingBlack(chess).length === 0) passMoves.push({ mv, fenAfter: chess.fen() });
       chess.undo();
     }
     if (!passMoves.length) continue;
