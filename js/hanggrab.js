@@ -403,7 +403,7 @@ async function showSummary() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   endDrill();
 
-  document.getElementById('btn-summary-again').onclick = () => navigate('screen-hanggrab');
+  document.getElementById('btn-summary-again').onclick = () => { navigate('screen-hanggrab'); startHangGrab(); };
 
   const n = drillResults.length;
   document.getElementById('stat-count').textContent = n;
