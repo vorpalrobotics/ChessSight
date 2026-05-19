@@ -88,8 +88,8 @@ async function fetchWithDifficulty() {
   const { fen, puzzleId, lastMove } = await fetchValidFen();
   const movesW = getPawnMovesForColor(fen, 'w');
   const movesB = getPawnMovesForColor(fen, 'b');
-  const ansW = Math.min(movesW.length, 9);
-  const ansB = Math.min(movesB.length, 9);
+  const ansW = Math.min(movesW.length, 12);
+  const ansB = Math.min(movesB.length, 12);
   return { fen, puzzleId, lastMove, answerW: ansW, answerB: ansB,
            difficulty: scoreCountDifficulty(fen, ansW + ansB) };
 }
