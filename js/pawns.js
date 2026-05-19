@@ -47,6 +47,8 @@ let queueVersion = 0;
 let seenIds = new Set();
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
+let expandedW = false;
+let expandedB = false;
 
 // --- Public API ---
 
@@ -348,7 +350,7 @@ function handleDigitClick(color, value) {
 
   btn.classList.remove('idle');
   const correct = isWhite ? answerW : answerB;
-  if (value === 7 ? correct >= 7 : value === correct) {
+  if (value >= 12 ? correct >= 12 : value === correct) {
     btn.classList.add('correct');
     correctAnswers++;
     if (isWhite) correctW = true; else correctB = true;
@@ -457,19 +459,55 @@ async function restartDrill() {
 
 // --- UI helpers ---
 
-function createDigitButtons() {
-  [['pawns-digits-white', 'w'], ['pawns-digits-black', 'b']].forEach(([containerId, color]) => {
-    const container = document.getElementById(containerId);
-    for (let i = 0; i <= 7; i++) {
+function renderDigitRow(containerId, color, expanded) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  if (expanded) {
+    container.classList.add('expanded');
+    const back = document.createElement('button');
+    back.className = 'digit-btn digit-btn-back';
+    back.textContent = '◀';
+    back.addEventListener('click', () => {
+      if (color === 'w') expandedW = false; else expandedB = false;
+      renderDigitRow(containerId, color, false);
+    });
+    container.appendChild(back);
+    for (let i = 7; i <= 12; i++) {
       const btn = document.createElement('button');
-      btn.className = 'digit-btn';
+      btn.className = 'digit-btn idle';
       btn.dataset.color = color;
       btn.dataset.value = i;
-      btn.textContent = i === 7 ? '7+' : i;
+      btn.textContent = i === 12 ? '12+' : i;
       btn.addEventListener('click', () => handleDigitClick(color, i));
       container.appendChild(btn);
     }
-  });
+  } else {
+    container.classList.remove('expanded');
+    for (let i = 0; i <= 6; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'digit-btn idle';
+      btn.dataset.color = color;
+      btn.dataset.value = i;
+      btn.textContent = i;
+      btn.addEventListener('click', () => handleDigitClick(color, i));
+      container.appendChild(btn);
+    }
+    const expand = document.createElement('button');
+    expand.className = 'digit-btn digit-btn-expand';
+    expand.dataset.color = color;
+    expand.dataset.value = 7;
+    expand.textContent = '7+';
+    expand.addEventListener('click', () => {
+      if (color === 'w') expandedW = true; else expandedB = true;
+      renderDigitRow(containerId, color, true);
+    });
+    container.appendChild(expand);
+  }
+}
+
+function createDigitButtons() {
+  renderDigitRow('pawns-digits-white', 'w', false);
+  renderDigitRow('pawns-digits-black', 'b', false);
 }
 
 function showDifficulty(id, score) {
@@ -510,6 +548,8 @@ function resetUI() {
   hidePawns();
   document.getElementById('pawns-timer').textContent  = '0:00';
   document.getElementById('pawns-misses').textContent = 'Misses: 0';
+  if (expandedW) { expandedW = false; renderDigitRow('pawns-digits-white', 'w', false); }
+  if (expandedB) { expandedB = false; renderDigitRow('pawns-digits-black', 'b', false); }
   document.querySelectorAll('#screen-pawns .digit-btn').forEach(b => {
     b.classList.remove('correct', 'incorrect', 'flashing');
     b.classList.add('idle');

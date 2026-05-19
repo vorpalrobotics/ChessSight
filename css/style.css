@@ -1404,6 +1404,9 @@ h2 .drill-info-btn {
   column-gap: calc(100% / 39);
   flex: 1;
 }
+.digit-buttons.expanded {
+  grid-template-columns: repeat(7, 1fr);
+}
 
 .digit-btn {
   width: 100%;
@@ -1449,6 +1452,20 @@ h2 .drill-info-btn {
 }
 .digit-btn.correct.flashing {
   animation: digit-correct-flash 0.3s ease-in-out 5;
+}
+.digit-btn-back,
+.digit-btn-expand {
+  background: var(--surface);
+  color: var(--text-muted);
+  border-color: var(--surface2);
+}
+.digit-btn-back:hover,
+.digit-btn-back:active,
+.digit-btn-expand:hover,
+.digit-btn-expand:active {
+  background: var(--surface2);
+  border-color: var(--text-muted);
+  color: var(--text);
 }
 
 
