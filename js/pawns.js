@@ -539,6 +539,10 @@ function resetDrill() {
   if (fill) fill.style.width = '0%';
   const label = document.getElementById('pawns-progress-label');
   if (label) label.textContent = '';
+  // Collapse expanded rows immediately (before fillQueue async gap)
+  expandedW = expandedB = false;
+  renderDigitRow('pawns-digits-white', 'w', false);
+  renderDigitRow('pawns-digits-black', 'b', false);
 }
 
 function resetUI() {
@@ -548,8 +552,9 @@ function resetUI() {
   hidePawns();
   document.getElementById('pawns-timer').textContent  = '0:00';
   document.getElementById('pawns-misses').textContent = 'Misses: 0';
-  if (expandedW) { expandedW = false; renderDigitRow('pawns-digits-white', 'w', false); }
-  if (expandedB) { expandedB = false; renderDigitRow('pawns-digits-black', 'b', false); }
+  expandedW = expandedB = false;
+  renderDigitRow('pawns-digits-white', 'w', false);
+  renderDigitRow('pawns-digits-black', 'b', false);
   document.querySelectorAll('#screen-pawns .digit-btn').forEach(b => {
     b.classList.remove('correct', 'incorrect', 'flashing');
     b.classList.add('idle');

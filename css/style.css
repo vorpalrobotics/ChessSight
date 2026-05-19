@@ -1404,9 +1404,6 @@ h2 .drill-info-btn {
   column-gap: calc(100% / 39);
   flex: 1;
 }
-.digit-buttons.expanded {
-  grid-template-columns: repeat(7, 1fr);
-}
 
 .digit-btn {
   width: 100%;
