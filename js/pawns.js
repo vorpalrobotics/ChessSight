@@ -461,18 +461,19 @@ async function restartDrill() {
 
 function renderDigitRow(containerId, color, expanded) {
   const container = document.getElementById(containerId);
+  const label = document.getElementById(color === 'w' ? 'pawns-label-w' : 'pawns-label-b');
   container.innerHTML = '';
+
   if (expanded) {
-    container.classList.add('expanded');
-    const back = document.createElement('button');
-    back.className = 'digit-btn digit-btn-back';
-    back.textContent = '◀';
-    back.addEventListener('click', () => {
-      if (color === 'w') expandedW = false; else expandedB = false;
-      renderDigitRow(containerId, color, false);
-    });
-    container.appendChild(back);
-    for (let i = 7; i <= 12; i++) {
+    if (label) {
+      label.textContent = '◀';
+      label.classList.add('label-back');
+      label.onclick = () => {
+        if (color === 'w') expandedW = false; else expandedB = false;
+        renderDigitRow(containerId, color, false);
+      };
+    }
+    for (let i = 6; i <= 12; i++) {
       const btn = document.createElement('button');
       btn.className = 'digit-btn idle';
       btn.dataset.color = color;
@@ -482,8 +483,12 @@ function renderDigitRow(containerId, color, expanded) {
       container.appendChild(btn);
     }
   } else {
-    container.classList.remove('expanded');
-    for (let i = 0; i <= 6; i++) {
+    if (label) {
+      label.textContent = color === 'w' ? 'W' : 'B';
+      label.classList.remove('label-back');
+      label.onclick = null;
+    }
+    for (let i = 0; i <= 5; i++) {
       const btn = document.createElement('button');
       btn.className = 'digit-btn idle';
       btn.dataset.color = color;
@@ -495,8 +500,8 @@ function renderDigitRow(containerId, color, expanded) {
     const expand = document.createElement('button');
     expand.className = 'digit-btn digit-btn-expand';
     expand.dataset.color = color;
-    expand.dataset.value = 7;
-    expand.textContent = '7+';
+    expand.dataset.value = 6;
+    expand.textContent = '6+';
     expand.addEventListener('click', () => {
       if (color === 'w') expandedW = true; else expandedB = true;
       renderDigitRow(containerId, color, true);

@@ -1397,12 +1397,23 @@ h2 .drill-info-btn {
   text-align: center;
   flex-shrink: 0;
 }
+.answer-label.label-back {
+  cursor: pointer;
+  color: var(--accent);
+}
+.answer-label.label-back:hover {
+  color: #fff;
+}
 
 .digit-buttons {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   column-gap: calc(100% / 39);
   flex: 1;
+}
+/* Pawn Push uses 7-button rows (0-6+ / 6-12+) — slightly larger tap targets */
+#screen-pawns .digit-buttons {
+  grid-template-columns: repeat(7, 1fr);
 }
 
 .digit-btn {
@@ -1450,14 +1461,11 @@ h2 .drill-info-btn {
 .digit-btn.correct.flashing {
   animation: digit-correct-flash 0.3s ease-in-out 5;
 }
-.digit-btn-back,
 .digit-btn-expand {
   background: var(--surface);
   color: var(--text-muted);
   border-color: var(--surface2);
 }
-.digit-btn-back:hover,
-.digit-btn-back:active,
 .digit-btn-expand:hover,
 .digit-btn-expand:active {
   background: var(--surface2);
