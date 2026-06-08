@@ -1411,8 +1411,10 @@ h2 .drill-info-btn {
   column-gap: calc(100% / 39);
   flex: 1;
 }
-/* Pawn Push uses 7-button rows (0-6+ / 6-12+) — slightly larger tap targets */
-#screen-pawns .digit-buttons {
+/* Checks/Captures/Pawn Push use 7-button rows (0-6+ / 6-12+) — slightly larger tap targets */
+#screen-pawns .digit-buttons,
+#screen-checks .digit-buttons,
+#screen-captures .digit-buttons {
   grid-template-columns: repeat(7, 1fr);
 }
 

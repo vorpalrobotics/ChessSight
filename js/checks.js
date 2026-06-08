@@ -34,6 +34,8 @@ let answerW = 0;
 let answerB = 0;
 let correctW = false;
 let correctB = false;
+let expandedW = false;
+let expandedB = false;
 let puzzleActive = false;
 let puzzleCount = 0;
 let currentPuzzleId = '';
@@ -65,8 +67,8 @@ export async function fetchChecksPuzzle() {
   const movesB = getChecksForColor(fen, 'b');
   return {
     fen, puzzleId, type: 'checks',
-    answerW: Math.min(movesW.length, 9),
-    answerB: Math.min(movesB.length, 9),
+    answerW: Math.min(movesW.length, 12),
+    answerB: Math.min(movesB.length, 12),
     movesW, movesB,
     difficulty: scoreChecksDifficulty(fen, movesW.length + movesB.length),
   };
@@ -212,7 +214,7 @@ function getChecksForColor(fen, colorChar) {
 }
 
 function countChecksForColor(fen, colorChar) {
-  return Math.min(getChecksForColor(fen, colorChar).length, 9);
+  return Math.min(getChecksForColor(fen, colorChar).length, 12);
 }
 
 function handleShow() {
@@ -343,7 +345,7 @@ function handleDigitClick(color, value) {
 
   btn.classList.remove('idle');
   const correct = isWhite ? answerW : answerB;
-  if (value === 7 ? correct >= 7 : value === correct) {
+  if (value >= 12 ? correct >= 12 : value === correct) {
     btn.classList.add('correct');
     correctAnswers++;
     if (isWhite) correctW = true; else correctB = true;
@@ -454,18 +456,59 @@ async function restartDrill() {
 // --- UI helpers ---
 
 function createDigitButtons() {
-  [['digits-white', 'w'], ['digits-black', 'b']].forEach(([containerId, color]) => {
-    const container = document.getElementById(containerId);
-    for (let i = 0; i <= 7; i++) {
+  renderDigitRow('digits-white', 'w', false);
+  renderDigitRow('digits-black', 'b', false);
+}
+
+function renderDigitRow(containerId, color, expanded) {
+  const container = document.getElementById(containerId);
+  const label = document.getElementById(color === 'w' ? 'checks-label-w' : 'checks-label-b');
+  container.innerHTML = '';
+
+  if (expanded) {
+    if (label) {
+      label.textContent = '◀';
+      label.classList.add('label-back');
+      label.onclick = () => {
+        if (color === 'w') expandedW = false; else expandedB = false;
+        renderDigitRow(containerId, color, false);
+      };
+    }
+    for (let i = 6; i <= 12; i++) {
       const btn = document.createElement('button');
-      btn.className = 'digit-btn';
+      btn.className = 'digit-btn idle';
       btn.dataset.color = color;
       btn.dataset.value = i;
-      btn.textContent = i === 7 ? '7+' : i;
+      btn.textContent = i === 12 ? '12+' : i;
       btn.addEventListener('click', () => handleDigitClick(color, i));
       container.appendChild(btn);
     }
-  });
+  } else {
+    if (label) {
+      label.textContent = color === 'w' ? 'W' : 'B';
+      label.classList.remove('label-back');
+      label.onclick = null;
+    }
+    for (let i = 0; i <= 5; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'digit-btn idle';
+      btn.dataset.color = color;
+      btn.dataset.value = i;
+      btn.textContent = i;
+      btn.addEventListener('click', () => handleDigitClick(color, i));
+      container.appendChild(btn);
+    }
+    const expand = document.createElement('button');
+    expand.className = 'digit-btn digit-btn-expand';
+    expand.dataset.color = color;
+    expand.dataset.value = 6;
+    expand.textContent = '6+';
+    expand.addEventListener('click', () => {
+      if (color === 'w') expandedW = true; else expandedB = true;
+      renderDigitRow(containerId, color, true);
+    });
+    container.appendChild(expand);
+  }
 }
 
 function showDifficulty(id, score) {
@@ -497,6 +540,9 @@ function resetDrill() {
   if (fill) fill.style.width = '0%';
   const label = document.getElementById('checks-progress-label');
   if (label) label.textContent = '';
+  expandedW = expandedB = false;
+  renderDigitRow('digits-white', 'w', false);
+  renderDigitRow('digits-black', 'b', false);
 }
 
 function resetUI() {
@@ -506,11 +552,9 @@ function resetUI() {
   hideChecks();
   document.getElementById('checks-timer').textContent = '0:00';
   document.getElementById('checks-misses').textContent = 'Misses: 0';
-  document.querySelectorAll('#screen-checks .digit-btn').forEach(b => {
-    b.classList.remove('correct', 'incorrect', 'flashing');
-    b.classList.add('idle');
-    b.blur();
-  });
+  expandedW = expandedB = false;
+  renderDigitRow('digits-white', 'w', false);
+  renderDigitRow('digits-black', 'b', false);
   if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
 }
 
