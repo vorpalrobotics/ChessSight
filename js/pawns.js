@@ -39,6 +39,7 @@ let currentPuzzleId = '';
 let currentFen = '';
 let currentLastMove = null;
 let showingPawns = false;
+let showColor = 'w';
 let waitingForContinue = false;
 const drillResults = [];
 let navigate = null;
@@ -220,7 +221,8 @@ function getPawnMovesForColor(fen, colorChar) {
 
 function handleShow() {
   if (waitingForContinue) {
-    if (showingPawns) hidePawns(); else showPawns();
+    showColor = showColor === 'w' ? 'b' : 'w';
+    showPawns(showColor);
     return;
   }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
@@ -235,7 +237,8 @@ function handleShow() {
     upsertDrillDay('pawns', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
     updateSessionStats();
   }
-  showPawns();
+  showColor = 'w';
+  showPawns('w');
   setStatus('Click board to continue');
   waitingForContinue = true;
 }
@@ -250,22 +253,25 @@ function handleBoardClick() {
   else loadNextPuzzle();
 }
 
-function showPawns() {
+function showPawns(color) {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearArrowLabels();
   clearNoMovesMessage('pawns-board');
-  // Last-move arrow first (drawn under pawn arrows)
+  // Last-move arrow for context (drawn under pawn arrows)
   if (currentLastMove) board.addArrow(ARROW_LAST_MOVE, currentLastMove.from, currentLastMove.to);
-  for (const m of getPawnMovesForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
-  for (const m of getPawnMovesForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  const totalMoves = answerW + answerB;
-  if (totalMoves === 0) {
-    setTimeout(() => showNoMovesMessage('pawns-board'), 50);
+  const moves = getPawnMovesForColor(currentFen, color);
+  const style = color === 'w' ? ARROW_WHITE_CAP : ARROW_BLACK_CAP;
+  for (const m of moves) board.addArrow(style, m.from, m.to);
+  if (moves.length === 0) {
+    setTimeout(() => showNoMovesMessage('pawns-board', color), 50);
   } else {
-    setTimeout(labelArrows, 50);
+    setTimeout(() => labelPawns(moves, color), 50);
   }
   showingPawns = true;
-  document.getElementById('btn-pawns-show').classList.add('active');
+  const btn = document.getElementById('btn-pawns-show');
+  btn.classList.add('active');
+  btn.textContent = color === 'w' ? 'SHOW B' : 'SHOW W';
 }
 
 function hidePawns() {
@@ -278,34 +284,53 @@ function hidePawns() {
     setTimeout(() => board.addArrow(ARROW_LAST_MOVE, currentLastMove.from, currentLastMove.to), 50);
   }
   showingPawns = false;
+  showColor = 'w';
   const btn = document.getElementById('btn-pawns-show');
-  if (btn) btn.classList.remove('active');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.textContent = 'SHOW';
+  }
 }
 
-function labelArrows() {
+function labelPawns(moves, color) {
   clearArrowLabels();
   const boardEl = document.getElementById('pawns-board');
   const svg = boardEl && boardEl.querySelector('svg');
-  if (!svg) return;
-  ['arrow-white-cap', 'arrow-black-cap'].forEach(cls => {
-    let n = 1;
-    boardEl.querySelectorAll(`.arrow.${cls}`).forEach(group => {
-      const line = group.querySelector('.arrow-line');
-      if (!line) return;
-      const x1 = parseFloat(line.getAttribute('x1'));
-      const y1 = parseFloat(line.getAttribute('y1'));
-      const x2 = parseFloat(line.getAttribute('x2'));
-      const y2 = parseFloat(line.getAttribute('y2'));
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x1 + (x2 - x1) * 0.75);
-      text.setAttribute('y', y1 + (y2 - y1) * 0.75);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('class', 'arrow-label');
-      text.textContent = n++;
-      svg.appendChild(text);
-    });
-  });
+  if (!svg || moves.length === 0) return;
+
+  // Query the specific color class to skip the last-move arrow (drawn first in DOM)
+  const cls = color === 'w' ? 'arrow-white-cap' : 'arrow-black-cap';
+  const firstLine = boardEl.querySelector(`.${cls} .arrow-line`);
+  if (!firstLine) return;
+  const x1c = parseFloat(firstLine.getAttribute('x1'));
+  const y1c = parseFloat(firstLine.getAttribute('y1'));
+  const fromFile = moves[0].from.charCodeAt(0) - 97;
+  const fromRank = parseInt(moves[0].from[1]);
+  const sqW = x1c / (fromFile + 0.5);
+  const sqH = y1c / (8.5 - fromRank);
+
+  const D = sqH * 0.35;
+  const OFFSETS = [[0,0],[0,-D],[0,D],[-D,0],[D,0]];
+
+  const squareCounts = {};
+  let n = 1;
+  for (const m of moves) {
+    const idx = squareCounts[m.to] ?? 0;
+    squareCounts[m.to] = idx + 1;
+    const toFile = m.to.charCodeAt(0) - 97;
+    const toRank = parseInt(m.to[1]);
+    const [dx, dy] = OFFSETS[idx] ?? [0, 0];
+    const cx = (toFile + 0.5) * sqW + dx;
+    const cy = (8.5 - toRank) * sqH + dy;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', cy);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('class', 'arrow-label');
+    text.textContent = n++;
+    svg.appendChild(text);
+  }
 }
 
 function clearArrowLabels() {
@@ -313,7 +338,7 @@ function clearArrowLabels() {
   if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
 }
 
-function showNoMovesMessage(boardId) {
+function showNoMovesMessage(boardId, color) {
   const boardEl = document.getElementById(boardId);
   const svg = boardEl && boardEl.querySelector('svg');
   if (!svg) return;
@@ -326,7 +351,7 @@ function showNoMovesMessage(boardId) {
   text.setAttribute('text-anchor', 'middle');
   text.setAttribute('dominant-baseline', 'central');
   text.setAttribute('class', 'board-none-msg');
-  text.textContent = 'None by either side';
+  text.textContent = color === 'w' ? 'None for White' : color === 'b' ? 'None for Black' : 'None by either side';
   svg.appendChild(text);
 }
 
