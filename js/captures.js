@@ -41,6 +41,7 @@ let puzzleCount = 0;
 let currentPuzzleId = '';
 let currentFen = '';
 let showingCaptures = false;
+let showColor = 'w';
 let waitingForContinue = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;       // injected by app.js for screen transitions
@@ -231,7 +232,8 @@ function countCapturesForColor(fen, colorChar) {
 
 function handleShow() {
   if (waitingForContinue) {
-    if (showingCaptures) hideCaptures(); else showCaptures();
+    showColor = showColor === 'w' ? 'b' : 'w';
+    showCaptures(showColor);
     return;
   }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
@@ -246,7 +248,8 @@ function handleShow() {
     upsertDrillDay('captures', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
     updateSessionStats();
   }
-  showCaptures();
+  showColor = 'w';
+  showCaptures('w');
   setStatus('Click board to continue');
   waitingForContinue = true;
 }
@@ -261,19 +264,23 @@ function handleBoardClick() {
   else loadNextPuzzle();
 }
 
-function showCaptures() {
+function showCaptures(color) {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearArrowLabels();
   clearNoMovesMessage('captures-board');
-  for (const m of getCapturesForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
-  for (const m of getCapturesForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  if (answerW === 0 && answerB === 0) {
+  const moves = getCapturesForColor(currentFen, color);
+  const style = color === 'w' ? ARROW_WHITE_CAP : ARROW_BLACK_CAP;
+  for (const m of moves) board.addArrow(style, m.from, m.to);
+  if (moves.length === 0) {
     setTimeout(() => showNoMovesMessage('captures-board'), 50);
   } else {
-    setTimeout(labelArrows, 50);
+    setTimeout(() => labelCaptures(moves), 50);
   }
   showingCaptures = true;
-  document.getElementById('btn-captures-show').classList.add('active');
+  const btn = document.getElementById('btn-captures-show');
+  btn.classList.add('active');
+  btn.textContent = color === 'w' ? 'SHOW B' : 'SHOW W';
 }
 
 function hideCaptures() {
@@ -282,34 +289,51 @@ function hideCaptures() {
   clearArrowLabels();
   clearNoMovesMessage('captures-board');
   showingCaptures = false;
+  showColor = 'w';
   const btn = document.getElementById('btn-captures-show');
-  if (btn) btn.classList.remove('active');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.textContent = 'SHOW';
+  }
 }
 
-function labelArrows() {
+function labelCaptures(moves) {
   clearArrowLabels();
   const boardEl = document.getElementById('captures-board');
   const svg = boardEl && boardEl.querySelector('svg');
-  if (!svg) return;
-  ['arrow-white-cap', 'arrow-black-cap'].forEach(cls => {
-    let n = 1;
-    boardEl.querySelectorAll(`.arrow.${cls}`).forEach(group => {
-      const line = group.querySelector('.arrow-line');
-      if (!line) return;
-      const x1 = parseFloat(line.getAttribute('x1'));
-      const y1 = parseFloat(line.getAttribute('y1'));
-      const x2 = parseFloat(line.getAttribute('x2'));
-      const y2 = parseFloat(line.getAttribute('y2'));
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x1 + (x2 - x1) * 0.75);
-      text.setAttribute('y', y1 + (y2 - y1) * 0.75);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('class', 'arrow-label');
-      text.textContent = n++;
-      svg.appendChild(text);
-    });
-  });
+  if (!svg || moves.length === 0) return;
+
+  const firstLine = boardEl.querySelector('.arrow-line');
+  if (!firstLine) return;
+  const x1c = parseFloat(firstLine.getAttribute('x1'));
+  const y1c = parseFloat(firstLine.getAttribute('y1'));
+  const fromFile = moves[0].from.charCodeAt(0) - 97;
+  const fromRank = parseInt(moves[0].from[1]);
+  const sqW = x1c / (fromFile + 0.5);
+  const sqH = y1c / (8.5 - fromRank);
+
+  const D = sqH * 0.35;
+  const OFFSETS = [[0,0],[0,-D],[0,D],[-D,0],[D,0]];
+
+  const squareCounts = {};
+  let n = 1;
+  for (const m of moves) {
+    const idx = squareCounts[m.to] ?? 0;
+    squareCounts[m.to] = idx + 1;
+    const toFile = m.to.charCodeAt(0) - 97;
+    const toRank = parseInt(m.to[1]);
+    const [dx, dy] = OFFSETS[idx] ?? [0, 0];
+    const cx = (toFile + 0.5) * sqW + dx;
+    const cy = (8.5 - toRank) * sqH + dy;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', cy);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('class', 'arrow-label');
+    text.textContent = n++;
+    svg.appendChild(text);
+  }
 }
 
 function clearArrowLabels() {

@@ -879,8 +879,9 @@ h2 .drill-info-btn {
   color: var(--text-muted);
   border-radius: 6px;
 }
-/* Prevent layout shift when checks SHOW button text changes to "SHOW B"/"SHOW W" */
-#btn-checks-show { min-width: 4.5rem; }
+/* Prevent layout shift when SHOW button text changes to "SHOW B"/"SHOW W" */
+#btn-checks-show,
+#btn-captures-show { min-width: 4.5rem; }
 #btn-threats-show.active,
 #btn-under-show.active,
 #btn-loose-show.active,
@@ -918,8 +919,9 @@ h2 .drill-info-btn {
 }
 
 /* Custom arrow colors for Captures SHOW feature */
-/* Checks drill: lines only, no arrowheads — numbers sit at destination square centers */
-#checks-board .arrow-head { display: none; }
+/* Checks/Captures drills: lines only, no arrowheads — numbers sit at destination square centers */
+#checks-board .arrow-head,
+#captures-board .arrow-head { display: none; }
 
 .cm-chessboard .arrow-white-cap {
   filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.7));
