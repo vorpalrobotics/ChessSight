@@ -261,7 +261,7 @@ function showChecks(color) {
   const style = color === 'w' ? ARROW_WHITE_CAP : ARROW_BLACK_CAP;
   for (const m of moves) board.addArrow(style, m.from, m.to);
   if (moves.length === 0) {
-    setTimeout(() => showNoMovesMessage('checks-board'), 50);
+    setTimeout(() => showNoMovesMessage('checks-board', color), 50);
   } else {
     setTimeout(() => labelChecks(moves), 50);
   }
@@ -333,7 +333,7 @@ function clearArrowLabels() {
   if (boardEl) boardEl.querySelectorAll('.arrow-label').forEach(el => el.remove());
 }
 
-function showNoMovesMessage(boardId) {
+function showNoMovesMessage(boardId, color) {
   const boardEl = document.getElementById(boardId);
   const svg = boardEl && boardEl.querySelector('svg');
   if (!svg) return;
@@ -346,7 +346,7 @@ function showNoMovesMessage(boardId) {
   text.setAttribute('text-anchor', 'middle');
   text.setAttribute('dominant-baseline', 'central');
   text.setAttribute('class', 'board-none-msg');
-  text.textContent = 'None by either side';
+  text.textContent = color === 'w' ? 'None for White' : color === 'b' ? 'None for Black' : 'None by either side';
   svg.appendChild(text);
 }
 
