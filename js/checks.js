@@ -289,13 +289,22 @@ function labelChecks(moves) {
   clearArrowLabels();
   const boardEl = document.getElementById('checks-board');
   const svg = boardEl && boardEl.querySelector('svg');
-  if (!svg) return;
-  const vb = svg.viewBox.baseVal;
-  if (!vb || !vb.width) return;
-  const sqW = vb.width / 8;
-  const sqH = vb.height / 8;
-  const D = sqH * 0.35; // offset distance for stacked labels
-  // 5 positions per square: center, above, below, left, right
+  if (!svg || moves.length === 0) return;
+
+  // Calibrate SVG coordinate space from the first drawn arrow's source square.
+  // arrow-line x1,y1 = center of source square in SVG units (no offset since
+  // board coordinates are disabled and board fills the SVG from origin).
+  const firstLine = boardEl.querySelector('.arrow-line');
+  if (!firstLine) return;
+  const x1c = parseFloat(firstLine.getAttribute('x1'));
+  const y1c = parseFloat(firstLine.getAttribute('y1'));
+  const fromFile = moves[0].from.charCodeAt(0) - 97;
+  const fromRank = parseInt(moves[0].from[1]);
+  const sqW = x1c / (fromFile + 0.5);
+  const sqH = y1c / (8.5 - fromRank);
+
+  const D = sqH * 0.35;
+  // 5 label positions per square: center, above, below, left, right
   const OFFSETS = [[0,0],[0,-D],[0,D],[-D,0],[D,0]];
 
   const squareCounts = {};
@@ -303,11 +312,11 @@ function labelChecks(moves) {
   for (const m of moves) {
     const idx = squareCounts[m.to] ?? 0;
     squareCounts[m.to] = idx + 1;
-    const file = m.to.charCodeAt(0) - 97;
-    const rank = parseInt(m.to[1]);
+    const toFile = m.to.charCodeAt(0) - 97;
+    const toRank = parseInt(m.to[1]);
     const [dx, dy] = OFFSETS[idx] ?? [0, 0];
-    const cx = (file + 0.5) * sqW + dx;
-    const cy = (8.5 - rank) * sqH + dy;
+    const cx = (toFile + 0.5) * sqW + dx;
+    const cy = (8.5 - toRank) * sqH + dy;
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', cx);
     text.setAttribute('y', cy);
