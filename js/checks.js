@@ -41,6 +41,7 @@ let puzzleCount = 0;
 let currentPuzzleId = '';
 let currentFen = '';
 let showingChecks = false;
+let showColor = 'w';
 let waitingForContinue = false;
 const drillResults = [];   // { seconds, correct, misses } per completed puzzle
 let navigate = null;
@@ -219,14 +220,12 @@ function countChecksForColor(fen, colorChar) {
 
 function handleShow() {
   if (waitingForContinue) {
-    // While waiting, allow toggling arrows off/on to study the position
-    if (showingChecks) hideChecks(); else showChecks();
+    showColor = showColor === 'w' ? 'b' : 'w';
+    showChecks(showColor);
     return;
   }
-  // Cancel any pending auto-advance
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
-  // End the puzzle if still active (user revealed before getting both right)
   if (puzzleActive) {
     puzzleActive = false;
     stopTimer();
@@ -237,7 +236,8 @@ function handleShow() {
     upsertDrillDay('checks', { seconds, correct: correctAnswers, misses, puzzleId: currentPuzzleId });
     updateSessionStats();
   }
-  showChecks();
+  showColor = 'w';
+  showChecks('w');
   setStatus('Click board to continue');
   waitingForContinue = true;
 }
@@ -252,19 +252,23 @@ function handleBoardClick() {
   else loadNextPuzzle();
 }
 
-function showChecks() {
+function showChecks(color) {
   if (!board || !currentFen) return;
   board.removeArrows();
+  clearArrowLabels();
   clearNoMovesMessage('checks-board');
-  for (const m of getChecksForColor(currentFen, 'w')) board.addArrow(ARROW_WHITE_CAP, m.from, m.to);
-  for (const m of getChecksForColor(currentFen, 'b')) board.addArrow(ARROW_BLACK_CAP, m.from, m.to);
-  if (answerW === 0 && answerB === 0) {
+  const moves = getChecksForColor(currentFen, color);
+  const style = color === 'w' ? ARROW_WHITE_CAP : ARROW_BLACK_CAP;
+  for (const m of moves) board.addArrow(style, m.from, m.to);
+  if (moves.length === 0) {
     setTimeout(() => showNoMovesMessage('checks-board'), 50);
   } else {
-    setTimeout(labelArrows, 50);
+    setTimeout(() => labelChecks(moves), 50);
   }
   showingChecks = true;
-  document.getElementById('btn-checks-show').classList.add('active');
+  const btn = document.getElementById('btn-checks-show');
+  btn.classList.add('active');
+  btn.textContent = color === 'w' ? 'SHOW B' : 'SHOW W';
 }
 
 function hideChecks() {
@@ -273,34 +277,44 @@ function hideChecks() {
   clearArrowLabels();
   clearNoMovesMessage('checks-board');
   showingChecks = false;
+  showColor = 'w';
   const btn = document.getElementById('btn-checks-show');
-  if (btn) btn.classList.remove('active');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.textContent = 'SHOW';
+  }
 }
 
-function labelArrows() {
+function labelChecks(moves) {
   clearArrowLabels();
   const boardEl = document.getElementById('checks-board');
   const svg = boardEl && boardEl.querySelector('svg');
   if (!svg) return;
-  ['arrow-white-cap', 'arrow-black-cap'].forEach(cls => {
-    let n = 1;
-    boardEl.querySelectorAll(`.arrow.${cls}`).forEach(group => {
-      const line = group.querySelector('.arrow-line');
-      if (!line) return;
-      const x1 = parseFloat(line.getAttribute('x1'));
-      const y1 = parseFloat(line.getAttribute('y1'));
-      const x2 = parseFloat(line.getAttribute('x2'));
-      const y2 = parseFloat(line.getAttribute('y2'));
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x1 + (x2 - x1) * 0.75);
-      text.setAttribute('y', y1 + (y2 - y1) * 0.75);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('class', 'arrow-label');
-      text.textContent = n++;
-      svg.appendChild(text);
-    });
-  });
+  const vb = svg.viewBox.baseVal;
+  if (!vb || !vb.width) return;
+  const sqW = vb.width / 8;
+  const sqH = vb.height / 8;
+  const OFFSET = sqH * 0.4;
+
+  const squareCounts = {};
+  let n = 1;
+  for (const m of moves) {
+    const idx = squareCounts[m.to] ?? 0;
+    squareCounts[m.to] = idx + 1;
+    const file = m.to.charCodeAt(0) - 97;
+    const rank = parseInt(m.to[1]);
+    const cx = (file + 0.5) * sqW;
+    const yOff = ([0, -OFFSET, OFFSET][idx]) ?? 0;
+    const cy = (8.5 - rank) * sqH + yOff;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', cy);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('class', 'arrow-label');
+    text.textContent = n++;
+    svg.appendChild(text);
+  }
 }
 
 function clearArrowLabels() {
