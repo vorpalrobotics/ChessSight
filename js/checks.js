@@ -294,7 +294,9 @@ function labelChecks(moves) {
   if (!vb || !vb.width) return;
   const sqW = vb.width / 8;
   const sqH = vb.height / 8;
-  const OFFSET = sqH * 0.4;
+  const D = sqH * 0.35; // offset distance for stacked labels
+  // 5 positions per square: center, above, below, left, right
+  const OFFSETS = [[0,0],[0,-D],[0,D],[-D,0],[D,0]];
 
   const squareCounts = {};
   let n = 1;
@@ -303,9 +305,9 @@ function labelChecks(moves) {
     squareCounts[m.to] = idx + 1;
     const file = m.to.charCodeAt(0) - 97;
     const rank = parseInt(m.to[1]);
-    const cx = (file + 0.5) * sqW;
-    const yOff = ([0, -OFFSET, OFFSET][idx]) ?? 0;
-    const cy = (8.5 - rank) * sqH + yOff;
+    const [dx, dy] = OFFSETS[idx] ?? [0, 0];
+    const cx = (file + 0.5) * sqW + dx;
+    const cy = (8.5 - rank) * sqH + dy;
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', cx);
     text.setAttribute('y', cy);
