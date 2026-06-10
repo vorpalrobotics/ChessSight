@@ -73,6 +73,7 @@ export async function startLoose() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
+  showBoardLoading();
   await fillQueue();
   await loadNextPuzzle();   // starts timer internally
   stopTimer();
@@ -116,6 +117,7 @@ async function loadNextPuzzle() {
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
+    showBoardLoading();
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
@@ -135,6 +137,7 @@ async function loadNextPuzzle() {
   } else {
     board.setPosition(currentFen, false);
   }
+  hideBoardLoading();
 
   updateSessionStats();
   setStatus('');
@@ -464,6 +467,14 @@ function resetUI() {
   clearAllMarks();
   document.getElementById('loose-timer').textContent   = '0:00';
   document.getElementById('loose-misses').textContent  = 'Misses: 0';
+}
+
+function showBoardLoading() {
+  document.getElementById('loose-board-loading')?.classList.remove('hidden');
+}
+
+function hideBoardLoading() {
+  document.getElementById('loose-board-loading')?.classList.add('hidden');
 }
 
 function setStatus(msg) {
