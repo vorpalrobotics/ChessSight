@@ -65,6 +65,7 @@ export async function startPawns() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
+  showBoardLoading();
   await fillQueue();
   await loadNextPuzzle();
   stopTimer();
@@ -108,6 +109,7 @@ async function loadNextPuzzle() {
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
+    showBoardLoading();
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
@@ -129,6 +131,7 @@ async function loadNextPuzzle() {
   } else {
     board.setPosition(currentFen, false);
   }
+  hideBoardLoading();
 
   // Show the last-move arrow so en passant context is visible
   if (currentLastMove) {
@@ -591,6 +594,14 @@ function resetUI() {
     b.blur();
   });
   if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
+}
+
+function showBoardLoading() {
+  document.getElementById('pawns-board-loading')?.classList.remove('hidden');
+}
+
+function hideBoardLoading() {
+  document.getElementById('pawns-board-loading')?.classList.add('hidden');
 }
 
 function setStatus(msg) {

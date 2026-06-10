@@ -79,6 +79,7 @@ export async function startCaptures() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
+  showBoardLoading();
   await fillQueue();
   await loadNextPuzzle();   // starts timer internally
   stopTimer();
@@ -120,6 +121,7 @@ async function loadNextPuzzle() {
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
+    showBoardLoading();
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
@@ -140,6 +142,7 @@ async function loadNextPuzzle() {
   } else {
     board.setPosition(currentFen, false);
   }
+  hideBoardLoading();
 
   updateSessionStats();
   setStatus('');
@@ -582,6 +585,14 @@ function resetUI() {
   renderDigitRow('cap-digits-white', 'w', false);
   renderDigitRow('cap-digits-black', 'b', false);
   if (document.activeElement?.classList.contains('digit-btn')) document.activeElement.blur();
+}
+
+function showBoardLoading() {
+  document.getElementById('captures-board-loading')?.classList.remove('hidden');
+}
+
+function hideBoardLoading() {
+  document.getElementById('captures-board-loading')?.classList.add('hidden');
 }
 
 function setStatus(msg) {
