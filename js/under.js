@@ -72,6 +72,7 @@ export async function startUnder() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
+  showBoardLoading();
   await fillQueue();
   await loadNextPuzzle();   // starts timer internally
   stopTimer();
@@ -115,6 +116,7 @@ async function loadNextPuzzle() {
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
+    showBoardLoading();
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
@@ -134,6 +136,7 @@ async function loadNextPuzzle() {
   } else {
     board.setPosition(currentFen, false);
   }
+  hideBoardLoading();
 
   updateSessionStats();
   setStatus('');
@@ -457,6 +460,14 @@ function resetUI() {
   clearAllMarks();
   document.getElementById('under-timer').textContent   = '0:00';
   document.getElementById('under-misses').textContent  = 'Misses: 0';
+}
+
+function showBoardLoading() {
+  document.getElementById('under-board-loading')?.classList.remove('hidden');
+}
+
+function hideBoardLoading() {
+  document.getElementById('under-board-loading')?.classList.add('hidden');
 }
 
 function setStatus(msg) {
