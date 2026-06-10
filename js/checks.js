@@ -79,6 +79,7 @@ export async function startChecks() {
   registerPause(stopTimer, startTimer);
   resetDrill();
   setStatus('Loading session…');
+  showBoardLoading();
   await fillQueue();
   await loadNextPuzzle();   // starts timer internally
   stopTimer();
@@ -120,6 +121,7 @@ async function loadNextPuzzle() {
 
   if (puzzleQueue.length === 0) {
     setStatus('Loading…');
+    showBoardLoading();
     await fillQueue();
   }
   const puzzle = puzzleQueue.shift();
@@ -141,6 +143,7 @@ async function loadNextPuzzle() {
   } else {
     board.setPosition(currentFen, false);
   }
+  hideBoardLoading();
 
   updateSessionStats();
   setStatus('');
@@ -353,6 +356,14 @@ function showNoMovesMessage(boardId, color) {
 function clearNoMovesMessage(boardId) {
   const boardEl = document.getElementById(boardId);
   if (boardEl) boardEl.querySelectorAll('.board-none-msg').forEach(el => el.remove());
+}
+
+function showBoardLoading() {
+  document.getElementById('checks-board-loading')?.classList.remove('hidden');
+}
+
+function hideBoardLoading() {
+  document.getElementById('checks-board-loading')?.classList.add('hidden');
 }
 
 // --- Digit button interaction ---
