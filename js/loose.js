@@ -34,7 +34,8 @@ const drillResults = [];
 let navigate = null;
 let puzzleQueue = [];
 let queueVersion = 0;
-let seenIds = new Set();
+let seenIds = new Set();   // puzzle IDs shown this page session — prevents repeats across restarts
+let seenFens = new Set();  // FENs shown this page session — catches fallback-FEN repeats too
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
 
@@ -152,8 +153,10 @@ async function fetchValidFen() {
     try {
       const { fen, puzzleId } = await fetchLichessPuzzle();
       if (puzzleId && seenIds.has(puzzleId)) continue;
+      if (seenFens.has(fen)) continue;
       if (!eitherSideInCheck(fen)) {
         if (puzzleId) seenIds.add(puzzleId);
+        seenFens.add(fen);
         return { fen, puzzleId };
       }
       console.log('Skipping position where a side is in check');
@@ -162,7 +165,12 @@ async function fetchValidFen() {
       break;
     }
   }
-  return { fen: FALLBACK_FENS[Math.floor(Math.random() * FALLBACK_FENS.length)], puzzleId: '' };
+  // Prefer a fallback FEN not yet seen this session; if all 7 are exhausted, allow repeats.
+  const unused = FALLBACK_FENS.filter(f => !seenFens.has(f));
+  const pool = unused.length > 0 ? unused : FALLBACK_FENS;
+  const fen = pool[Math.floor(Math.random() * pool.length)];
+  seenFens.add(fen);
+  return { fen, puzzleId: '' };
 }
 
 function eitherSideInCheck(fen) {
@@ -449,7 +457,8 @@ function resetDrill() {
   if (autoSummaryTimer) { clearTimeout(autoSummaryTimer); autoSummaryTimer = null; }
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   queueVersion++;
-  seenIds = new Set();
+  // seenIds/seenFens intentionally persist across restarts to avoid repeat
+  // puzzles within the same page session.
   puzzleCount = 0;
   drillResults.length = 0;
   puzzleQueue = [];
