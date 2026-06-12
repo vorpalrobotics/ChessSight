@@ -308,6 +308,7 @@ export async function addFallbackFen(fen) {
       if (getReq.result) return; // already in the pool
 
       store.put({ fen, ts: Date.now() });
+      console.log(`[fallbackFens] added FEN to pool: ${fen}`);
 
       const countReq = store.count();
       countReq.onsuccess = () => {
@@ -315,7 +316,10 @@ export async function addFallbackFen(fen) {
           const cursorReq = store.index('ts').openCursor();
           cursorReq.onsuccess = e => {
             const cursor = e.target.result;
-            if (cursor) store.delete(cursor.primaryKey);
+            if (cursor) {
+              console.log(`[fallbackFens] pool over cap (${FALLBACK_FEN_CAP}), evicting oldest: ${cursor.value.fen}`);
+              store.delete(cursor.primaryKey);
+            }
           };
         }
       };

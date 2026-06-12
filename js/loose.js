@@ -162,7 +162,9 @@ async function fetchValidFen() {
   // Walk the shared fallback pool sequentially (random start offset) so the
   // full pool is covered before any position repeats.
   const pool = await getFallbackPool();
-  const fen = pool[fallbackIndex % pool.length];
+  const idx = fallbackIndex % pool.length;
+  const fen = pool[idx];
+  console.log(`[loose] using fallback FEN pool index ${idx} of ${pool.length} (fallbackIndex=${fallbackIndex}): ${fen}`);
   fallbackIndex++;
   seenFens.add(fen);
   return { fen, puzzleId: '' };
