@@ -1,10 +1,12 @@
 const DB_NAME = 'ChessSight';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 const STORE = 'drillDays';
 const GAME_STORE = 'disciplineGames';
 const GOALS_STORE = 'goals';
 const PB_STORE = 'personalBests';
 const BB_STORE = 'bbPuzzles';
+const FALLBACK_FEN_STORE = 'fallbackFens';
+const FALLBACK_FEN_CAP = 100;
 
 // Lazy singleton DB connection
 let _dbPromise = null;
@@ -36,6 +38,11 @@ function openDB() {
       // v5: blunder buster generated puzzles
       if (!db.objectStoreNames.contains(BB_STORE)) {
         db.createObjectStore(BB_STORE, { keyPath: 'id', autoIncrement: true });
+      }
+      // v6: shared pool of fallback FENs harvested from successful lichess fetches
+      if (!db.objectStoreNames.contains(FALLBACK_FEN_STORE)) {
+        const store = db.createObjectStore(FALLBACK_FEN_STORE, { keyPath: 'fen' });
+        store.createIndex('ts', 'ts');
       }
     };
 
@@ -281,6 +288,53 @@ export async function getBBPuzzleCount() {
     const tx  = db.transaction(BB_STORE, 'readonly');
     const req = tx.objectStore(BB_STORE).count();
     req.onsuccess = () => resolve(req.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Add a FEN to the shared fallback pool if not already present.
+ * Caps the pool at FALLBACK_FEN_CAP entries, evicting the oldest when full.
+ * Intended to be called fire-and-forget after a successful lichess fetch.
+ */
+export async function addFallbackFen(fen) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(FALLBACK_FEN_STORE, 'readwrite');
+    const store = tx.objectStore(FALLBACK_FEN_STORE);
+
+    const getReq = store.get(fen);
+    getReq.onsuccess = () => {
+      if (getReq.result) return; // already in the pool
+
+      store.put({ fen, ts: Date.now() });
+
+      const countReq = store.count();
+      countReq.onsuccess = () => {
+        if (countReq.result > FALLBACK_FEN_CAP) {
+          const cursorReq = store.index('ts').openCursor();
+          cursorReq.onsuccess = e => {
+            const cursor = e.target.result;
+            if (cursor) store.delete(cursor.primaryKey);
+          };
+        }
+      };
+    };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror    = e => reject(e.target.error);
+  });
+}
+
+/**
+ * Return all FENs in the shared fallback pool.
+ */
+export async function getAllFallbackFens() {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(FALLBACK_FEN_STORE, 'readonly');
+    const req = tx.objectStore(FALLBACK_FEN_STORE).getAll();
+    req.onsuccess = () => resolve(req.result.map(r => r.fen));
     req.onerror   = e => reject(e.target.error);
   });
 }

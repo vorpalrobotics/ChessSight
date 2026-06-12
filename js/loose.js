@@ -1,6 +1,7 @@
 import { Chessboard, COLOR } from 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js';
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1/+esm';
-import { upsertDrillDay } from './storage.js';
+import { upsertDrillDay, addFallbackFen, getAllFallbackFens } from './storage.js';
+import { SEED_FALLBACK_FENS } from './fallback-fens.js';
 import { checkAndUpdatePB, showPBCelebration, checkGoals, showGoalCelebration, updateSummaryGoals, setSummaryResultMsg } from './pb.js';
 import { scoreCountDifficulty, diffLabel } from './difficulty.js';
 import { registerPause } from './pause.js';
@@ -8,16 +9,6 @@ import { runWalkthrough } from './walkthrough.js';
 import { buildWalkthrough } from './helptext.js';
 
 const PIECES_URL = 'https://cdn.jsdelivr.net/npm/cm-chessboard@8/assets/pieces/standard.svg';
-
-const FALLBACK_FENS = [
-  'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-  'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 5 6',
-  'rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 b - - 0 8',
-  'r2qkb1r/ppp2ppp/2np1n2/4p1B1/2B1P3/2NP1N2/PPP2PPP/R2QK2R b KQkq - 1 8',
-  'r1bqr1k1/ppp2pbp/2np1np1/3Pp3/2P5/2N1BNP1/PP2PPBP/R2Q1RK1 w - - 2 10',
-  'r2q1rk1/ppp1bppp/2n1bn2/3pp3/2PP4/2N1PN2/PPQ1BPPP/R1B2RK1 w - - 4 10',
-  'r1b2rk1/ppq1bppp/2n1pn2/3pN3/2PP4/2N1B3/PPQ1BPPP/R4RK1 w - - 0 12',
-];
 
 // --- Module state ---
 let board = null;
@@ -36,6 +27,8 @@ let puzzleQueue = [];
 let queueVersion = 0;
 let seenIds = new Set();   // puzzle IDs shown this page session — prevents repeats across restarts
 let seenFens = new Set();  // FENs shown this page session — catches fallback-FEN repeats too
+let fallbackPool = null;   // seed FENs + IDB-harvested FENs, loaded lazily
+let fallbackIndex = Math.floor(Math.random() * 1000); // random start, walks the pool sequentially
 let autoSummaryTimer = null;
 let autoAdvanceTimer = null;
 
@@ -157,6 +150,7 @@ async function fetchValidFen() {
       if (!eitherSideInCheck(fen)) {
         if (puzzleId) seenIds.add(puzzleId);
         seenFens.add(fen);
+        addFallbackFen(fen).catch(() => {}); // opportunistically grow the shared pool
         return { fen, puzzleId };
       }
       console.log('Skipping position where a side is in check');
@@ -165,12 +159,28 @@ async function fetchValidFen() {
       break;
     }
   }
-  // Prefer a fallback FEN not yet seen this session; if all 7 are exhausted, allow repeats.
-  const unused = FALLBACK_FENS.filter(f => !seenFens.has(f));
-  const pool = unused.length > 0 ? unused : FALLBACK_FENS;
-  const fen = pool[Math.floor(Math.random() * pool.length)];
+  // Walk the shared fallback pool sequentially (random start offset) so the
+  // full pool is covered before any position repeats.
+  const pool = await getFallbackPool();
+  const fen = pool[fallbackIndex % pool.length];
+  fallbackIndex++;
   seenFens.add(fen);
   return { fen, puzzleId: '' };
+}
+
+async function getFallbackPool() {
+  if (!fallbackPool) {
+    let idbFens = [];
+    try {
+      idbFens = await getAllFallbackFens();
+    } catch (err) {
+      console.warn('Could not load fallback FEN pool from IDB:', err.message);
+    }
+    const seedSet = new Set(SEED_FALLBACK_FENS);
+    const extra = idbFens.filter(f => !seedSet.has(f));
+    fallbackPool = [...SEED_FALLBACK_FENS, ...extra];
+  }
+  return fallbackPool;
 }
 
 function eitherSideInCheck(fen) {
