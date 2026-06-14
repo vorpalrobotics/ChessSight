@@ -118,6 +118,10 @@ async function loadNextPuzzle() {
   currentLastMove = puzzle.lastMove;
   answerW         = puzzle.answerW;
   answerB         = puzzle.answerB;
+  if (autoAdvanceCountsEnabled()) {
+    if (answerW >= 6) { expandedW = true; renderDigitRow('pawns-digits-white', 'w', true); }
+    if (answerB >= 6) { expandedB = true; renderDigitRow('pawns-digits-black', 'b', true); }
+  }
   showDifficulty('pawns-diff', puzzle.difficulty);
   if (puzzleQueue.length === 0) fillQueue();
 
@@ -413,6 +417,10 @@ function getPositionsPerDrill() {
   const el = document.getElementById('select-positions-per-drill');
   if (!el || el.value === 'unlimited') return null;
   return parseInt(el.value, 10);
+}
+
+function autoAdvanceCountsEnabled() {
+  return localStorage.getItem('chesssight-auto-advance-counts') === 'true';
 }
 
 function updateProgress() {

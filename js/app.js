@@ -249,6 +249,14 @@ chkAccuracyWarnings.addEventListener('change', () => {
   if (chkAccuracyWarnings.checked) localStorage.removeItem('chesssight-acc-warning-date');
 });
 
+// Persist "auto-expand large counts" to localStorage
+const chkAutoAdvanceCounts = document.getElementById('chk-auto-advance-counts');
+const AUTO_ADVANCE_COUNTS_KEY = 'chesssight-auto-advance-counts';
+chkAutoAdvanceCounts.checked = localStorage.getItem(AUTO_ADVANCE_COUNTS_KEY) === 'true';
+chkAutoAdvanceCounts.addEventListener('change', () => {
+  localStorage.setItem(AUTO_ADVANCE_COUNTS_KEY, chkAutoAdvanceCounts.checked);
+});
+
 // Accuracy warning modal
 const modalAccWarning = document.getElementById('modal-acc-warning');
 

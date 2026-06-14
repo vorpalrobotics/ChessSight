@@ -127,6 +127,7 @@ export const DRILL_HELP = {
     title: 'Settings',
     body: `<p class=helpText><strong>Positions per drill</strong> sets how many puzzles are served before the session ends and you see the summary screen. Set it to Unlimited to keep drilling until you tap END DRILL manually.</p>
 <p class=helpText><strong>Multiply positions for Mix Drill</strong> — when checked, the Mix drill automatically multiplies the Positions per drill value by the number of drill types you select. For example, if Positions per drill is 5 and you select 4 drill types, the Mix session will run for 20 puzzles. This way each drill type gets roughly equal representation. You can always override the final count on the Mix selection screen before starting.</p>
+<p class=helpText><strong>Auto-expand large counts</strong> — in count drills (Checks, Captures, Pawn Push), the answer buttons normally show 0-5 with a "6+" button to reveal 6-12+. When this is on, if the correct count for a side is 6 or more, that side's row automatically opens to the 6-12+ buttons, saving a tap. It only reveals that the answer is "6 or more" — it never reveals the exact count.</p>
 <p class=helpText>Settings are saved locally in your browser and persist between sessions.</p>`,
   },
 
